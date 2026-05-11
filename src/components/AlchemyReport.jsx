@@ -1,6 +1,7 @@
 import React from 'react';
 import alchemyData from '../../design/alchemy-v1-data.json';
 import './alchemy-report.css';
+import './alchemy-report-ornate.css';
 
 export const ALCHEMY_PAGE_ORDER = ['1', '2', '3', '4'];
 
@@ -98,10 +99,11 @@ function PageTwo({ data }) {
 
 function PageThree({ data }) {
   const flow = [
-    ['надежда', 'Gorse'],
-    ['границы', 'Centaury'],
-    ['смелость', 'Mimulus'],
-    ['ритм', 'Impatiens'],
+    ['свет', 'Mustard'],
+    ['границы', 'Cherry Plum'],
+    ['выбор', 'Scleranthus'],
+    ['защита', 'Aspen'],
+    ['сохранить себя', 'Sweet Chestnut'],
   ];
 
   return (
