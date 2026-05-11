@@ -1,0 +1,436 @@
+.alchemy-page-stack {
+  gap: 28px;
+}
+
+.alchemy-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 22mm 18mm 16mm;
+  position: relative;
+  overflow: hidden;
+  border-radius: 26px;
+  border: 1px solid rgba(98, 62, 24, 0.34);
+  color: #27313f;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(213, 153, 60, 0.24), transparent 26%),
+    radial-gradient(circle at 8% 88%, rgba(111, 67, 24, 0.13), transparent 28%),
+    linear-gradient(180deg, #f4dfbb 0%, #efe0c0 48%, #ead4aa 100%);
+  box-shadow: 0 26px 70px rgba(83, 55, 25, 0.15);
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.alchemy-page::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(126, 78, 24, 0.34);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.alchemy-page::after {
+  content: "✦   ☉   △   ☽   ✦";
+  position: absolute;
+  right: 22mm;
+  bottom: 14mm;
+  color: rgba(117, 74, 27, 0.32);
+  font-size: 0.9rem;
+  letter-spacing: 0.5em;
+}
+
+.alchemy-page-border {
+  position: absolute;
+  inset: 8mm;
+  border: 2px solid rgba(86, 52, 17, 0.55);
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+.alchemy-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding-bottom: 14px;
+  margin-bottom: 22px;
+  border-bottom: 2px solid rgba(139, 87, 31, 0.62);
+}
+
+.alchemy-brand {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2.45rem;
+  line-height: 0.95;
+  font-weight: 700;
+  color: #302b25;
+}
+
+.alchemy-subtitle {
+  margin: 10px 0 0;
+  color: #70491e;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.alchemy-header h2 {
+  margin: 24px 0 0;
+  font-size: 2.45rem;
+  line-height: 1.05;
+  color: #25262b;
+}
+
+.alchemy-seal {
+  width: 78px;
+  height: 78px;
+  border: 3px solid #9b672a;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: #593816;
+  font-weight: 700;
+  font-size: 0.78rem;
+  flex: 0 0 auto;
+}
+
+.alchemy-seal::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(155, 103, 42, 0.5);
+  border-radius: 50%;
+}
+
+.alchemy-seal-triangle {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-left: 1px solid #9b672a;
+  border-bottom: 1px solid #9b672a;
+  transform: rotate(-45deg) translateY(-3px);
+}
+
+.alchemy-page-content,
+.alchemy-header,
+.alchemy-footer {
+  position: relative;
+  z-index: 2;
+}
+
+.alchemy-footer {
+  position: absolute;
+  left: 22mm;
+  bottom: 15mm;
+  color: #70491e;
+  font-size: 0.92rem;
+}
+
+.alchemy-white-note {
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid rgba(140, 88, 31, 0.48);
+  border-radius: 24px;
+  padding: 22px 24px;
+  box-shadow: 9px 11px 0 rgba(112, 77, 34, 0.1);
+  color: #27313f;
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+.alchemy-white-note p {
+  margin: 0;
+  white-space: pre-line;
+  font-size: 1.04rem;
+  line-height: 1.62;
+}
+
+.alchemy-white-note h3,
+.alchemy-white-note h4 {
+  margin: 0 0 12px;
+  color: #7f4d18;
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.alchemy-white-note h3 {
+  font-size: 1.55rem;
+}
+
+.alchemy-white-note h4 {
+  margin-top: 18px;
+  font-size: 1.1rem;
+}
+
+.alchemy-live-start {
+  margin-bottom: 18px !important;
+  color: #874f16;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2.2rem !important;
+  font-weight: 700;
+}
+
+.alchemy-diagnosis-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 24px;
+  align-items: start;
+}
+
+.alchemy-main-letter {
+  min-height: 650px;
+}
+
+.alchemy-side-notes {
+  display: grid;
+  gap: 16px;
+  padding-top: 210px;
+}
+
+.alchemy-side-note {
+  border: 1px solid rgba(139, 87, 31, 0.45);
+  border-radius: 18px;
+  background: rgba(250, 237, 207, 0.84);
+  padding: 16px;
+}
+
+.alchemy-side-note span {
+  display: block;
+  color: #7a4c19;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.alchemy-side-note strong {
+  display: block;
+  margin-top: 8px;
+  color: #27313f;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+.alchemy-pentagram {
+  position: absolute;
+  right: 36mm;
+  top: 88mm;
+  width: 205px;
+  height: 205px;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.alchemy-pentagram circle,
+.alchemy-pentagram path {
+  fill: none;
+  stroke: rgba(137, 82, 23, 0.58);
+  stroke-width: 2;
+}
+
+.alchemy-pentagram text {
+  fill: rgba(71, 51, 28, 0.78);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: Georgia, serif;
+}
+
+.alchemy-decode-grid,
+.alchemy-message-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.alchemy-remedy-decode {
+  min-height: 235px;
+  position: relative;
+  padding-left: 92px;
+}
+
+.alchemy-remedy-medallion {
+  position: absolute;
+  left: 22px;
+  top: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #a55a35, #70491e);
+  color: #fff9ed;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.alchemy-remedy-element,
+.alchemy-remedy-marker,
+.alchemy-transformation,
+.alchemy-formula-line.muted {
+  color: #7a4c19;
+}
+
+.alchemy-remedy-decode h3,
+.alchemy-message-card h3 {
+  color: #27313f;
+  margin-bottom: 4px;
+}
+
+.alchemy-remedy-marker,
+.alchemy-transformation {
+  margin-bottom: 12px !important;
+  font-weight: 700;
+}
+
+.alchemy-wide-note {
+  margin-top: 18px;
+}
+
+.alchemy-inner-mechanism {
+  background: rgba(250, 237, 207, 0.94);
+}
+
+.alchemy-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.alchemy-flow-pill {
+  flex: 1;
+  border-radius: 999px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 4px;
+  min-height: 76px;
+}
+
+.alchemy-flow-pill strong {
+  font-size: 1.05rem;
+}
+
+.alchemy-flow-pill span {
+  font-size: 0.86rem;
+}
+
+.alchemy-flow-1,
+.alchemy-flow-4 {
+  background: #45382b;
+  color: #fff4df;
+}
+
+.alchemy-flow-2 {
+  background: #ead8b8;
+  color: #27313f;
+}
+
+.alchemy-flow-3 {
+  background: #d99c37;
+  color: #27313f;
+}
+
+.alchemy-flow-arrow {
+  color: #8f5b20;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.alchemy-prescription-note {
+  min-height: 650px;
+}
+
+.alchemy-prescription-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0 4px;
+}
+
+.alchemy-prescription-columns > div {
+  background: rgba(244, 226, 190, 0.7);
+  border: 1px solid rgba(140, 88, 31, 0.24);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.alchemy-closing-line {
+  margin-top: 18px !important;
+  color: #7a4c19;
+  font-weight: 700;
+}
+
+.alchemy-message-card {
+  min-height: 230px;
+}
+
+.alchemy-future-note {
+  background: rgba(250, 237, 207, 0.94);
+}
+
+.alchemy-final-formula {
+  margin-top: 18px;
+  border: 1px solid rgba(140, 88, 31, 0.42);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f2dcae, #e5c37a);
+  color: #74440e;
+  padding: 24px;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2.05rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+@media (max-width: 960px) {
+  .alchemy-page {
+    width: 100%;
+    min-height: auto;
+    padding: 28px 20px 72px;
+    border-radius: 22px;
+  }
+
+  .alchemy-header,
+  .alchemy-diagnosis-layout,
+  .alchemy-decode-grid,
+  .alchemy-message-grid,
+  .alchemy-prescription-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .alchemy-header {
+    display: grid;
+  }
+
+  .alchemy-pentagram {
+    opacity: 0.18;
+    right: 28px;
+    top: 230px;
+  }
+
+  .alchemy-side-notes {
+    padding-top: 0;
+  }
+
+  .alchemy-flow {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .alchemy-flow-arrow {
+    display: none;
+  }
+}
+
+@media print {
+  .alchemy-page {
+    width: 190mm;
+    min-height: 277mm;
+    border-radius: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .alchemy-page:last-child {
+    page-break-after: auto;
+  }
+}
