@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import reportData from '../design/sample-data.json';
+import { AlchemyReport, ALCHEMY_PAGE_ORDER } from './components/AlchemyReport';
 import { ReportPage2 } from './components/ReportPage2';
 import { ReportPage3 } from './components/ReportPage3';
 import { ReportPage4 } from './components/ReportPage4';
@@ -25,23 +26,29 @@ function renderPage(pageId, report) {
   return <ReportPage4 brand={report.brand} data={pageData} />;
 }
 
-function PreviewToolbar({ allPages = false, currentPageId = '2' }) {
+function PreviewToolbar({ allPages = false, currentPageId = '2', template = 'legacy' }) {
+  const isAlchemy = template === 'alchemy';
+  const pages = isAlchemy ? ALCHEMY_PAGE_ORDER : PAGE_ORDER;
+  const basePath = isAlchemy ? '/report-preview/alchemy-v1' : '/report-preview';
+  const title = isAlchemy ? 'Алхимия Души · alchemy-v1' : reportData.preview.title;
+  const label = isAlchemy ? 'Канонический шаблон отчёта' : reportData.preview.label;
+
   return (
     <div className="preview-toolbar print-hidden">
       <div className="toolbar-copy">
-        <p className="toolbar-label">{reportData.preview.label}</p>
-        <h1>{reportData.preview.title}</h1>
+        <p className="toolbar-label">{label}</p>
+        <h1>{title}</h1>
       </div>
 
       <div className="toolbar-actions">
         <nav className="preview-nav" aria-label="Навигация по страницам отчёта">
-          {PAGE_ORDER.map((pageId) => (
+          {pages.map((pageId) => (
             <NavLink
               key={pageId}
               className={({ isActive }) =>
                 `preview-nav-link${isActive && !allPages ? ' active' : ''}`
               }
-              to={`/report-preview/${pageId}`}
+              to={`${basePath}/${pageId}`}
             >
               Стр. {pageId}
             </NavLink>
@@ -50,7 +57,7 @@ function PreviewToolbar({ allPages = false, currentPageId = '2' }) {
             className={({ isActive }) =>
               `preview-nav-link${isActive && allPages ? ' active' : ''}`
             }
-            to="/report-preview/all"
+            to={`${basePath}/all`}
           >
             Все
           </NavLink>
@@ -64,8 +71,25 @@ function PreviewToolbar({ allPages = false, currentPageId = '2' }) {
   );
 }
 
-export default function App({ mode = 'single' }) {
+export default function App({ mode = 'single', template = 'legacy' }) {
   const params = useParams();
+
+  if (template === 'alchemy') {
+    const currentPageId = ALCHEMY_PAGE_ORDER.includes(params.pageId) ? params.pageId : '1';
+    const pageId = mode === 'all' ? 'all' : currentPageId;
+
+    return (
+      <main className="preview-shell">
+        <PreviewToolbar
+          template="alchemy"
+          allPages={mode === 'all'}
+          currentPageId={currentPageId}
+        />
+        <AlchemyReport pageId={pageId} />
+      </main>
+    );
+  }
+
   const currentPageId = PAGE_ORDER.includes(params.pageId) ? params.pageId : '2';
 
   return (
