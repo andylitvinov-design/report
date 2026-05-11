@@ -1,0 +1,240 @@
+/* Ornate canonical overrides for alchemy-v1.
+   Keep this file after alchemy-report.css so the approved anchor style wins. */
+
+.alchemy-page {
+  padding: 21mm 17mm 17mm;
+  border-radius: 30px;
+  border: 1px solid rgba(78, 45, 12, 0.68);
+  background:
+    radial-gradient(circle at 84% 8%, rgba(217, 149, 48, 0.34), transparent 24%),
+    radial-gradient(circle at 8% 88%, rgba(82, 48, 17, 0.18), transparent 29%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, #f1d8aa 0%, #ead2a4 46%, #e2bf82 100%);
+  box-shadow: 0 30px 84px rgba(65, 41, 18, 0.2);
+}
+
+.alchemy-page::before {
+  inset: 9mm;
+  border: 2px solid rgba(87, 51, 15, 0.56);
+  border-radius: 22px;
+  box-shadow:
+    inset 0 0 0 1px rgba(222, 180, 98, 0.45),
+    inset 0 0 64px rgba(82, 48, 17, 0.08);
+}
+
+.alchemy-page::after {
+  content: "☉   △   ☽   ✦   ☿   ✦   ☽   △   ☉";
+  right: 17mm;
+  bottom: 12mm;
+  max-width: 72mm;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  letter-spacing: 0.36em;
+  text-align: right;
+  color: rgba(94, 58, 19, 0.34);
+}
+
+.alchemy-page-border {
+  inset: 6mm;
+  border: 3px solid rgba(70, 41, 10, 0.72);
+  border-radius: 24px;
+}
+
+.alchemy-page-border::before,
+.alchemy-page-border::after {
+  content: "";
+  position: absolute;
+  width: 88px;
+  height: 88px;
+  border-color: rgba(141, 88, 28, 0.85);
+  pointer-events: none;
+}
+
+.alchemy-page-border::before {
+  left: 14px;
+  top: 14px;
+  border-left: 2px solid;
+  border-top: 2px solid;
+}
+
+.alchemy-page-border::after {
+  right: 14px;
+  bottom: 14px;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
+}
+
+.alchemy-header {
+  margin-bottom: 20px;
+  border-bottom-color: rgba(121, 71, 18, 0.76);
+}
+
+.alchemy-brand {
+  color: #2f261d;
+  letter-spacing: -0.015em;
+}
+
+.alchemy-subtitle,
+.alchemy-footer {
+  color: #6d3e0d;
+}
+
+.alchemy-header h2 {
+  color: #232329;
+}
+
+.alchemy-seal {
+  width: 82px;
+  height: 82px;
+  border-color: #945a1b;
+  background: rgba(247, 225, 181, 0.54);
+  color: #54310c;
+  box-shadow: inset 0 0 0 8px rgba(255, 247, 228, 0.25);
+}
+
+.alchemy-seal::before {
+  border-color: rgba(148, 90, 27, 0.58);
+}
+
+.alchemy-seal-triangle {
+  border-color: #945a1b;
+}
+
+.alchemy-white-note {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 252, 246, 0.94));
+  border-color: rgba(126, 73, 17, 0.58);
+  box-shadow:
+    9px 10px 0 rgba(82, 52, 21, 0.13),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.62);
+}
+
+.alchemy-white-note p {
+  font-size: 0.98rem;
+  line-height: 1.52;
+}
+
+.alchemy-white-note h3,
+.alchemy-white-note h4,
+.alchemy-live-start {
+  color: #7c440d;
+}
+
+.alchemy-main-letter {
+  min-height: 665px;
+}
+
+.alchemy-side-note {
+  background: rgba(246, 224, 184, 0.84);
+  border-color: rgba(121, 71, 18, 0.52);
+  box-shadow: inset 0 0 0 1px rgba(255, 248, 230, 0.35);
+}
+
+.alchemy-side-note span,
+.alchemy-side-note strong {
+  color: #27313f;
+}
+
+.alchemy-side-note span {
+  color: #73400b;
+}
+
+.alchemy-pentagram {
+  right: 27mm;
+  top: 82mm;
+  width: 230px;
+  height: 230px;
+  opacity: 0.34;
+}
+
+.alchemy-pentagram circle,
+.alchemy-pentagram path {
+  stroke: rgba(104, 58, 12, 0.72);
+}
+
+.alchemy-remedy-decode {
+  min-height: 178px;
+  padding-left: 82px;
+}
+
+.alchemy-remedy-decode:nth-child(5) {
+  grid-column: 1 / -1;
+  min-height: 132px;
+}
+
+.alchemy-message-card:nth-child(5) {
+  grid-column: 1 / -1;
+  min-height: 135px;
+}
+
+.alchemy-remedy-medallion {
+  left: 20px;
+  top: 22px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(180deg, #a65a34, #68400f);
+  box-shadow: inset 0 0 0 2px rgba(255, 244, 220, 0.2);
+}
+
+.alchemy-remedy-element,
+.alchemy-remedy-marker,
+.alchemy-transformation,
+.alchemy-formula-line.muted {
+  color: #77420b;
+}
+
+.alchemy-wide-note {
+  margin-top: 14px;
+}
+
+.alchemy-inner-mechanism,
+.alchemy-future-note {
+  background: linear-gradient(180deg, rgba(250, 236, 204, 0.96), rgba(245, 222, 181, 0.93));
+}
+
+.alchemy-flow {
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+.alchemy-flow-pill {
+  padding: 14px 12px;
+  min-height: 68px;
+}
+
+.alchemy-flow-pill strong {
+  font-size: 0.95rem;
+}
+
+.alchemy-flow-pill span {
+  font-size: 0.76rem;
+}
+
+.alchemy-flow-5 {
+  background: #6a5a35;
+  color: #fff4df;
+}
+
+.alchemy-flow-arrow {
+  color: #8c5015;
+  font-size: 1.25rem;
+}
+
+.alchemy-prescription-note {
+  min-height: 625px;
+}
+
+.alchemy-prescription-columns > div {
+  background: rgba(244, 226, 190, 0.72);
+}
+
+.alchemy-closing-line {
+  color: #77420b;
+}
+
+.alchemy-final-formula {
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, #f2dcae, #dfbc6e);
+  color: #74400b;
+  font-size: 1.85rem;
+}
