@@ -29,7 +29,7 @@ function PentagramMark() {
 
 function PageShell({ pageNumber, title, subtitle, children, accent = null }) {
   return (
-    <section className="alchemy-page">
+    <section className={`alchemy-page alchemy-page-${pageNumber}`}>
       <div className="alchemy-page-border" />
       <header className="alchemy-header">
         <div>
