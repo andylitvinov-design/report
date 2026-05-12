@@ -5,9 +5,18 @@ import './alchemy-report-ornate.css';
 
 export const ALCHEMY_PAGE_ORDER = ['1', '2', '3', '4'];
 
+const REMEDY_AXIS = [
+  { remedy: 'Mustard', element: 'Вода', score: '2.4', glyph: '☿', code: 'MU' },
+  { remedy: 'Scleranthus', element: 'Дерево', score: '2.6', glyph: '♃', code: 'SC' },
+  { remedy: 'Aspen', element: 'Огонь', score: '2.8', glyph: '☉', code: 'AS' },
+  { remedy: 'Sweet Chestnut', element: 'Земля', score: '2.8', glyph: '♁', code: 'SW' },
+  { remedy: 'Cherry Plum', element: 'Металл', score: '3.3', glyph: '☽', code: 'CH' },
+];
+
 function DaoSeal() {
   return (
     <div className="alchemy-seal" aria-hidden="true">
+      <div className="alchemy-seal-ring" />
       <div className="alchemy-seal-triangle" />
       <span>DAO</span>
     </div>
@@ -27,12 +36,14 @@ function PentagramMark() {
   );
 }
 
-function PageShell({ pageNumber, title, subtitle, children, accent = null }) {
+function PageShell({ pageNumber, title, subtitle, type, children, accent = null }) {
   return (
-    <section className={`alchemy-page alchemy-page-${pageNumber}`}>
-      <div className="alchemy-page-border" />
+    <section className={`alchemy-page alchemy-page-${pageNumber} alchemy-page--${type}`}>
+      <div className="alchemy-page-border" aria-hidden="true" />
+      <div className="alchemy-corner-square alchemy-corner-square--top" aria-hidden="true" />
+      <div className="alchemy-corner-square alchemy-corner-square--bottom" aria-hidden="true" />
       <header className="alchemy-header">
-        <div>
+        <div className="alchemy-header-copy">
           <p className="alchemy-brand">{alchemyData.template.title}</p>
           <p className="alchemy-subtitle">{subtitle}</p>
           <h2>{pageNumber}. {title}</h2>
@@ -46,24 +57,30 @@ function PageShell({ pageNumber, title, subtitle, children, accent = null }) {
   );
 }
 
-function WhiteNote({ className = '', children }) {
-  return <article className={`alchemy-white-note ${className}`}>{children}</article>;
+function WhiteInsert({ as: Tag = 'article', className = '', children }) {
+  return <Tag className={`alchemy-white-insert ${className}`}>{children}</Tag>;
 }
 
 function PageOne({ data }) {
   return (
-    <PageShell pageNumber="1" title={data.title} subtitle={data.subtitle} accent={<PentagramMark />}>
+    <PageShell
+      pageNumber="1"
+      title={data.title}
+      subtitle={data.subtitle}
+      type="diagnosis"
+      accent={<PentagramMark />}
+    >
       <div className="alchemy-diagnosis-layout">
-        <WhiteNote className="alchemy-main-letter">
+        <WhiteInsert className="alchemy-primary-letter">
           <p className="alchemy-live-start">Смотрю.</p>
           <p>{data.mainText.replace(/^Смотрю\.\s*/u, '')}</p>
-        </WhiteNote>
-        <aside className="alchemy-side-notes">
+        </WhiteInsert>
+        <aside className="alchemy-side-notes" aria-label="Ключевые показатели">
           {data.sideNotes.map((item) => (
-            <div className="alchemy-side-note" key={item.label}>
+            <WhiteInsert as="div" className="alchemy-side-note" key={item.label}>
               <span>{item.label}</span>
               <strong>{item.value}</strong>
-            </div>
+            </WhiteInsert>
           ))}
         </aside>
       </div>
@@ -72,27 +89,41 @@ function PageOne({ data }) {
 }
 
 function PageTwo({ data }) {
+  const cardsByRemedy = Object.fromEntries(data.cards.map((card) => [card.remedy, card]));
+
   return (
-    <PageShell pageNumber="2" title={data.title} subtitle={data.subtitle}>
-      <div className="alchemy-decode-grid">
-        {data.cards.map((card) => (
-          <WhiteNote className="alchemy-remedy-decode" key={card.remedy}>
-            <div className="alchemy-remedy-medallion">{card.remedy.slice(0, 2)}</div>
-            <p className="alchemy-remedy-element">{card.element}</p>
-            <h3>{card.remedy}</h3>
-            <p className="alchemy-remedy-marker">{card.marker}</p>
-            <p>{card.text}</p>
-          </WhiteNote>
-        ))}
+    <PageShell pageNumber="2" title={data.title} subtitle={data.subtitle} type="remedy-map">
+      <section className="alchemy-remedy-map" aria-label="Карта набора эссенций">
+        <div className="alchemy-remedy-axis" aria-hidden="true" />
+        {REMEDY_AXIS.map((axisItem, index) => {
+          const card = cardsByRemedy[axisItem.remedy];
+
+          return (
+            <div className={`alchemy-map-row alchemy-map-row-${index + 1}`} key={axisItem.remedy}>
+              <div className="alchemy-map-glyph" aria-hidden="true">
+                <span>{axisItem.glyph}</span>
+                <small>{axisItem.code}</small>
+              </div>
+              <WhiteInsert className="alchemy-map-note">
+                <p className="alchemy-remedy-element">{axisItem.element} {axisItem.score}</p>
+                <h3>{card.remedy}</h3>
+                <p className="alchemy-remedy-marker">{card.marker}</p>
+                <p>{card.text}</p>
+              </WhiteInsert>
+            </div>
+          );
+        })}
+      </section>
+      <div className="alchemy-map-conclusions">
+        <WhiteInsert className="alchemy-wide-insert">
+          <h3>Что говорит набор</h3>
+          <p>{data.summary}</p>
+        </WhiteInsert>
+        <WhiteInsert className="alchemy-wide-insert alchemy-warm-insert">
+          <h3>Что происходит внутри</h3>
+          <p>{data.innerMechanism}</p>
+        </WhiteInsert>
       </div>
-      <WhiteNote className="alchemy-wide-note">
-        <h3>Что говорит набор</h3>
-        <p>{data.summary}</p>
-      </WhiteNote>
-      <WhiteNote className="alchemy-wide-note alchemy-inner-mechanism">
-        <h3>Что происходит внутри</h3>
-        <p>{data.innerMechanism}</p>
-      </WhiteNote>
     </PageShell>
   );
 }
@@ -107,20 +138,18 @@ function PageThree({ data }) {
   ];
 
   return (
-    <PageShell pageNumber="3" title={data.title} subtitle={data.subtitle}>
-      <section className="alchemy-flow">
+    <PageShell pageNumber="3" title={data.title} subtitle={data.subtitle} type="prescription">
+      <section className="alchemy-prescription-chain" aria-label="Ритуальная цепочка назначения">
         {flow.map(([quality, remedy], index) => (
-          <React.Fragment key={quality}>
-            <div className={`alchemy-flow-pill alchemy-flow-${index + 1}`}>
-              <strong>{quality}</strong>
-              <span>{remedy}</span>
-            </div>
-            {index < flow.length - 1 ? <div className="alchemy-flow-arrow">→</div> : null}
-          </React.Fragment>
+          <div className={`alchemy-chain-step alchemy-chain-step-${index + 1}`} key={quality}>
+            <span>{index + 1}</span>
+            <strong>{quality}</strong>
+            <small>{remedy}</small>
+          </div>
         ))}
       </section>
 
-      <WhiteNote className="alchemy-prescription-note">
+      <WhiteInsert className="alchemy-prescription-panel">
         <h3>Формула назначения</h3>
         <p className="alchemy-formula-line">{data.formula.remedies}</p>
         <p className="alchemy-formula-line muted">{data.formula.qualities}</p>
@@ -143,27 +172,27 @@ function PageThree({ data }) {
         <h4>Повторная проверка</h4>
         <p>{data.followUp}</p>
         <p className="alchemy-closing-line">{data.closingLine}</p>
-      </WhiteNote>
+      </WhiteInsert>
     </PageShell>
   );
 }
 
 function PageFour({ data }) {
   return (
-    <PageShell pageNumber="4" title={data.title} subtitle={data.subtitle}>
-      <div className="alchemy-message-grid">
-        {data.messages.map((item) => (
-          <WhiteNote className="alchemy-message-card" key={item.remedy}>
+    <PageShell pageNumber="4" title={data.title} subtitle={data.subtitle} type="integration">
+      <section className="alchemy-integration-flow" aria-label="Послания эссенций">
+        {data.messages.map((item, index) => (
+          <WhiteInsert className={`alchemy-message-note alchemy-message-note-${index + 1}`} key={item.remedy}>
             <h3>{item.remedy}</h3>
             <p className="alchemy-transformation">{item.transformation}</p>
             <p>{item.message}</p>
-          </WhiteNote>
+          </WhiteInsert>
         ))}
-      </div>
-      <WhiteNote className="alchemy-wide-note alchemy-future-note">
+      </section>
+      <WhiteInsert className="alchemy-wide-insert alchemy-future-note">
         <h3>Чего ожидать</h3>
         <p>{data.whatToExpect}</p>
-      </WhiteNote>
+      </WhiteInsert>
       <div className="alchemy-final-formula">{data.finalFormula}</div>
     </PageShell>
   );
