@@ -50,14 +50,6 @@ function WhiteNote({ className = '', children }) {
   return <article className={`alchemy-white-note ${className}`}>{children}</article>;
 }
 
-const REMEDY_AXIS = [
-  { element: 'Вода', score: '2.4', remedy: 'Mustard', quality: 'дефицит света', symbol: '☿' },
-  { element: 'Дерево', score: '2.6', remedy: 'Scleranthus', quality: 'колебание', symbol: '♃' },
-  { element: 'Огонь', score: '2.8', remedy: 'Aspen', quality: 'тревожность', symbol: '☉' },
-  { element: 'Земля', score: '2.8', remedy: 'Sweet Chestnut', quality: 'опыт предела', symbol: '♁' },
-  { element: 'Металл', score: '3.3', remedy: 'Cherry Plum', quality: 'контроль', symbol: '☽' },
-];
-
 function PageOne({ data }) {
   return (
     <PageShell pageNumber="1" title={data.title} subtitle={data.subtitle} accent={<PentagramMark />}>
@@ -80,36 +72,26 @@ function PageOne({ data }) {
 }
 
 function PageTwo({ data }) {
-  const cardsByRemedy = Object.fromEntries(data.cards.map((card) => [card.remedy, card]));
-
   return (
     <PageShell pageNumber="2" title={data.title} subtitle={data.subtitle}>
-      <section className="alchemy-remedy-map" aria-label="У-Син карта назначения">
-        <div className="alchemy-map-orbit" aria-hidden="true">
-          <span className="alchemy-map-sun">☉</span>
-          <span className="alchemy-map-moon">☽</span>
-          <span className="alchemy-map-triangle">△</span>
-        </div>
-        <div className="alchemy-map-axis" aria-hidden="true" />
-        {REMEDY_AXIS.map((item, index) => {
-          const card = cardsByRemedy[item.remedy];
-
-          return (
-            <div className={`alchemy-map-row alchemy-map-row-${index + 1}`} key={item.remedy}>
-              <div className="alchemy-map-glyph" aria-hidden="true">{item.symbol}</div>
-              <WhiteNote className="alchemy-map-note">
-                <p className="alchemy-remedy-element">{item.element} {item.score}</p>
-                <h3>{item.remedy}</h3>
-                <p className="alchemy-remedy-marker">{item.quality}</p>
-                <p>{card.text}</p>
-              </WhiteNote>
-            </div>
-          );
-        })}
-      </section>
-      <WhiteNote className="alchemy-bottom-conclusion">
-        <h3>Вывод карты</h3>
-        <p>Главная нехватка — Вода и Дерево: жизненность + спокойное направление.</p>
+      <div className="alchemy-decode-grid">
+        {data.cards.map((card) => (
+          <WhiteNote className="alchemy-remedy-decode" key={card.remedy}>
+            <div className="alchemy-remedy-medallion">{card.remedy.slice(0, 2)}</div>
+            <p className="alchemy-remedy-element">{card.element}</p>
+            <h3>{card.remedy}</h3>
+            <p className="alchemy-remedy-marker">{card.marker}</p>
+            <p>{card.text}</p>
+          </WhiteNote>
+        ))}
+      </div>
+      <WhiteNote className="alchemy-wide-note">
+        <h3>Что говорит набор</h3>
+        <p>{data.summary}</p>
+      </WhiteNote>
+      <WhiteNote className="alchemy-wide-note alchemy-inner-mechanism">
+        <h3>Что происходит внутри</h3>
+        <p>{data.innerMechanism}</p>
       </WhiteNote>
     </PageShell>
   );
@@ -126,13 +108,15 @@ function PageThree({ data }) {
 
   return (
     <PageShell pageNumber="3" title={data.title} subtitle={data.subtitle}>
-      <section className="alchemy-ritual-chain" aria-label="Формула назначения">
+      <section className="alchemy-flow">
         {flow.map(([quality, remedy], index) => (
-          <div className={`alchemy-ritual-step alchemy-flow-${index + 1}`} key={quality}>
-            <span className="alchemy-ritual-number">{index + 1}</span>
-            <strong>{remedy}</strong>
-            <span>{quality}</span>
-          </div>
+          <React.Fragment key={quality}>
+            <div className={`alchemy-flow-pill alchemy-flow-${index + 1}`}>
+              <strong>{quality}</strong>
+              <span>{remedy}</span>
+            </div>
+            {index < flow.length - 1 ? <div className="alchemy-flow-arrow">→</div> : null}
+          </React.Fragment>
         ))}
       </section>
 
@@ -167,12 +151,7 @@ function PageThree({ data }) {
 function PageFour({ data }) {
   return (
     <PageShell pageNumber="4" title={data.title} subtitle={data.subtitle}>
-      <WhiteNote className="alchemy-note-block">
-        <h3>Примечание</h3>
-        <p>Поддержка здесь не про ускорение и не про рывок. Она ведёт к тому, чтобы закрепить опору, не расплескать ресурс и дать внутренней крепости стать спокойнее.</p>
-      </WhiteNote>
-
-      <div className="alchemy-message-ribbon">
+      <div className="alchemy-message-grid">
         {data.messages.map((item) => (
           <WhiteNote className="alchemy-message-card" key={item.remedy}>
             <h3>{item.remedy}</h3>
