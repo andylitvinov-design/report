@@ -1,5 +1,5 @@
 /* Anchor-derived visual system for alchemy-v1.
-   Source: design/reference_alchemy_report_anchor_v1.png */
+   Single source of truth: design/alchemy_anchor_design_reference.png */
 
 .alchemy-page-stack {
   gap: 34px;
@@ -134,7 +134,8 @@
 
 .alchemy-header,
 .alchemy-page-content,
-.alchemy-footer {
+.alchemy-footer,
+.alchemy-ritual-accents {
   position: relative;
   z-index: 2;
 }
@@ -371,7 +372,69 @@
   font-weight: 700;
 }
 
-.alchemy-page--remedy-map .alchemy-page-content {
+.alchemy-wuxing-side {
+  position: absolute;
+  right: 26mm;
+  top: 151mm;
+  z-index: 2;
+  width: 56mm;
+  height: 56mm;
+  border-radius: 50%;
+  border: 1px solid rgba(88, 49, 10, 0.28);
+  opacity: 0.86;
+}
+
+.alchemy-wuxing-side::before,
+.alchemy-wuxing-side::after {
+  content: "";
+  position: absolute;
+  inset: 13mm;
+  border: 1px solid rgba(88, 49, 10, 0.25);
+  transform: rotate(45deg);
+}
+
+.alchemy-wuxing-side::after {
+  inset: 21mm;
+  border-radius: 50%;
+  transform: none;
+}
+
+.alchemy-wuxing-dot {
+  position: absolute;
+  width: 20mm;
+  min-height: 12mm;
+  padding: 4px 6px;
+  border: 1px solid rgba(85, 51, 14, 0.34);
+  border-radius: 7px;
+  background: rgba(255, 250, 238, 0.68);
+  box-shadow: 4px 5px 0 rgba(70, 43, 15, 0.08);
+  text-align: center;
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+.alchemy-wuxing-dot span,
+.alchemy-wuxing-dot strong {
+  display: block;
+}
+
+.alchemy-wuxing-dot span {
+  color: #74400a;
+  font-size: 0.62rem;
+}
+
+.alchemy-wuxing-dot strong {
+  color: #111923;
+  font-size: 0.78rem;
+}
+
+.alchemy-wuxing-dot--mu { left: 18mm; top: -4mm; }
+.alchemy-wuxing-dot--sc { right: -2mm; top: 17mm; }
+.alchemy-wuxing-dot--as { right: 6mm; bottom: -2mm; }
+.alchemy-wuxing-dot--sw { left: 5mm; bottom: -2mm; }
+.alchemy-wuxing-dot--ch { left: -4mm; top: 17mm; }
+
+.alchemy-page--remedy-map .alchemy-page-content,
+.alchemy-page--remedy-set .alchemy-page-content {
   display: grid;
   gap: 7px;
 }
@@ -504,7 +567,8 @@
 }
 
 .alchemy-warm-insert,
-.alchemy-future-note {
+.alchemy-future-note,
+.alchemy-note-insert {
   background: linear-gradient(180deg, rgba(250, 236, 204, 0.96), rgba(246, 224, 184, 0.94));
 }
 
@@ -610,14 +674,18 @@
   font-weight: 700;
 }
 
+.alchemy-note-insert {
+  margin-bottom: 8px;
+}
+
 .alchemy-integration-flow {
   display: grid;
-  gap: 9px;
-  margin-bottom: 9px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .alchemy-message-note {
-  padding: 12px 16px;
+  padding: 11px 15px;
   width: 128mm;
 }
 
@@ -631,16 +699,17 @@
 
 .alchemy-message-note h3 {
   color: #222;
-  font-size: 1.1rem;
+  font-size: 1.02rem;
+  margin-bottom: 5px;
 }
 
 .alchemy-message-note p {
-  font-size: 0.76rem;
-  line-height: 1.22;
+  font-size: 0.72rem;
+  line-height: 1.18;
 }
 
 .alchemy-transformation {
-  margin-bottom: 7px !important;
+  margin-bottom: 6px !important;
   color: #74400a !important;
   font-weight: 700;
 }
@@ -650,18 +719,109 @@
 }
 
 .alchemy-final-formula {
-  margin-top: 10px;
-  padding: 15px 18px;
+  margin-top: 9px;
+  padding: 14px 18px;
   border: 1px solid rgba(90, 52, 13, 0.48);
   border-radius: 7px;
   background: linear-gradient(180deg, #f2dcae, #dfbc6e);
   color: #6c3908;
   box-shadow: inset 0 0 0 1px rgba(255, 247, 216, 0.34);
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1.48rem;
+  font-size: 1.42rem;
   font-weight: 700;
   line-height: 1.18;
   text-align: center;
+}
+
+.alchemy-ritual-accents {
+  position: absolute;
+  left: 17mm;
+  right: 17mm;
+  bottom: 21mm;
+  height: 24mm;
+  pointer-events: none;
+}
+
+.alchemy-accent {
+  position: absolute;
+  color: rgba(73, 43, 11, 0.48);
+}
+
+.alchemy-accent--botanical {
+  left: 9mm;
+  bottom: 0;
+  font-size: 2.9rem;
+  transform: rotate(-18deg);
+}
+
+.alchemy-accent--botanical::before,
+.alchemy-accent--botanical::after {
+  content: "";
+  position: absolute;
+  width: 18mm;
+  height: 1px;
+  background: rgba(73, 43, 11, 0.25);
+  transform-origin: left center;
+}
+
+.alchemy-accent--botanical::before {
+  left: 8px;
+  top: 28px;
+  transform: rotate(-34deg);
+}
+
+.alchemy-accent--botanical::after {
+  left: 10px;
+  top: 35px;
+  transform: rotate(28deg);
+}
+
+.alchemy-accent--crystal {
+  left: 44mm;
+  bottom: 5mm;
+  font-size: 1.7rem;
+}
+
+.alchemy-accent--bottle {
+  right: 45mm;
+  bottom: 2mm;
+  width: 8mm;
+  height: 18mm;
+  border: 1px solid rgba(73, 43, 11, 0.38);
+  border-radius: 4mm 4mm 3mm 3mm;
+  background: rgba(255, 247, 218, 0.16);
+}
+
+.alchemy-accent--bottle::before {
+  content: "";
+  position: absolute;
+  left: 2mm;
+  top: -5mm;
+  width: 4mm;
+  height: 6mm;
+  border: 1px solid rgba(73, 43, 11, 0.38);
+  border-bottom: 0;
+  border-radius: 2mm 2mm 0 0;
+}
+
+.alchemy-accent--bowl {
+  right: 14mm;
+  bottom: 1mm;
+  width: 22mm;
+  height: 8mm;
+  border: 1px solid rgba(73, 43, 11, 0.42);
+  border-top: 0;
+  border-radius: 0 0 12mm 12mm;
+}
+
+.alchemy-accent--bowl::before {
+  content: "✦  ✦  ✦";
+  position: absolute;
+  left: -1mm;
+  top: -9mm;
+  color: rgba(73, 43, 11, 0.34);
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
 }
 
 @media (max-width: 960px) {
@@ -688,6 +848,10 @@
 
   .alchemy-side-notes {
     padding-top: 0;
+  }
+
+  .alchemy-wuxing-side {
+    display: none;
   }
 
   .alchemy-map-row,
