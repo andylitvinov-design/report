@@ -39,22 +39,25 @@ When the real report text is too long for the visual composition, preserve both 
 
 The graphic layout renders `displayText`. `fullText` remains the complete source text.
 
-## 2. Required anchor composition
+## 2. Open Design / anchor breakdown
 
-The JSX and CSS must reproduce the anchor:
+Anchor inspected from `design/alchemy_anchor_design_reference.png`:
 
-- 4 vertical A4 pages;
-- header `Алхимия Души`;
-- thin ornate frames;
-- DAO seal at the top right;
-- warm parchment background;
-- white text inserts with soft brown shadow;
-- decorative gold dividers, stars, ritual marks, and small alchemical accents;
-- botanical / crystal / bottle / bowl accents near the bottom;
-- page 1: living letter plus Wu Xing / DAO scheme on the side;
-- page 2: vertical list of remedies, not a dashboard grid;
-- page 3: prescription formula plus practical block;
-- page 4: note, remedy messages, and `Чего ожидать`.
+- source PNG: 1392 x 4557 px;
+- page stack: four centered portrait pages, each visually A4, with about 24 px vertical gap between page surfaces;
+- page surface: about 780 px wide in the anchor raster; the rendered implementation keeps canonical 210 mm x 297 mm A4 and uses print rules for exact four-page output;
+- frame: outer dark hairline plus inset gold/dark double frame, about 5-7 mm from page edge, square corners;
+- header: left title block, thin divider, DAO circular seal at upper-right overlapping a dark brown square;
+- background: warm ochre parchment with a pale top-center glow, deeper amber lower area, low-contrast grid/scratch texture;
+- white inserts: almost-white panels with 1 px warm brown border, 7 px radius, and a soft brown down/right shadow;
+- lower accents: dark square lower-left, corner bracket lower-right, small glyph line near footer; botanical/crystal/bottle/bowl marks stay subtle and low.
+
+Required JSX/CSS composition:
+
+- Page 1: large living-letter insert left; three compact metric inserts right; faint DAO/pentagram diagram behind the side column.
+- Page 2: two-column remedy card grid; first four remedies in 2 x 2, Cherry Plum full-width, then two full-width conclusion inserts.
+- Page 3: horizontal five-step prescription chain, then one large prescription insert with two warm nested blocks.
+- Page 4: two-column message card grid; Cherry Plum full-width, then `Чего ожидать`, then final formula band.
 
 ## 3. Page background
 
@@ -123,7 +126,7 @@ Required content:
 - Металл 3.3 — Cherry Plum — контроль;
 - краткий вывод.
 
-Layout: vertical remedy list with ritual axis/glyphs. No 2 × 2 dashboard.
+Layout: anchor card rhythm, not a new dashboard: four remedy inserts in a two-column grid, fifth remedy full-width, then two full-width interpretation inserts.
 
 ### Page 3 — Prescription
 
@@ -151,7 +154,7 @@ Required content:
 - `Чего ожидать`;
 - final formula: `не рывок, а закрепление опоры`.
 
-Layout: message cards plus future panel; it may use card rhythm, but must stay anchored in the ornate parchment style.
+Layout: two-column message-card rhythm, fifth message full-width, future panel, and final formula band.
 
 ## 8. Forbidden patterns
 
@@ -160,7 +163,7 @@ Do not use:
 - generic parchment card templates;
 - dashboard grids;
 - analytics cards;
-- unrelated 2 × 2 layouts;
+- unrelated layouts that differ from the anchor;
 - dark app-dashboard styling;
 - flat white document pages;
 - landscape compositions;

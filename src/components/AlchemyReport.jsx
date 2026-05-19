@@ -44,19 +44,6 @@ function PentagramMark() {
   );
 }
 
-function WuXingSideScheme() {
-  return (
-    <div className="alchemy-wuxing-side" aria-label="Wu Xing side scheme">
-      {REMEDY_AXIS.map((item) => (
-        <div className={`alchemy-wuxing-dot alchemy-wuxing-dot--${item.code.toLowerCase()}`} key={item.code}>
-          <span>{item.element}</span>
-          <strong>{item.score}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function RitualBottomAccents() {
   return (
     <div className="alchemy-ritual-accents" aria-hidden="true">
@@ -103,7 +90,7 @@ function PageOne({ data }) {
       title={data.title}
       subtitle={data.subtitle}
       type="diagnosis"
-      accent={<><PentagramMark /><WuXingSideScheme /></>}
+      accent={<PentagramMark />}
     >
       <div className="alchemy-diagnosis-layout">
         <WhiteInsert className="alchemy-primary-letter">
@@ -128,7 +115,7 @@ function PageTwo({ data }) {
 
   return (
     <PageShell pageNumber="2" title={data.title} subtitle={data.subtitle} type="remedy-set">
-      <section className="alchemy-remedy-map" aria-label="Вертикальный набор эссенций">
+      <section className="alchemy-remedy-map" aria-label="Карта подходящих эссенций">
         <div className="alchemy-remedy-axis" aria-hidden="true" />
         {REMEDY_AXIS.map((axisItem, index) => {
           const card = cardsByRemedy[axisItem.remedy];
@@ -151,11 +138,11 @@ function PageTwo({ data }) {
       </section>
       <div className="alchemy-map-conclusions">
         <WhiteInsert className="alchemy-wide-insert">
-          <h3>Краткий вывод</h3>
+          <h3>Что говорит набор</h3>
           <p>{displayText(data.summary)}</p>
         </WhiteInsert>
         <WhiteInsert className="alchemy-wide-insert alchemy-warm-insert">
-          <h3>Bottleneck</h3>
+          <h3>Что происходит внутри</h3>
           <p>{displayText(data.innerMechanism)}</p>
         </WhiteInsert>
       </div>
@@ -215,12 +202,6 @@ function PageThree({ data }) {
 function PageFour({ data }) {
   return (
     <PageShell pageNumber="4" title={data.title} subtitle={data.subtitle} type="messages-future">
-      {data.note ? (
-        <WhiteInsert className="alchemy-wide-insert alchemy-note-insert">
-          <h3>Примечание</h3>
-          <p>{displayText(data.note)}</p>
-        </WhiteInsert>
-      ) : null}
       <section className="alchemy-integration-flow" aria-label="Послания препаратов">
         {data.messages.map((item, index) => (
           <WhiteInsert className={`alchemy-message-note alchemy-message-note-${index + 1}`} key={item.remedy}>
