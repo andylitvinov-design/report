@@ -1,54 +1,57 @@
-# Client Cabinet Design Source of Truth
+# Client Cabinet Design Source Of Truth
 
-## Main visual source
+Canonical visual source:
 
-Primary concrete mockup file:
+- `docs/client-cabinet/assets/client-cabinet-mockup-source.svg`
 
-`docs/client-cabinet/assets/client-cabinet-mockup-source.svg`
+The SVG is the source for the first Overview prototype. The prototype should preserve the same structure, proportions, and visual language unless this document is updated.
 
-This SVG is the source-of-truth layout reference for the first Holistic Therapy Cabinet MVP. Text documentation explains the design, but implementation should be visually checked against this mockup.
+## Product Surface
 
-## Desktop layout requirements
+The Overview screen is a calm client workspace for **Alchemy Cabinet / Holistic Therapy**. It should feel like an operational cabinet, not a marketing landing page.
 
-The desktop screen must preserve these zones:
+Primary jobs:
 
-- left sidebar with product identity and five main menu items;
-- active client card in the sidebar;
-- top page header with client context and primary action;
-- top subsection tabs;
-- four metric cards: problem strength, resource, main remedy, bottleneck;
-- dynamics chart area;
-- support formula / recommendations preview;
-- right specialist comment panel.
+- show the current client report state;
+- surface the next required client action;
+- keep report timeline and session context visible;
+- work as both desktop and mobile-first experience.
 
-## Mobile layout requirements
+## Layout Contract
 
-The mobile screen must preserve these zones:
+Desktop:
 
-- compact product header;
-- client state card;
-- stacked metric cards;
-- main current-state card;
-- specialist comment card;
-- primary action button.
+- dark left navigation, fixed-width visual weight;
+- warm paper workspace background;
+- top heading area with status pill;
+- main report summary panel on the left;
+- next-step panel on the right;
+- full-width timeline below.
 
-## Visual style
+Mobile:
 
-- warm ivory background;
-- white rounded cards;
-- soft borders;
-- natural green accents;
-- orange progress accent;
-- blue resource accent;
-- calm, spacious therapeutic feel;
-- small charts instead of dense analytics.
+- single-column Overview;
+- current report summary first;
+- next action second;
+- timeline and report action below;
+- no dense desktop sidebar.
 
-## Non-negotiable rule
+## Visual Tokens
 
-Right panel on desktop is not a second dashboard. It is the living specialist voice: short comment, next step, one action.
+- Background: warm parchment, `#efe7d7`.
+- Surface: paper white, `#fffdf8`.
+- Primary ink: `#24312d`.
+- Muted text: `#7b877d`.
+- Navigation: deep green, `#263a34`.
+- Main accent: muted gold, `#b88a55`.
+- Supporting accents: sage `#60796b`, rose `#c98b7c`, gold `#d8b56a`.
+- Radius: 12-28px depending on surface size.
+- Typography: Georgia for report/client headings, system sans for product UI labels.
 
-## Verification
+## Implementation Rules
 
-Before accepting UI implementation, compare it with:
-
-`docs/client-cabinet/assets/client-cabinet-mockup-source.svg`
+- The Overview prototype must start on the working surface, not a hero page.
+- Do not add generic SaaS card grids beyond the panels shown in the source SVG.
+- Use restrained motion only for entry, hover, and focus states.
+- Keep labels short and operational.
+- Mobile must preserve the report-first information order.

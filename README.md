@@ -39,6 +39,16 @@ Product docs added for this project:
 - `docs/product/report-repository-map.md`
 - `docs/product/site-branch-plan.md`
 
+## Client Cabinet Design Source
+
+Client cabinet source materials:
+
+- `docs/client-cabinet/assets/client-cabinet-mockup-source.svg` — canonical SVG mockup for the Overview screen.
+- `docs/client-cabinet/DESIGN_SOURCE_OF_TRUTH.md` — visual and layout source of truth.
+- `docs/client-cabinet/MOCKUP_IMPLEMENTATION_MAP.md` — mapping from mockup regions to prototype selectors.
+- `docs/client-cabinet/VISUAL_QA_CHECKLIST.md` — visual QA checklist for desktop and mobile review.
+- `docs/client-cabinet/prototype/overview.html` — static Overview prototype following the SVG mockup.
+
 ## Branches
 
 - `main` — stable reference and accepted materials.

@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Client Cabinet Overview Prototype</title>
+    <link rel="icon" href="data:,">
+    <style>
+      :root {
+        --bg: #efe7d7;
+        --paper: #fffdf8;
+        --paper-soft: #f7f2e8;
+        --line: #d8cbb6;
+        --ink: #24312d;
+        --muted: #7b877d;
+        --nav: #263a34;
+        --sage: #60796b;
+        --sage-dark: #2f4a42;
+        --accent: #b88a55;
+        --rose: #c98b7c;
+        --gold: #d8b56a;
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(184, 138, 85, 0.12), transparent 28rem),
+          linear-gradient(135deg, #f4ecdd, var(--bg));
+        color: var(--ink);
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .stage {
+        min-height: 100vh;
+        padding: clamp(20px, 4vw, 56px);
+        display: grid;
+        place-items: center;
+      }
+
+      .cabinet-shell {
+        width: min(1180px, 100%);
+        min-height: min(720px, calc(100vh - 48px));
+        display: grid;
+        grid-template-columns: 224px 1fr;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: linear-gradient(135deg, #fbf8ef, #f0eadc);
+        box-shadow: 0 28px 70px rgba(36, 56, 47, 0.18);
+        animation: shell-in 520ms ease-out both;
+      }
+
+      .side-nav {
+        padding: 32px 24px;
+        background: var(--nav);
+        color: #f6efe0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand {
+        margin-bottom: 46px;
+      }
+
+      .brand strong {
+        display: block;
+        font-family: Georgia, serif;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .brand span,
+      .session-card span,
+      .eyebrow {
+        display: block;
+        color: #b8c4b7;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .nav-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav-item {
+        width: 100%;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 0;
+        border-radius: 14px;
+        background: transparent;
+        color: #9ca99b;
+        text-align: left;
+        cursor: pointer;
+        transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+      }
+
+      .nav-item::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: currentColor;
+        content: "";
+      }
+
+      .nav-item.active,
+      .nav-item:hover,
+      .nav-item:focus-visible {
+        background: rgba(245, 234, 215, 0.14);
+        color: #f6efe0;
+      }
+
+      .nav-item:hover {
+        transform: translateX(2px);
+      }
+
+      .nav-item.active::before {
+        background: var(--gold);
+      }
+
+      .session-card {
+        margin-top: auto;
+        padding: 18px;
+        border-radius: 18px;
+        background: #334d45;
+      }
+
+      .session-card strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 15px;
+      }
+
+      .workspace {
+        padding: clamp(26px, 4vw, 54px);
+      }
+
+      .overview-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 40px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1,
+      h2 {
+        font-family: Georgia, serif;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: clamp(34px, 4vw, 48px);
+        line-height: 1.02;
+      }
+
+      .overview-header p {
+        max-width: 520px;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .status-pill {
+        min-width: 86px;
+        padding: 9px 18px;
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--sage), var(--sage-dark));
+        color: var(--paper);
+        font-weight: 700;
+      }
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.9fr);
+        gap: 28px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 253, 248, 0.88);
+        box-shadow: 0 16px 36px rgba(36, 49, 45, 0.08);
+      }
+
+      .client-card {
+        position: relative;
+        min-height: 260px;
+        padding: 30px;
+      }
+
+      .client-card h2,
+      .action-panel h2,
+      .timeline-panel h2 {
+        font-size: 26px;
+        line-height: 1.15;
+      }
+
+      .client-card .eyebrow {
+        margin-top: 9px;
+        color: var(--muted);
+      }
+
+      .progress-ring {
+        position: absolute;
+        top: 34px;
+        right: 34px;
+        width: 96px;
+        height: 96px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at center, #fffdf8 0 52%, transparent 53%),
+          conic-gradient(var(--accent) 0 259deg, #eadfcd 259deg 360deg);
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      .divider {
+        height: 1px;
+        margin: 34px 0 24px;
+        background: var(--line);
+      }
+
+      .label {
+        margin-bottom: 9px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .focus-text {
+        max-width: 340px;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .report-action {
+        margin-top: 22px;
+        padding: 10px 18px;
+        border: 0;
+        border-radius: 999px;
+        background: #f4eadb;
+        color: #7a5834;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 180ms ease, transform 180ms ease;
+      }
+
+      .report-action:hover,
+      .report-action:focus-visible {
+        background: #ead8bd;
+        transform: translateY(-1px);
+      }
+
+      .action-panel {
+        padding: 26px;
+      }
+
+      .task-list {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .task {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 14px;
+        align-items: center;
+        min-height: 68px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--paper-soft);
+      }
+
+      .task-marker {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--sage), var(--sage-dark));
+      }
+
+      .task.secondary .task-marker {
+        background: var(--gold);
+      }
+
+      .task strong,
+      .task span {
+        display: block;
+      }
+
+      .task strong {
+        font-size: 15px;
+      }
+
+      .task span {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .timeline-panel {
+        grid-column: 1 / -1;
+        padding: 28px 30px 32px;
+      }
+
+      .timeline-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 34px;
+      }
+
+      .schedule-pill {
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: #f3eadc;
+        color: #7a5834;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .timeline-track {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .timeline-track::before {
+        position: absolute;
+        top: 15px;
+        right: 7%;
+        left: 7%;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--line);
+        content: "";
+      }
+
+      .milestone {
+        position: relative;
+        z-index: 1;
+      }
+
+      .dot {
+        display: block;
+        width: 30px;
+        height: 30px;
+        margin-bottom: 16px;
+        border: 5px solid var(--paper);
+        border-radius: 50%;
+        background: var(--sage);
+        box-shadow: 0 0 0 1px var(--line);
+      }
+
+      .milestone:nth-child(2) .dot {
+        background: var(--accent);
+      }
+
+      .milestone:nth-child(3) .dot {
+        background: var(--rose);
+      }
+
+      .milestone:nth-child(4) .dot {
+        background: var(--gold);
+      }
+
+      .milestone strong {
+        display: block;
+        font-size: 13px;
+      }
+
+      .milestone span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @keyframes shell-in {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          scroll-behavior: auto !important;
+          transition-duration: 1ms !important;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .cabinet-shell {
+          grid-template-columns: 188px 1fr;
+        }
+
+        .overview-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .timeline-panel {
+          grid-column: auto;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .stage {
+          padding: 0;
+          place-items: stretch;
+        }
+
+        .cabinet-shell {
+          min-height: 100vh;
+          grid-template-columns: 1fr;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        .side-nav {
+          display: none;
+        }
+
+        .workspace {
+          padding: 28px 20px 34px;
+        }
+
+        .overview-header {
+          display: block;
+          margin-bottom: 24px;
+        }
+
+        .status-pill {
+          margin-top: 18px;
+        }
+
+        .client-card,
+        .action-panel,
+        .timeline-panel {
+          padding: 22px;
+        }
+
+        .client-card {
+          min-height: 270px;
+        }
+
+        .progress-ring {
+          position: static;
+          margin: 22px 0 0;
+        }
+
+        .divider {
+          margin-top: 22px;
+        }
+
+        .timeline-head {
+          display: block;
+        }
+
+        .schedule-pill {
+          display: inline-block;
+          margin-top: 14px;
+        }
+
+        .timeline-track {
+          gap: 10px;
+        }
+
+        .timeline-track::before {
+          right: 12%;
+          left: 12%;
+        }
+
+        .milestone strong {
+          font-size: 12px;
+        }
+
+        .milestone span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <section class="cabinet-shell" aria-label="Client cabinet overview prototype">
+        <aside class="side-nav" aria-label="Client cabinet navigation">
+          <div class="brand">
+            <strong>Alchemy Cabinet</strong>
+            <span>Holistic Therapy</span>
+          </div>
+          <nav class="nav-list">
+            <button class="nav-item active" type="button">Overview</button>
+            <button class="nav-item" type="button">Reports</button>
+            <button class="nav-item" type="button">Questionnaires</button>
+            <button class="nav-item" type="button">Sessions</button>
+            <button class="nav-item" type="button">Messages</button>
+          </nav>
+          <div class="session-card">
+            <span>Next session</span>
+            <strong>June 4, 12:00</strong>
+          </div>
+        </aside>
+
+        <div class="workspace">
+          <header class="overview-header">
+            <div>
+              <h1>Client overview</h1>
+              <p>Current report, session rhythm, and next actions in one workspace.</p>
+            </div>
+            <button class="status-pill" type="button">Active</button>
+          </header>
+
+          <section class="overview-grid" aria-label="Client report overview">
+            <article class="panel client-card">
+              <h2>Sophia M.</h2>
+              <span class="eyebrow">DAO / Bach / Wu Xing profile</span>
+              <div class="progress-ring" aria-label="Report progress 72 percent">72%</div>
+              <div class="divider"></div>
+              <p class="label">Primary focus</p>
+              <p class="focus-text">Emotional regulation and grounding</p>
+              <button class="report-action" type="button">Open full report</button>
+            </article>
+
+            <article class="panel action-panel">
+              <h2>Next step</h2>
+              <div class="task-list">
+                <div class="task">
+                  <span class="task-marker" aria-hidden="true"></span>
+                  <p><strong>Complete check-in</strong><span>7 minutes</span></p>
+                </div>
+                <div class="task secondary">
+                  <span class="task-marker" aria-hidden="true"></span>
+                  <p><strong>Review remedies</strong><span>3 items updated</span></p>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel timeline-panel">
+              <div class="timeline-head">
+                <h2>Report timeline</h2>
+                <span class="schedule-pill">On schedule</span>
+              </div>
+              <div class="timeline-track" aria-label="Report timeline">
+                <div class="milestone"><span class="dot"></span><strong>Intake</strong><span>Completed</span></div>
+                <div class="milestone"><span class="dot"></span><strong>Analysis</strong><span>In review</span></div>
+                <div class="milestone"><span class="dot"></span><strong>Report</strong><span>Current</span></div>
+                <div class="milestone"><span class="dot"></span><strong>Follow-up</strong><span>Planned</span></div>
+              </div>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

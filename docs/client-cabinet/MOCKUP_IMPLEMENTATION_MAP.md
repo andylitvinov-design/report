@@ -2,39 +2,36 @@
 
 Source mockup:
 
-`docs/client-cabinet/assets/client-cabinet-mockup-source.svg`
+- `docs/client-cabinet/assets/client-cabinet-mockup-source.svg`
 
-## Desktop mapping
+Prototype:
 
-| Mockup zone | Component |
-|---|---|
-| Product identity in sidebar | BrandHeader |
-| Left navigation | Sidebar |
-| Active client card | ClientSummary |
-| Page title and client context | ClientHeader |
-| Top subsection tabs | TopTabs |
-| Problem strength card | MetricCard |
-| Resource card | MetricCard |
-| Main remedy card | MetricCard |
-| Bottleneck card | MetricCard |
-| Dynamics chart | DynamicsPreviewChart |
-| Support formula preview | RecommendationPreview |
-| Right specialist panel | SpecialistCommentPanel |
+- `docs/client-cabinet/prototype/overview.html`
 
-## Mobile mapping
+## Screen Mapping
 
-| Mockup zone | Component |
-|---|---|
-| Mobile product header | MobileHeader |
-| Client state card | MobileClientSummary |
-| Metric cards | MobileMetricCards |
-| Current state card | MobileCurrentState |
-| Specialist comment card | SpecialistCommentCard |
-| Main action button | MobilePrimaryAction |
+| SVG area | Prototype selector | Notes |
+| --- | --- | --- |
+| Desktop shell | `.cabinet-shell` | Full app surface with nav and workspace. |
+| Left navigation | `.side-nav` | Desktop-only persistent product navigation. |
+| Header and status | `.overview-header`, `.status-pill` | Current screen title and client state. |
+| Current report panel | `.client-card` | Client identity, report progress, primary focus, report action. |
+| Next step panel | `.action-panel` | Immediate client tasks with priority emphasis. |
+| Report timeline | `.timeline-panel`, `.timeline-track` | Intake, analysis, report, follow-up sequence. |
+| Mobile mockup | responsive CSS under `@media (max-width: 760px)` | Sidebar collapses, panels stack, touch targets stay large. |
 
-## Implementation priority
+## Required Fidelity Points
 
-1. Build overview screen first.
-2. Keep mock data.
-3. Match layout and palette before adding database logic.
-4. Add self-analysis questionnaire after overview is visually stable.
+- Keep deep-green navigation paired with warm paper workspace.
+- Keep the main content split: report summary left, action panel right, timeline below.
+- Preserve the circular progress treatment from the SVG.
+- Preserve the four-step timeline and colored milestones.
+- Keep mobile single-column order: header, report, next step, timeline.
+
+## Non-Goals
+
+- Authentication flow.
+- Real data integration.
+- PDF export.
+- Questionnaire form implementation.
+- Report-detail route.

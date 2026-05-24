@@ -1,86 +1,130 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1080" viewBox="0 0 1440 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Client Cabinet overview mockup source</title>
+  <desc id="desc">Desktop and mobile overview screens for the Holistic Therapy client cabinet.</desc>
   <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf8ef"/>
+      <stop offset="1" stop-color="#f0eadc"/>
+    </linearGradient>
+    <linearGradient id="sage" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60796b"/>
+      <stop offset="1" stop-color="#2f4a42"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#24382f" flood-opacity="0.16"/>
+    </filter>
     <style>
-      .bg{fill:#F7F3EA}.card{fill:#fff;stroke:#E4DCCF;stroke-width:2}.soft{fill:#EAF3E2}.green{fill:#3F7A3D}.orange{fill:#D78322}.blue{fill:#3E72C7}.muted{fill:#777066}.text{fill:#1F1F1F}.title{font:700 30px Arial}.h2{font:700 22px Arial}.body{font:400 16px Arial}.small{font:400 13px Arial}.bold{font:700 16px Arial}.tiny{font:400 11px Arial}
+      .bg { fill: #efe7d7; }
+      .screen { fill: url(#paper); stroke: #d8cbb6; stroke-width: 1.5; filter: url(#shadow); }
+      .nav { fill: #263a34; }
+      .nav-muted { fill: #9ca99b; }
+      .ink { fill: #24312d; }
+      .muted { fill: #7b877d; }
+      .line { stroke: #d8cbb6; stroke-width: 1.5; }
+      .soft { fill: #f7f2e8; stroke: #ddd1be; stroke-width: 1.2; }
+      .panel { fill: #fffdf8; stroke: #d9ccba; stroke-width: 1.2; }
+      .accent { fill: #b88a55; }
+      .sage { fill: url(#sage); }
+      .rose { fill: #c98b7c; }
+      .gold { fill: #d8b56a; }
+      .text-xl { font: 700 36px Georgia, serif; letter-spacing: 0; }
+      .text-lg { font: 700 22px Georgia, serif; letter-spacing: 0; }
+      .text-md { font: 600 15px Arial, sans-serif; letter-spacing: 0; }
+      .text-sm { font: 500 12px Arial, sans-serif; letter-spacing: 0; }
+      .text-xs { font: 500 10px Arial, sans-serif; letter-spacing: 0; }
     </style>
   </defs>
-  <rect class="bg" width="1600" height="1000"/>
-  <text x="56" y="54" class="title">Holistic Therapy Cabinet — Design Source Mockup</text>
-  <text x="56" y="82" class="body muted">Desktop + mobile layout reference. This SVG is a concrete source-of-truth mockup.</text>
 
-  <!-- desktop canvas -->
-  <g transform="translate(56 120)">
-    <rect class="card" width="1040" height="760" rx="32"/>
-    <text x="32" y="46" class="h2">Desktop / Обзор</text>
+  <rect class="bg" width="1440" height="1080"/>
 
-    <!-- sidebar -->
-    <rect x="24" y="78" width="190" height="650" rx="26" fill="#FBF8F1" stroke="#E4DCCF" stroke-width="2"/>
-    <circle cx="62" cy="120" r="20" class="soft"/><text x="55" y="126" class="bold green">☘</text>
-    <text x="90" y="116" class="bold">Holistic</text><text x="90" y="136" class="small muted">Therapy Cabinet</text>
-    <rect x="42" y="172" width="150" height="38" rx="12" class="soft"/><text x="58" y="196" class="bold green">Обзор</text>
-    <text x="58" y="245" class="body muted">Самоанализ</text>
-    <text x="58" y="292" class="body muted">Экспертный анализ</text>
-    <text x="58" y="339" class="body muted">Рекомендации</text>
-    <text x="58" y="386" class="body muted">Динамика / История</text>
-    <rect x="42" y="650" width="150" height="52" rx="16" fill="#FFFFFF" stroke="#E4DCCF"/><text x="58" y="673" class="bold">Анна</text><text x="58" y="692" class="small muted">ID C-1024</text>
+  <g transform="translate(80 72)">
+    <rect class="screen" width="960" height="680" rx="28"/>
+    <rect class="nav" x="0" y="0" width="196" height="680" rx="28"/>
+    <rect class="nav" x="166" y="0" width="30" height="680"/>
+    <text x="34" y="58" class="text-md" fill="#f6efe0">Alchemy Cabinet</text>
+    <text x="34" y="82" class="text-xs" fill="#b8c4b7">Holistic Therapy</text>
+    <rect x="24" y="130" width="148" height="38" rx="12" fill="#f5ead7" opacity="0.14"/>
+    <circle cx="44" cy="149" r="5" fill="#d8b56a"/>
+    <text x="60" y="153" class="text-sm" fill="#f6efe0">Overview</text>
+    <text x="60" y="204" class="text-sm nav-muted">Reports</text>
+    <text x="60" y="250" class="text-sm nav-muted">Questionnaires</text>
+    <text x="60" y="296" class="text-sm nav-muted">Sessions</text>
+    <text x="60" y="342" class="text-sm nav-muted">Messages</text>
+    <rect x="24" y="570" width="148" height="54" rx="16" fill="#334d45"/>
+    <text x="42" y="594" class="text-xs" fill="#cfd8cf">Next session</text>
+    <text x="42" y="614" class="text-sm" fill="#f6efe0">June 4, 12:00</text>
 
-    <!-- header -->
-    <rect x="240" y="78" width="520" height="86" rx="24" class="card"/>
-    <text x="264" y="115" class="h2">Обзор состояния</text>
-    <text x="264" y="142" class="small muted">Фокус: здоровье / тело · Последний срез: 14.05</text>
-    <rect x="780" y="78" width="220" height="86" rx="24" fill="#3F7A3D"/><text x="824" y="130" font-family="Arial" font-size="18" font-weight="700" fill="#fff">+ Новая оценка</text>
+    <g transform="translate(236 46)">
+      <text x="0" y="34" class="text-xl ink">Client overview</text>
+      <text x="0" y="64" class="text-sm muted">Current report, session rhythm, and next actions in one workspace.</text>
+      <rect x="594" y="4" width="84" height="34" rx="17" class="sage"/>
+      <text x="617" y="26" class="text-sm" fill="#fffdf8">Active</text>
 
-    <!-- top tabs -->
-    <rect x="240" y="184" width="760" height="56" rx="20" fill="#FBF8F1" stroke="#E4DCCF"/>
-    <rect x="256" y="196" width="124" height="32" rx="12" class="soft"/><text x="282" y="217" class="bold green">Состояние</text>
-    <text x="412" y="217" class="body muted">Графики</text><text x="510" y="217" class="body muted">Следующий шаг</text><text x="650" y="217" class="body muted">Комментарий</text>
+      <g transform="translate(0 112)">
+        <rect class="panel" width="420" height="236" rx="18"/>
+        <text x="28" y="42" class="text-lg ink">Sophia M.</text>
+        <text x="28" y="70" class="text-sm muted">DAO / Bach / Wu Xing profile</text>
+        <circle cx="330" cy="72" r="46" fill="#f4eadb"/>
+        <path d="M330 27 A45 45 0 1 1 292 96" fill="none" stroke="#b88a55" stroke-width="10" stroke-linecap="round"/>
+        <text x="311" y="78" class="text-md ink">72%</text>
+        <line x1="28" y1="106" x2="392" y2="106" class="line"/>
+        <text x="28" y="140" class="text-sm muted">Primary focus</text>
+        <text x="28" y="166" class="text-md ink">Emotional regulation and grounding</text>
+        <rect x="28" y="190" width="140" height="26" rx="13" fill="#f4eadb"/>
+        <text x="48" y="208" class="text-xs" fill="#7a5834">Open full report</text>
+      </g>
 
-    <!-- metric cards -->
-    <g transform="translate(240 264)">
-      <rect class="card" width="170" height="120" rx="22"/><text x="18" y="32" class="small muted">Сила проблемы</text><text x="18" y="78" font-family="Arial" font-size="34" font-weight="800" fill="#D78322">7/10</text><text x="18" y="102" class="small muted">умеренно высокая</text>
-      <rect x="190" class="card" width="170" height="120" rx="22"/><text x="208" y="32" class="small muted">Общий ресурс</text><text x="208" y="78" font-family="Arial" font-size="34" font-weight="800" fill="#3E72C7">4/10</text><text x="208" y="102" class="small muted">ниже среднего</text>
-      <rect x="380" class="card" width="170" height="120" rx="22"/><text x="398" y="32" class="small muted">Главный препарат</text><text x="398" y="78" font-family="Arial" font-size="28" font-weight="800" fill="#3F7A3D">Olive</text><text x="398" y="102" class="small muted">ресурс</text>
-      <rect x="570" class="card" width="190" height="120" rx="22"/><text x="588" y="32" class="small muted">Bottleneck</text><text x="588" y="78" font-family="Arial" font-size="30" font-weight="800" fill="#D78322">Земля</text><text x="588" y="102" class="small muted">опора</text>
+      <g transform="translate(448 112)">
+        <rect class="panel" width="260" height="236" rx="18"/>
+        <text x="24" y="42" class="text-lg ink">Next step</text>
+        <rect x="24" y="70" width="212" height="62" rx="14" class="soft"/>
+        <circle cx="52" cy="101" r="13" class="sage"/>
+        <text x="78" y="96" class="text-sm ink">Complete check-in</text>
+        <text x="78" y="116" class="text-xs muted">7 minutes</text>
+        <rect x="24" y="148" width="212" height="54" rx="14" fill="#f8f2e9"/>
+        <circle cx="52" cy="175" r="13" class="gold"/>
+        <text x="78" y="171" class="text-sm ink">Review remedies</text>
+        <text x="78" y="190" class="text-xs muted">3 items updated</text>
+      </g>
+
+      <g transform="translate(0 384)">
+        <rect class="panel" width="708" height="190" rx="18"/>
+        <text x="28" y="40" class="text-lg ink">Report timeline</text>
+        <line x1="54" y1="92" x2="650" y2="92" stroke="#d8cbb6" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="78" cy="92" r="14" class="sage"/>
+        <circle cx="240" cy="92" r="14" class="accent"/>
+        <circle cx="402" cy="92" r="14" class="rose"/>
+        <circle cx="564" cy="92" r="14" class="gold"/>
+        <text x="52" y="132" class="text-xs muted">Intake</text>
+        <text x="204" y="132" class="text-xs muted">Analysis</text>
+        <text x="360" y="132" class="text-xs muted">Report</text>
+        <text x="528" y="132" class="text-xs muted">Follow-up</text>
+        <rect x="542" y="32" width="110" height="32" rx="16" fill="#f3eadc"/>
+        <text x="564" y="53" class="text-xs" fill="#7a5834">On schedule</text>
+      </g>
     </g>
-
-    <!-- chart -->
-    <rect x="240" y="410" width="470" height="210" rx="24" class="card"/>
-    <text x="264" y="446" class="h2">Динамика последних срезов</text>
-    <polyline points="270,555 360,535 450,510 540,490 680,455" fill="none" stroke="#3E72C7" stroke-width="5"/>
-    <polyline points="270,468 360,486 450,505 540,518 680,540" fill="none" stroke="#D78322" stroke-width="5"/>
-    <text x="264" y="596" class="small muted">Синий — ресурс растёт · Оранжевый — напряжение снижается</text>
-
-    <!-- recommendations -->
-    <rect x="240" y="642" width="470" height="86" rx="24" class="card"/>
-    <text x="264" y="676" class="h2">Формула поддержки</text>
-    <text x="264" y="705" class="body muted">Olive · Elm · White Chestnut · повторная проверка через 7 дней</text>
-
-    <!-- right comment -->
-    <rect x="734" y="410" width="266" height="318" rx="26" class="card"/>
-    <circle cx="768" cy="450" r="22" fill="#E7D5B8"/><text x="802" y="446" class="bold">Комментарий специалиста</text><text x="802" y="466" class="small muted">Андрей Ли · сегодня</text>
-    <text x="758" y="512" class="body">Сейчас главное —</text><text x="758" y="536" class="body">не усиливать нагрузку,</text><text x="758" y="560" class="body">а восстановить</text><text x="758" y="584" class="body">базовую опору.</text>
-    <rect x="758" y="642" width="210" height="48" rx="16" class="green"/><text x="790" y="672" font-family="Arial" font-size="16" font-weight="700" fill="#fff">Повторный анализ</text>
   </g>
 
-  <!-- mobile canvas -->
-  <g transform="translate(1140 120)">
-    <rect class="card" width="360" height="760" rx="38"/>
-    <text x="28" y="48" class="h2">Mobile / Обзор</text>
-    <rect x="24" y="74" width="312" height="62" rx="24" fill="#FBF8F1" stroke="#E4DCCF"/>
-    <circle cx="58" cy="105" r="17" class="soft"/><text x="84" y="101" class="bold">Holistic Therapy</text><text x="84" y="121" class="small muted">Кабинет натуральной терапии</text>
-
-    <rect x="24" y="156" width="312" height="92" rx="24" class="card"/>
-    <text x="48" y="190" class="h2">Анна</text><text x="48" y="216" class="small muted">Фокус: здоровье / тело · ID C-1024</text>
-
-    <rect x="24" y="268" width="146" height="100" rx="22" class="card"/><text x="44" y="300" class="small muted">Проблема</text><text x="44" y="342" font-family="Arial" font-size="31" font-weight="800" fill="#D78322">7/10</text>
-    <rect x="190" y="268" width="146" height="100" rx="22" class="card"/><text x="210" y="300" class="small muted">Ресурс</text><text x="210" y="342" font-family="Arial" font-size="31" font-weight="800" fill="#3E72C7">4/10</text>
-
-    <rect x="24" y="388" width="312" height="118" rx="24" class="card"/>
-    <text x="48" y="422" class="h2">Главное сейчас</text><text x="48" y="454" class="body muted">Olive · Земля · восстановить опору</text><rect x="48" y="472" width="220" height="10" rx="5" fill="#EAF3E2"/><rect x="48" y="472" width="150" height="10" rx="5" class="orange"/>
-
-    <rect x="24" y="526" width="312" height="128" rx="24" class="card"/>
-    <text x="48" y="560" class="h2">Комментарий</text><text x="48" y="592" class="body">Не усиливать нагрузку.</text><text x="48" y="616" class="body">Сначала вернуть ресурс.</text>
-
-    <rect x="24" y="676" width="312" height="52" rx="22" class="green"/><text x="84" y="709" font-family="Arial" font-size="17" font-weight="700" fill="#fff">Пройти самоанализ</text>
+  <g transform="translate(1088 120)">
+    <rect class="screen" width="270" height="586" rx="34"/>
+    <rect x="22" y="20" width="226" height="546" rx="24" fill="#fffdf8"/>
+    <text x="42" y="68" class="text-md ink">Overview</text>
+    <text x="42" y="91" class="text-xs muted">Sophia M.</text>
+    <rect x="42" y="118" width="186" height="118" rx="18" fill="#f7f1e7" stroke="#ded2c0"/>
+    <text x="60" y="151" class="text-sm ink">Current report</text>
+    <text x="60" y="177" class="text-lg ink">72%</text>
+    <rect x="60" y="198" width="118" height="10" rx="5" fill="#e1d4bf"/>
+    <rect x="60" y="198" width="86" height="10" rx="5" class="accent"/>
+    <rect x="42" y="260" width="186" height="82" rx="18" class="sage"/>
+    <text x="60" y="292" class="text-sm" fill="#fffdf8">Complete check-in</text>
+    <text x="60" y="316" class="text-xs" fill="#d7e1d8">7 minutes</text>
+    <text x="42" y="382" class="text-sm ink">Timeline</text>
+    <line x1="66" y1="430" x2="206" y2="430" stroke="#d8cbb6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="72" cy="430" r="10" class="sage"/>
+    <circle cx="118" cy="430" r="10" class="accent"/>
+    <circle cx="164" cy="430" r="10" class="rose"/>
+    <circle cx="206" cy="430" r="10" class="gold"/>
+    <rect x="42" y="480" width="186" height="52" rx="16" fill="#f4eadb"/>
+    <text x="60" y="512" class="text-xs" fill="#7a5834">Open full report</text>
   </g>
 </svg>
