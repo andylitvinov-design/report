@@ -4,6 +4,28 @@ This repository stores the product, design, and implementation materials for the
 
 Main target: build a dynamic HTML/React A4 report page and client cabinet for **Алхимия Души / Holistic Therapy**.
 
+## Live client cabinet site
+
+GitHub Pages URL:
+
+`https://andylitvinov-design.github.io/report/`
+
+Deployment is handled by `.github/workflows/pages.yml` from the `main` branch.
+
+Local run:
+
+```bash
+npm install
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+npm run preview
+```
+
 ## Repository role
 
 `report` is the working repository for the report product layer:
