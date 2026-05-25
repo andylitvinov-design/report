@@ -8,20 +8,20 @@ import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
 const pageTabs = {
-  overview: ["Состояние", "Графики", "Следующий шаг", "Комментарий"],
+  overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
+  expert: ["Последний отчёт", "Отчёты по датам", "Механизм", "У-Син", "Препараты"],
+  recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: selfAnalysis.tabs,
-  expert: ["Интерпретация", "Проверка", "Финализация"],
-  recommendations: ["Формула", "Практика", "Контроль"],
-  history: ["График", "История", "Сравнение"],
+  history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
 };
 
 export default function App() {
   const [activePage, setActivePage] = useState("overview");
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
-    self: selfAnalysis.tabs[0],
     expert: pageTabs.expert[0],
     recommendations: pageTabs.recommendations[0],
+    self: selfAnalysis.tabs[0],
     history: pageTabs.history[0],
   });
 
@@ -49,10 +49,13 @@ export default function App() {
     return <Overview />;
   };
 
+  const isSelfAnalysisFocusMode = activePage === "self" && activeTabs.self !== selfAnalysis.tabs[0];
+
   return (
     <Layout
       activePage={activePage}
       activeTab={activeTabs[activePage]}
+      focusMode={isSelfAnalysisFocusMode}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
     >
