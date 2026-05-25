@@ -53,8 +53,7 @@ export function startGoogleSignIn(nextPath = "/cabinet") {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     createDevSession();
-    window.history.pushState({}, "", next);
-    window.dispatchEvent(new PopStateEvent("popstate"));
+    window.location.assign(next);
     return;
   }
 
@@ -64,6 +63,7 @@ export function startGoogleSignIn(nextPath = "/cabinet") {
   const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
   authUrl.searchParams.set("provider", "google");
   authUrl.searchParams.set("redirect_to", redirectTo.toString());
+  authUrl.searchParams.set("response_type", "token");
 
   window.location.assign(authUrl.toString());
 }
