@@ -8,7 +8,7 @@ export default function Layout({ activePage, pageTabs, activeTab, onTabChange, c
     <div className="app-shell">
       <aside className="sidebar" aria-label="Основная навигация">
         <div className="brand">
-          <strong>Holistic Therapy Cabinet</strong>
+          <strong>Alchemy</strong>
           <span>Кабинет натуральной терапии</span>
         </div>
         <nav className="nav-list">
