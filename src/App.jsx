@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
+import AuthStatus from "./components/AuthStatus.jsx";
 import { selfAnalysis } from "./data/mockData.js";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
@@ -91,6 +92,7 @@ export default function App() {
     if (path === "/auth/google") {
       const params = new URLSearchParams(window.location.search);
       startGoogleSignIn(getSafeNextPath(params.get("next"), "/cabinet"));
+      setUser(getStoredSession());
     }
 
     if (path === "/auth/callback") {
@@ -173,16 +175,19 @@ export default function App() {
   };
 
   return (
-    <Layout
-      activePage={activePage}
-      activeTab={activeTabs[activePage]}
-      onTabChange={handleNavigation}
-      onNewAnalysis={handleNewAnalysis}
-      onSignOut={handleSignOut}
-      pageTabs={pageTabs[activePage]}
-      user={user}
-    >
-      {renderPage()}
-    </Layout>
+    <>
+      <AuthStatus user={user} onCreate={handleNewAnalysis} />
+      <Layout
+        activePage={activePage}
+        activeTab={activeTabs[activePage]}
+        onTabChange={handleNavigation}
+        onNewAnalysis={handleNewAnalysis}
+        onSignOut={handleSignOut}
+        pageTabs={pageTabs[activePage]}
+        user={user}
+      >
+        {renderPage()}
+      </Layout>
+    </>
   );
 }
