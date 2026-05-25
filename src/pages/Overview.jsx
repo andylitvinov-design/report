@@ -30,9 +30,11 @@ export default function Overview() {
       </div>
 
       <article className="card">
-        <h2>Формула поддержки</h2>
-        <p className="subtitle">Повторная проверка через 7 дней.</p>
-        <FormulaList items={overview.formula} />
+        <h2>Психологический портрет и карта личности</h2>
+        <p className="subtitle">
+          Краткий обзор ведущих тем, опорных качеств и зон, которые стоит отслеживать до следующего среза.
+        </p>
+        <FormulaList items={["Восстановление ресурса", "Границы нагрузки", "Спокойное завершение дня"]} />
       </article>
     </>
   );

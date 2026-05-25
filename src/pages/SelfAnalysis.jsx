@@ -4,8 +4,8 @@ import { selfAnalysis } from "../data/mockData.js";
 import { calculateBachScore } from "../lib/bachScoring.js";
 
 const sectionMap = {
-  "Анкета ситуации": "situation",
-  "Анкета характера": "character",
+  "Ситуация": "situation",
+  "Характер": "character",
   "Контроль": "control",
 };
 
@@ -54,23 +54,23 @@ export default function SelfAnalysis({ activeTab }) {
       <article className="card result-panel">
         <h2>Итог самоанализа</h2>
         <p>
-          This is a preliminary slice based on client answers. Final recommendations are formed after expert analysis.
+          Это предварительный срез по ответам клиента. Финальные рекомендации формируются после экспертной проверки.
         </p>
         <div className="score-summary">
           <strong>{bachScore.displayValue}</strong>
-          <span>предварительный Bach score</span>
+          <span>предварительный Bach-показатель</span>
         </div>
         <div className="result-grid">
           <div>
-            <h3>Main candidates</h3>
+            <h3>Основные кандидаты для проверки</h3>
             <FormulaList items={["Olive", "White Chestnut"]} />
           </div>
           <div>
-            <h3>Additional support</h3>
+            <h3>Дополнительное направление поддержки</h3>
             <FormulaList items={["Elm"]} />
           </div>
           <div>
-            <h3>Needs verification</h3>
+            <h3>Нужна повторная проверка</h3>
             <FormulaList items={["Oak", "Centaury"]} />
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function SelfAnalysis({ activeTab }) {
   return (
     <>
       <article className="card">
-        <h2>Текущие данные</h2>
+        <h2>Данные</h2>
         <div className="form-grid">
           <label className="field">
             <span>Дата</span>
@@ -114,7 +114,7 @@ export default function SelfAnalysis({ activeTab }) {
         </label>
       </article>
 
-      {activeTab !== "Текущие данные" && (
+      {activeTab !== "Данные" && (
         <div className="question-list">
           {visibleQuestions.map((question, index) => (
             <QuestionCard
@@ -134,7 +134,7 @@ export default function SelfAnalysis({ activeTab }) {
         <h2>Предварительный итог по Bach</h2>
         <div className="score-summary inline">
           <strong>{bachScore.displayValue}</strong>
-          <span>total = situation + character + control * 1.5 + bonuses</span>
+          <span>сумма по ситуации, характеру, контролю и проверочным признакам</span>
         </div>
         <FormulaList items={["Olive", "Elm", "White Chestnut"]} />
       </article>

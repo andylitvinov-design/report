@@ -1,11 +1,11 @@
 import React from "react";
 import { client, navigation, specialistComments } from "../data/mockData.js";
 
-export default function Layout({ activePage, pageTabs, activeTab, onTabChange, children }) {
+export default function Layout({ activePage, pageTabs, activeTab, focusMode = false, onTabChange, children }) {
   const currentNav = navigation.find((item) => item.id === activePage);
 
   return (
-    <div className="app-shell">
+    <div className={focusMode ? "app-shell focus-mode" : "app-shell"}>
       <aside className="sidebar" aria-label="Основная навигация">
         <div className="brand">
           <strong>Holistic Therapy Cabinet</strong>
@@ -39,7 +39,7 @@ export default function Layout({ activePage, pageTabs, activeTab, onTabChange, c
               {client.name} / ID {client.id} · Фокус: {client.focus} · Последний срез: {client.lastSlice}
             </p>
           </div>
-          <button className="primary-btn" type="button">+ Новая оценка</button>
+          <button className="primary-btn" type="button">+ Новый самоанализ</button>
         </section>
 
         <div className="mobile-nav" aria-label="Мобильная навигация">
@@ -76,7 +76,7 @@ export default function Layout({ activePage, pageTabs, activeTab, onTabChange, c
           <article className="card">
             <h2>Комментарий специалиста</h2>
             <p>{specialistComments[activePage]}</p>
-            <button className="primary-btn full" type="button">Запросить анализ</button>
+            <button className="primary-btn full" type="button">Запросить отчёт</button>
           </article>
           <article className="card soft-card">
             <h3>Следующий шаг</h3>

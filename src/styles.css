@@ -57,6 +57,22 @@ h2 {
   min-height: 100vh;
 }
 
+.app-shell.focus-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-shell.focus-mode .sidebar,
+.app-shell.focus-mode .topbar,
+.app-shell.focus-mode .mobile-nav,
+.app-shell.focus-mode .specialist-panel {
+  display: none;
+}
+
+.app-shell.focus-mode .main-shell {
+  grid-template-columns: minmax(0, 900px);
+  justify-content: center;
+}
+
 .sidebar {
   position: sticky;
   top: 0;

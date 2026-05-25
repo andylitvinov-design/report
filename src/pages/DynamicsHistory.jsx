@@ -6,8 +6,8 @@ export default function DynamicsHistory() {
   return (
     <>
       <article className="card">
-        <h2>Динамика / История</h2>
-        <p>История срезов показывает, как меняются сила проблемы и общий ресурс.</p>
+        <h2>Текущие рекомендации</h2>
+        <p>Раздел объединяет карту личности, динамику замеров, историю изменений и следующий шаг.</p>
         <DynamicsChart points={overview.dynamics} />
       </article>
 
