@@ -2,17 +2,41 @@
 
 This repository stores the product, design, and implementation materials for the dynamic client report system.
 
-Main target: build a dynamic HTML/React A4 report page and client cabinet for **Алхимия Души / Holistic Therapy**.
+Main target: build a dynamic HTML/React A4 report page and client cabinet for **Алхимия Души / Holistic Therapy / holistic healing and homeopathy-oriented reports**.
 
-## Live client cabinet site
+## Primary live site target
 
-GitHub Pages URL:
+Desired Vercel production URL:
+
+`https://holistichealing.vercel.app/`
+
+Build info / live version check:
+
+`https://holistichealing.vercel.app/build-info.json`
+
+Vercel fallback deployment is handled by:
+
+`.github/workflows/deploy-production.yml`
+
+The Vercel project should be connected to this repo and configured to deploy `main` to `holistichealing.vercel.app`.
+
+## Legacy GitHub Pages site
+
+Legacy/reference GitHub Pages URL:
 
 `https://andylitvinov-design.github.io/report/`
 
-Deployment is handled by `.github/workflows/pages.yml` from the `main` branch.
+Legacy build info / live version check:
 
-Local run:
+`https://andylitvinov-design.github.io/report/build-info.json`
+
+Legacy GitHub Pages deployment is handled by:
+
+`.github/workflows/pages.yml`
+
+Keep GitHub Pages as a reference during migration. Do not remove it until Vercel production is verified end-to-end.
+
+## Local run
 
 ```bash
 npm install
@@ -25,6 +49,8 @@ Production build:
 npm run build
 npm run preview
 ```
+
+`npm run build` automatically generates `public/build-info.json` through `scripts/write-build-info.mjs`, so agents can verify the live deployment version without asking the user.
 
 ## Repository role
 
@@ -43,6 +69,15 @@ Methodology and agent standards remain in source-of-truth repositories:
 - `andylitvinov-design/ai-projects-brain` — system instructions, report quality standards, auditor rules;
 - `andylitvinov-design/alchemy-method` — DAO / У-Син / Bach / method logic;
 - `andylitvinov-design/report` — product implementation, UX, UI, templates, site/cabinet materials.
+
+## Deployment and verification docs
+
+- `AGENTS.md` — agent rules for this project.
+- `docs/deploy-fallback.md` — Vercel fallback deploy protocol.
+- `docs/deploy-version-check.md` — live version check protocol.
+- `vercel.json` — Vercel project config.
+- `.github/workflows/deploy-production.yml` — Vercel production fallback workflow.
+- `.github/workflows/pages.yml` — legacy GitHub Pages workflow.
 
 ## Current materials
 
