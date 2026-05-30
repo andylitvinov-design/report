@@ -33,8 +33,10 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL: "1"
-      PRODUCTION_URL: https://holistichealing.vercel.app/
-      BUILD_INFO_URL: https://holistichealing.vercel.app/build-info.json
+      PRODUCTION_URL: https://myalchemy.vercel.app/
+      BUILD_INFO_URL: https://myalchemy.vercel.app/build-info.json
+      ALTERNATE_URL: https://holistichealing.vercel.app/
+      ALTERNATE_BUILD_INFO_URL: https://holistichealing.vercel.app/build-info.json
       LEGACY_URL: https://andylitvinov-design.github.io/report/
       LEGACY_BUILD_INFO_URL: https://andylitvinov-design.github.io/report/build-info.json
 
@@ -90,10 +92,10 @@ jobs:
       - name: Wait for production alias
         run: sleep 60
 
-      - name: Verify production URL responds
+      - name: Verify primary production URL responds
         run: curl -fsS --retry 6 --retry-delay 10 "$PRODUCTION_URL" >/dev/null
 
-      - name: Verify build info responds
+      - name: Verify primary build info responds
         run: curl -fsS --retry 6 --retry-delay 10 "$BUILD_INFO_URL" | tee /tmp/build-info.json
 
       - name: Verify build info commit if expected SHA provided
@@ -118,7 +120,8 @@ jobs:
             echo "- Actual SHA: $(git rev-parse HEAD)"
             echo "- Reason: ${{ inputs.reason }}"
             echo "- Deploy URL: ${DEPLOY_URL:-unknown}"
-            echo "- Production URL: $PRODUCTION_URL"
-            echo "- Build Info URL: $BUILD_INFO_URL"
+            echo "- Primary URL: $PRODUCTION_URL"
+            echo "- Primary Build Info URL: $BUILD_INFO_URL"
+            echo "- Alternate URL: $ALTERNATE_URL"
             echo "- Legacy URL: $LEGACY_URL"
           } >> "$GITHUB_STEP_SUMMARY"
