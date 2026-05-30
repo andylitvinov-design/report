@@ -88,6 +88,7 @@ Methodology and agent standards remain in source-of-truth repositories:
 ## Deployment and verification docs
 
 - `AGENTS.md` — agent rules for this project.
+- `docs/myalchemy-migration-plan.md` — current migration status, verification evidence, and blockers.
 - `docs/deploy-fallback.md` — Vercel fallback deploy protocol.
 - `docs/deploy-version-check.md` — live version check protocol.
 - `vercel.json` — Vercel project config.
