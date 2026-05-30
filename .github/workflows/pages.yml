@@ -25,12 +25,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: VITE_BASE=/report/ npm run build
+
+      - name: Print build info
+        run: cat public/build-info.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -50,3 +54,18 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Wait for GitHub Pages propagation
+        run: sleep 60
+
+      - name: Verify GitHub Pages build info
+        run: |
+          BUILD_INFO_URL="${{ steps.deployment.outputs.page_url }}build-info.json"
+          echo "Checking $BUILD_INFO_URL"
+          curl -fsS --retry 6 --retry-delay 10 "$BUILD_INFO_URL" | tee /tmp/build-info.json
+          if ! grep -q "${{ github.sha }}" /tmp/build-info.json; then
+            echo "Legacy GitHub Pages build-info does not contain expected SHA"
+            echo "expected=${{ github.sha }}"
+            cat /tmp/build-info.json
+            exit 1
+          fi
