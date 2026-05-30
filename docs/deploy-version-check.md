@@ -6,11 +6,13 @@ This document tells agents how to check the current live deployment version with
 
 ```text
 Repo: andylitvinov-design/report
-Product: Holistic Healing / homeopathy-oriented client report system
+Product: My Alchemy / Alchemy / homeopathy-oriented client report system
 Primary platform: Vercel
 Legacy platform: GitHub Pages
-Primary production URL: https://holistichealing.vercel.app/
-Primary build-info URL: https://holistichealing.vercel.app/build-info.json
+Primary production URL: https://myalchemy.vercel.app/
+Primary build-info URL: https://myalchemy.vercel.app/build-info.json
+Alternate Vercel URL: https://holistichealing.vercel.app/
+Alternate build-info URL: https://holistichealing.vercel.app/build-info.json
 Legacy URL: https://andylitvinov-design.github.io/report/
 Legacy build-info URL: https://andylitvinov-design.github.io/report/build-info.json
 ```
@@ -22,6 +24,13 @@ Agents must check the current live version themselves. Do not ask Andrey to open
 ## Primary checks
 
 Use:
+
+```text
+GET https://myalchemy.vercel.app/
+GET https://myalchemy.vercel.app/build-info.json
+```
+
+If relevant, also check the alternate Vercel alias:
 
 ```text
 GET https://holistichealing.vercel.app/
@@ -53,13 +62,15 @@ Expected fields:
 
 ```json
 {
-  "project": "holistic-healing-report",
+  "project": "myalchemy-report",
+  "productName": "My Alchemy",
   "repo": "andylitvinov-design/report",
   "commitSha": "...",
   "commitRef": "main",
   "buildTime": "...",
   "platform": "Vercel or GitHub Pages or local",
-  "productionUrl": "https://holistichealing.vercel.app/",
+  "productionUrl": "https://myalchemy.vercel.app/",
+  "alternateUrl": "https://holistichealing.vercel.app/",
   "legacyUrl": "https://andylitvinov-design.github.io/report/"
 }
 ```
@@ -103,12 +114,13 @@ Every production/deploy-related report must include:
 
 ```text
 Live version check:
-- Production URL: https://holistichealing.vercel.app/
-- Build-info URL: https://holistichealing.vercel.app/build-info.json
+- Production URL: https://myalchemy.vercel.app/
+- Build-info URL: https://myalchemy.vercel.app/build-info.json
 - Expected SHA:
 - Live SHA/build marker:
 - Match: yes/no/unknown
 - Evidence source: build-info.json / workflow summary / production URL
+- Alternate Vercel URL check:
 - Legacy URL check:
 - If unknown, why:
 ```
