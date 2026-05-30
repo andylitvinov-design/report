@@ -1,14 +1,24 @@
-# AGENTS.md — Holistic Healing Report
+# AGENTS.md — My Alchemy Report
 
 ## Project boundary
 
 Canonical repo: `andylitvinov-design/report`.
-Project/product: dynamic client report system for **Алхимия Души / Holistic Therapy / homeopathy-oriented reports**.
-Primary production target: `https://holistichealing.vercel.app/`.
+Project/product: dynamic client report system for **My Alchemy / Алхимия Души / Holistic Therapy / homeopathy-oriented reports**.
+Primary production target: `https://myalchemy.vercel.app/`.
+Possible alternate / previous Vercel alias: `https://holistichealing.vercel.app/`.
 Legacy GitHub Pages URL: `https://andylitvinov-design.github.io/report/`.
 Framework: Vite + React.
 Primary hosting target: Vercel.
 Legacy hosting: GitHub Pages via `.github/workflows/pages.yml`.
+
+## Related Alchemy repositories
+
+- `andylitvinov-design/report` — main React/Vite implementation repo for the client report/cabinet and `myalchemy.vercel.app`.
+- `andylitvinov-design/alchemy` — concept/MVP notes and static draft materials for the Alchemy project.
+- `andylitvinov-design/alchemy-method` — methodology/source logic for DAO / У-Син / Bach / homeopathy-oriented interpretation.
+- `andylitvinov-design/alchemy_site` — standalone site-facing Alchemy HTML bundle / cloud-ready shell.
+
+Current rule: use `report` as the main site implementation repo for `myalchemy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
 
 ## Context-first rules
 
@@ -29,10 +39,11 @@ If a file is missing, report `not found`.
 
 ## Production target rules
 
-- Treat `https://holistichealing.vercel.app/` as the desired primary production URL.
+- Treat `https://myalchemy.vercel.app/` as the desired primary production URL.
+- Treat `https://holistichealing.vercel.app/` as possible alternate/previous Vercel alias, not the primary target unless explicitly changed later.
 - Treat `https://andylitvinov-design.github.io/report/` as legacy/reference until migration is fully verified.
 - Do not remove GitHub Pages deployment until Vercel production is verified end-to-end.
-- Vercel project should be connected to this repo and configured so production deploys from `main` serve `holistichealing.vercel.app`.
+- Vercel project should be connected to this repo and configured so production deploys from `main` serve `myalchemy.vercel.app`.
 
 ## Deploy fallback
 
@@ -54,8 +65,10 @@ Platform: Vercel
 Target ref: normally main
 Expected SHA: known commit SHA
 Changes: committed and pushed/merged
-Production URL: https://holistichealing.vercel.app/
-Build info URL: https://holistichealing.vercel.app/build-info.json
+Primary production URL: https://myalchemy.vercel.app/
+Primary build info URL: https://myalchemy.vercel.app/build-info.json
+Alternate URL: https://holistichealing.vercel.app/
+Alternate build info URL: https://holistichealing.vercel.app/build-info.json
 Legacy URL: https://andylitvinov-design.github.io/report/
 Legacy build info URL: https://andylitvinov-design.github.io/report/build-info.json
 ```
@@ -85,6 +98,12 @@ Never deploy uncommitted or unpushed changes. Never deploy an unknown ref. Never
 Agents must check the current live deployment version themselves.
 
 Primary check:
+
+```text
+https://myalchemy.vercel.app/build-info.json
+```
+
+Alternate check if needed:
 
 ```text
 https://holistichealing.vercel.app/build-info.json
@@ -118,11 +137,18 @@ npm run build
 After deploy, verify:
 
 ```text
+https://myalchemy.vercel.app/
+https://myalchemy.vercel.app/build-info.json
+```
+
+If relevant, also verify alternate Vercel alias:
+
+```text
 https://holistichealing.vercel.app/
 https://holistichealing.vercel.app/build-info.json
 ```
 
-During migration, also verify:
+During migration, also verify legacy GitHub Pages:
 
 ```text
 https://andylitvinov-design.github.io/report/
@@ -143,6 +169,7 @@ Deploy workflow result if used:
 Production URL:
 Build info URL:
 Live version check:
+Alternate URL check:
 Legacy URL check:
 Remaining blockers:
 ```
