@@ -2,23 +2,27 @@
 
 This repository stores the product, design, and implementation materials for the dynamic client report system.
 
-Main target: build a dynamic HTML/React A4 report page and client cabinet for **Алхимия Души / Holistic Therapy / holistic healing and homeopathy-oriented reports**.
+Main target: build a dynamic HTML/React A4 report page and client cabinet for **My Alchemy / Алхимия Души / Holistic Therapy / homeopathy-oriented reports**.
 
 ## Primary live site target
 
 Desired Vercel production URL:
 
-`https://holistichealing.vercel.app/`
+`https://myalchemy.vercel.app/`
 
 Build info / live version check:
 
-`https://holistichealing.vercel.app/build-info.json`
+`https://myalchemy.vercel.app/build-info.json`
+
+Possible alternate / previous Vercel alias:
+
+`https://holistichealing.vercel.app/`
 
 Vercel fallback deployment is handled by:
 
 `.github/workflows/deploy-production.yml`
 
-The Vercel project should be connected to this repo and configured to deploy `main` to `holistichealing.vercel.app`.
+The Vercel project should be connected to this repo and configured to deploy `main` to `myalchemy.vercel.app`.
 
 ## Legacy GitHub Pages site
 
@@ -35,6 +39,17 @@ Legacy GitHub Pages deployment is handled by:
 `.github/workflows/pages.yml`
 
 Keep GitHub Pages as a reference during migration. Do not remove it until Vercel production is verified end-to-end.
+
+## Related Alchemy repositories
+
+The project historically appears under several names/places:
+
+- `andylitvinov-design/report` — working React/Vite implementation for the client report and cabinet.
+- `andylitvinov-design/alchemy` — concept/MVP notes and static draft materials for the Alchemy project.
+- `andylitvinov-design/alchemy-method` — methodology/source logic for DAO / У-Син / Bach / homeopathy-oriented interpretation.
+- `andylitvinov-design/alchemy_site` — standalone site-facing Alchemy HTML bundle / cloud-ready shell.
+
+Current rule: use `report` as the main site implementation repo for `myalchemy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
 
 ## Local run
 
