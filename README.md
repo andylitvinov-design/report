@@ -49,6 +49,35 @@ Client cabinet source materials:
 - `docs/client-cabinet/VISUAL_QA_CHECKLIST.md` — visual QA checklist for desktop and mobile review.
 - `docs/client-cabinet/prototype/overview.html` — static Overview prototype following the SVG mockup.
 
+## Client Cabinet App
+
+The real cabinet is implemented as a minimal Next 16 + TypeScript app:
+
+- `/` — entry page with the Google cabinet login button.
+- `/login` — protected-route login target with `Войти через Google`.
+- `/cabinet` — current state, graph, latest report summary.
+- `/cabinet/self-analysis` — current data and new/repeat questionnaire action.
+- `/cabinet/expert-analysis` — expert text/visual interpretation and repeat warning.
+- `/cabinet/recommendations` — current recommendations.
+- `/cabinet/history` — user-scoped past analyses and reports.
+
+Required environment variables are listed in `.env.example`. Do not commit real values.
+Setup details are documented in `docs/client-cabinet/environment.md`.
+
+Supabase schema reference:
+
+- `supabase/schema.sql`
+
+Local development falls back to a dev-only cookie-backed store when Supabase is not configured. Authenticated production clients use Supabase through the server-side repository layer as the source of truth.
+
+Validation:
+
+```bash
+npm test
+npm run typecheck
+npm run build
+```
+
 ## Branches
 
 - `main` — stable reference and accepted materials.

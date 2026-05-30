@@ -28,6 +28,11 @@ body {
   color: var(--text);
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 button,
 input,
 select,
@@ -51,10 +56,117 @@ h2 {
   letter-spacing: 0;
 }
 
+.site-header {
+  min-height: 64px;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 253, 248, 0.92);
+  backdrop-filter: blur(14px);
+}
+
+.site-logo {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 14px;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.auth-btn,
+.google-btn,
+.ghost-link {
+  min-height: 42px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-weight: 850;
+}
+
+.auth-btn {
+  margin-left: auto;
+}
+
+.google-btn {
+  border-color: #d7dce4;
+  box-shadow: var(--shadow);
+}
+
+.google-mark {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.landing-shell {
+  min-height: calc(100vh - 64px);
+  padding: 28px;
+  display: grid;
+  place-items: center;
+}
+
+.landing-panel {
+  width: min(760px, 100%);
+  padding: clamp(24px, 6vw, 56px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.landing-panel h1 {
+  margin-bottom: 12px;
+}
+
+.action-row {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-error {
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(217, 83, 79, 0.28);
+  border-radius: 14px;
+  background: rgba(217, 83, 79, 0.08);
+  color: var(--danger);
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
   min-height: 100vh;
+}
+
+.app-shell.focus-mode {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-shell.focus-mode .sidebar,
+.app-shell.focus-mode .topbar,
+.app-shell.focus-mode .mobile-nav,
+.app-shell.focus-mode .specialist-panel {
+  display: none;
+}
+
+.app-shell.focus-mode .main-shell {
+  grid-template-columns: minmax(0, 900px);
+  justify-content: center;
 }
 
 .sidebar {
@@ -273,6 +385,15 @@ h3 {
   color: var(--muted);
 }
 
+.metric-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
 .metric-card strong {
   display: block;
   margin-top: 8px;
@@ -376,6 +497,71 @@ h3 {
   height: 100%;
   border-radius: inherit;
   background: var(--orange);
+}
+
+.mini-chart {
+  min-height: 230px;
+  margin-top: 16px;
+  padding: 16px 10px 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(44px, 1fr));
+  align-items: end;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff, #fbf7ee);
+}
+
+.chart-point {
+  height: 190px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 5px;
+}
+
+.chart-point span {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.chart-point .bar {
+  width: 100%;
+  min-height: 10px;
+  margin-top: 0;
+}
+
+.chart-point .problem {
+  background: var(--orange);
+}
+
+.chart-point .resource {
+  background: var(--blue);
+}
+
+.theme-bar {
+  display: grid;
+  gap: 7px;
+}
+
+.theme-bar span {
+  color: var(--muted);
+}
+
+.theme-bar div {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #efe9df;
+}
+
+.theme-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
 }
 
 .formula-list {
@@ -539,6 +725,16 @@ h3 {
   gap: 14px;
 }
 
+.analysis-form {
+  margin-top: 10px;
+}
+
+.empty-state,
+.error-state,
+.warning-card {
+  border-color: rgba(217, 83, 79, 0.18);
+}
+
 @media (max-width: 1120px) {
   .main-shell {
     grid-template-columns: 1fr;
@@ -554,6 +750,20 @@ h3 {
 }
 
 @media (max-width: 760px) {
+  .site-header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  .site-header nav {
+    order: 3;
+    width: 100%;
+  }
+
+  .auth-btn {
+    margin-left: auto;
+  }
+
   .app-shell {
     display: block;
   }
@@ -599,6 +809,10 @@ h3 {
   .workspace,
   .specialist-panel {
     margin-top: 14px;
+  }
+
+  .report-first {
+    order: 1;
   }
 
   .metrics-grid,
