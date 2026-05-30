@@ -36,7 +36,7 @@ https://holistichealing.vercel.app/
 
 ## Current Verification Snapshot
 
-Snapshot time: `2026-05-31 00:09 Europe/Madrid`.
+Snapshot time: `2026-05-31 00:21 Europe/Madrid`.
 
 Target ref:
 
@@ -72,12 +72,27 @@ team/context: super10
 Direct project checks:
 
 ```text
+npx vercel project inspect reports
+Found Project super10/reports
+ID: prj_gAULkzGFwndd5YYWufWyqYNwdKQ5
+Framework Preset: Vite
+Root Directory: .
+Latest Production URL: https://reports-super10.vercel.app
+
 npx vercel project inspect myalchemy
 Error: There is no project for "myalchemy"
 
 npx vercel project inspect report
 Error: There is no project for "report"
 ```
+
+The existing `reports` Vercel project is not enough to complete the migration:
+
+- it serves `reports-super10.vercel.app`, not `myalchemy.vercel.app`;
+- its production deployment is behind Vercel authentication and does not expose public `build-info.json`;
+- `npx vercel git connect https://github.com/andylitvinov-design/report` returned Vercel API `400 Bad Request`.
+
+Local GitHub access is not the blocker: `gh repo view andylitvinov-design/report --json viewerPermission` returns `ADMIN`, and the repo is public. The remaining Git connection blocker is on the Vercel side, most likely Git provider integration access/installation for `andylitvinov-design/report`.
 
 Direct domain/deployment checks:
 
@@ -131,6 +146,13 @@ Current `gh secret list --repo andylitvinov-design/report` result:
 No repository secrets returned.
 ```
 
+Confirmed through both:
+
+```text
+gh secret list --repo andylitvinov-design/report --json name,updatedAt
+gh api repos/andylitvinov-design/report/actions/secrets
+```
+
 Do not run the production fallback workflow until these secrets exist. The workflow uses those secrets for `vercel pull`, `vercel build`, and `vercel deploy --prod`.
 
 ## Workflow Status
@@ -181,11 +203,12 @@ a06bf2c8ea2ee30631807eff138cfc9f963b373f
 
 ## Remaining Blockers
 
-1. Vercel project connection to `andylitvinov-design/report` has not been confirmed; no accessible `myalchemy` or `report` project exists in the current Vercel context.
-2. Primary production URL returns `DEPLOYMENT_NOT_FOUND`.
-3. Required GitHub repository secrets are missing or unavailable through `gh secret list`.
-4. Production fallback workflow has not been run because the required secrets are missing.
-5. Production `build-info.json` is unavailable, so Vercel live SHA comparison is impossible.
+1. Vercel has an accessible `reports` project, but no accessible `myalchemy` project.
+2. The accessible `reports` project is not connected to `andylitvinov-design/report`; `vercel git connect` returns Vercel API `400 Bad Request`.
+3. The required production domain `myalchemy.vercel.app` is not serving a deployment and is not accessible in the current Vercel context.
+4. Required GitHub repository secrets are missing: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+5. Production fallback workflow has not been run because the required secrets are missing.
+6. Production `build-info.json` is unavailable, so Vercel live SHA comparison is impossible.
 
 ## Mandala / Public Service Requirements
 
