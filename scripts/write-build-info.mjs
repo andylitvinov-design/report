@@ -12,13 +12,15 @@ const commitRef =
   'local';
 
 const buildInfo = {
-  project: 'holistic-healing-report',
+  project: 'myalchemy-report',
+  productName: 'My Alchemy',
   repo: process.env.GITHUB_REPOSITORY || 'andylitvinov-design/report',
   commitSha,
   commitRef,
   buildTime: new Date().toISOString(),
   platform: process.env.VERCEL ? 'Vercel' : 'GitHub Pages or local',
-  productionUrl: 'https://holistichealing.vercel.app/',
+  productionUrl: 'https://myalchemy.vercel.app/',
+  alternateUrl: 'https://holistichealing.vercel.app/',
   legacyUrl: 'https://andylitvinov-design.github.io/report/'
 };
 
