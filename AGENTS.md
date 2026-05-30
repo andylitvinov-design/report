@@ -33,9 +33,44 @@ Before changing this repo, read:
 7. `.github/workflows/pages.yml`
 8. `docs/deploy-fallback.md`
 9. `docs/deploy-version-check.md`
-10. relevant product/design docs under `docs/`
+10. `docs/myalchemy-migration-plan.md` if present
+11. relevant product/design docs under `docs/`
 
 If a file is missing, report `not found`.
+
+## Absolute deployment escalation rule
+
+Do not ask Andrey to perform local deployment from his terminal.
+
+If direct deploy tooling is unavailable, follow this order instead:
+
+```text
+1. Use the GitHub Actions fallback workflow if it exists.
+2. If workflow dispatch is available, run it with the correct ref and expected SHA.
+3. If workflow dispatch is not available but GitHub write is available, create or update an issue/PR handoff for Codex or another agent.
+4. If GitHub write is unavailable, report the exact missing capability and the exact workflow/ref/SHA that another agent must run.
+```
+
+Invalid final answer:
+
+```text
+I cannot deploy from here; Andrey should deploy manually.
+```
+
+Required final answer when blocked:
+
+```text
+Deployment not completed.
+Exact blocker:
+Next non-user action:
+GitHub issue/PR/workflow handoff:
+```
+
+Source policy:
+
+```text
+andylitvinov-design/active-projects-ops/docs/no-user-terminal-deploy-policy.md
+```
 
 ## Production target rules
 
@@ -55,7 +90,7 @@ This repo has a Vercel production fallback workflow:
 
 Use it when Vercel auto-deploy does not trigger, production remains stale after push/merge, or the user reports that live does not show completed changes.
 
-Do not ask Andrey to run a local terminal deploy until this fallback path has been attempted and diagnosed.
+Do not ask Andrey to perform local deployment. Use workflow fallback, issue/PR handoff, or exact non-user blocker reporting.
 
 Before fallback deploy, always prove:
 
@@ -171,5 +206,6 @@ Build info URL:
 Live version check:
 Alternate URL check:
 Legacy URL check:
+If not deployed, exact non-user blocker and next agent action:
 Remaining blockers:
 ```
