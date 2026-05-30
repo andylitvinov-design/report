@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/write-build-info.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },
