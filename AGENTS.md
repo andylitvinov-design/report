@@ -209,3 +209,48 @@ Legacy URL check:
 If not deployed, exact non-user blocker and next agent action:
 Remaining blockers:
 ```
+---
+
+## Agent Command Registry
+
+### /delivery
+
+`/delivery` is sufficient by itself. No extra delegation language is required.
+The command means full safe release-owner delegation:
+
+```
+task → acceptance criteria → implementation → result quality gate → local checks
+→ PR → PR health → merge if permitted → deploy → live proof → final report
+```
+
+When the user invokes `/delivery`, read and follow `.claude/commands/delivery.md`.
+
+Act as a release owner, not only a coding assistant. Do not stop after code changes,
+PR creation, green checks, merge, or deployment. Stop only with:
+
+- `STATUS: SUCCESS` — task implemented, merged, deployed, and verified on live.
+- `STATUS: BLOCKED` — real external blocker with exact evidence and required user action.
+
+**Project adapter:**
+
+- Repository: `andylitvinov-design/report`
+- Default branch: `main`
+- Target branch: `main`
+- Package manager: `npm`
+- Framework: Vite + React SPA
+- Build: `npm run build`
+- CI: GitHub Actions
+- Deployment: Vercel
+- Primary live URL: `https://myalchemy.vercel.app/` ← default SUCCESS target
+
+**Live target rule:** Unless the user explicitly specifies another target, SUCCESS requires
+LIVE PROOF on `https://myalchemy.vercel.app/`.
+
+**Result verification gate:** STATUS: SUCCESS also requires the Final Result Verification
+Gate from `.claude/commands/delivery.md`. Every required item must be `PASS`.
+
+**Cost-control rules:**
+- Prefer diffs over full files.
+- Stop after 3 failed fix attempts on the same issue — return STATUS: BLOCKED.
+- Never touch env vars, secrets, billing, production database, or auth-sensitive settings without explicit user approval.
+- Final report must include a COST CONTROL section.
