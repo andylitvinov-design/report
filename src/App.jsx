@@ -11,12 +11,13 @@ const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
   expert: ["Последний отчёт", "Отчёты по датам", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
-  self: selfAnalysis.tabs,
+  self: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
 };
 
 export default function App() {
   const [activePage, setActivePage] = useState("overview");
+  const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
     expert: pageTabs.expert[0],
@@ -31,11 +32,14 @@ export default function App() {
       return;
     }
     setActivePage(page);
+    if (page !== "self") {
+      setSelfAnalysisMode("overview");
+    }
   };
 
   const renderPage = () => {
     if (activePage === "self") {
-      return <SelfAnalysis activeTab={activeTabs.self} />;
+      return <SelfAnalysis onModeChange={setSelfAnalysisMode} />;
     }
     if (activePage === "expert") {
       return <ExpertAnalysis />;
@@ -49,7 +53,7 @@ export default function App() {
     return <Overview />;
   };
 
-  const isSelfAnalysisFocusMode = activePage === "self" && activeTabs.self !== selfAnalysis.tabs[0];
+  const isSelfAnalysisFocusMode = activePage === "self" && selfAnalysisMode === "form";
 
   return (
     <Layout

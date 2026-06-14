@@ -48,16 +48,18 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
       </aside>
 
       <main className="main-shell">
-        <section className="topbar">
-          <div>
-            <p className="eyebrow">{currentLabel}</p>
-            <h1>{currentLabel}</h1>
-            <p className="subtitle">
-              {client.name} / ID {client.id} · Фокус: {client.focus} · Последний срез: {client.lastSlice}
-            </p>
-          </div>
-          <button className="primary-btn" type="button">{actionLabels[activePage] || "+ Новая оценка"}</button>
-        </section>
+        {!focusMode && (
+          <section className="topbar">
+            <div>
+              <p className="eyebrow">{currentLabel}</p>
+              <h1>{currentLabel}</h1>
+              <p className="subtitle">
+                {client.name} / ID {client.id} · Фокус: {client.focus} · Последний срез: {client.lastSlice}
+              </p>
+            </div>
+            <button className="primary-btn" type="button">{actionLabels[activePage] || "+ Новая оценка"}</button>
+          </section>
+        )}
 
         <div className="mobile-nav" aria-label="Мобильная навигация">
           {navigation.map((item) => (
@@ -72,7 +74,7 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
           ))}
         </div>
 
-        {pageTabs?.length > 0 && (
+        {!focusMode && pageTabs?.length > 0 && (
           <div className="tabs" aria-label="Разделы страницы">
             {pageTabs.map((tab) => (
               <button
