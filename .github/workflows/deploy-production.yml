@@ -15,6 +15,10 @@ on:
         description: "Why this fallback deploy was triggered"
         required: false
         default: "fallback production deploy"
+      production_url:
+        description: "Production URL to verify after deploy"
+        required: false
+        default: "https://psitherapy.vercel.app/"
 
 permissions:
   contents: read
@@ -33,10 +37,8 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL: "1"
-      PRODUCTION_URL: https://myalchemy.vercel.app/
-      BUILD_INFO_URL: https://myalchemy.vercel.app/build-info.json
-      ALTERNATE_URL: https://holistichealing.vercel.app/
-      ALTERNATE_BUILD_INFO_URL: https://holistichealing.vercel.app/build-info.json
+      PRODUCTION_URL: ${{ inputs.production_url }}
+      BUILD_INFO_URL: ${{ inputs.production_url }}build-info.json
       LEGACY_URL: https://andylitvinov-design.github.io/report/
       LEGACY_BUILD_INFO_URL: https://andylitvinov-design.github.io/report/build-info.json
 
@@ -51,6 +53,7 @@ jobs:
           echo "ref=${{ inputs.ref }}"
           echo "reason=${{ inputs.reason }}"
           echo "expected_sha=${{ inputs.expected_sha }}"
+          echo "production_url=${{ inputs.production_url }}"
           echo "actual_sha=$(git rev-parse HEAD)"
           git log -1 --oneline
 
@@ -62,6 +65,19 @@ jobs:
             echo "Expected SHA does not match checked-out SHA"
             echo "expected=${{ inputs.expected_sha }}"
             echo "actual=$ACTUAL_SHA"
+            exit 1
+          fi
+
+      - name: Verify Vercel secrets are configured
+        run: |
+          missing=0
+          for var in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!var}" ]; then
+              echo "::error::$var is not configured"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
             exit 1
           fi
 
@@ -122,6 +138,5 @@ jobs:
             echo "- Deploy URL: ${DEPLOY_URL:-unknown}"
             echo "- Primary URL: $PRODUCTION_URL"
             echo "- Primary Build Info URL: $BUILD_INFO_URL"
-            echo "- Alternate URL: $ALTERNATE_URL"
             echo "- Legacy URL: $LEGACY_URL"
           } >> "$GITHUB_STEP_SUMMARY"
