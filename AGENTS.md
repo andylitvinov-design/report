@@ -38,6 +38,57 @@ Before changing this repo, read:
 
 If a file is missing, report `not found`.
 
+## Agent Command Registry
+
+### /delivery
+
+When the user invokes `/delivery`, follow the local source-of-truth files in this order:
+
+1. `.claude/commands/delivery.md`
+2. `.claude/skills/delivery/SKILL.md`
+3. `docs/delivery-loop-program.md`
+4. `docs/delivery-loop-technical-details.md`
+5. `docs/delivery-loop-source-patterns-and-live-proof.md`
+6. this `AGENTS.md`
+
+`/delivery` is sufficient by itself. Do not ask Andrey for extra confirmation to create a branch, create/update a PR, merge if safe/permitted, run deployment fallback, or verify live merely because `/delivery` was invoked.
+
+Act as a release owner, not only a coding assistant.
+
+Do not stop after code changes, PR creation, green checks, merge, or deployment.
+
+Stop only with:
+
+- `STATUS: SUCCESS` — task implemented, verified, PR/merge completed if required, deployed, and verified on live.
+- `STATUS: BLOCKED` — real external blocker with exact evidence and required user action.
+
+Before starting, create a project adapter:
+
+- repository: `andylitvinov-design/report`;
+- target branch: normally `main`;
+- package manager: `npm`;
+- framework: Vite + React;
+- build command: `npm run build`;
+- delivery check command: `npm run delivery:check`;
+- CI provider: GitHub Actions;
+- deployment provider: Vercel fallback workflow + legacy GitHub Pages;
+- primary live URL: `https://myalchemy.vercel.app/`;
+- primary build-info URL: `https://myalchemy.vercel.app/build-info.json`;
+- alternate URL: `https://holistichealing.vercel.app/`;
+- legacy URL: `https://andylitvinov-design.github.io/report/`;
+- required deploy secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+
+Before any completion claim, run the Final Result Verification Gate:
+
+| Requirement | Status | Evidence | Verification method |
+|---|---|---|---|
+
+Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`.
+
+Only all required items as `PASS` allow `STATUS: SUCCESS`. If any required item is `PARTIAL`, `FAIL`, or `NOT VERIFIED`, repair and rerun the gate. After 2 failed gate repair attempts, report `STATUS: BLOCKED`.
+
+For this repo, production delivery success requires live proof on `https://myalchemy.vercel.app/` and matching `build-info.commitSha`, unless the user explicitly requests another target. Legacy GitHub Pages can be reported as legacy proof only; it cannot satisfy primary Vercel production success by default.
+
 ## Absolute deployment escalation rule
 
 Do not ask Andrey to perform local deployment from his terminal.
@@ -167,6 +218,7 @@ Run:
 ```bash
 npm ci
 npm run build
+npm run delivery:check
 ```
 
 After deploy, verify:
