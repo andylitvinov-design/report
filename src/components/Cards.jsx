@@ -19,6 +19,28 @@ export function FormulaList({ items }) {
   );
 }
 
+export function RemedyResultList({ items }) {
+  if (!items.length) {
+    return <p className="empty-result">Пока недостаточно отмеченных ответов для этой группы.</p>;
+  }
+
+  return (
+    <div className="remedy-result-list">
+      {items.map((item) => (
+        <article className="remedy-result" key={item.remedy}>
+          <div>
+            <strong>{item.remedy}</strong>
+            <span>{item.theme}</span>
+          </div>
+          <b>{item.total}</b>
+          <p>{item.explanation}</p>
+          <small>{item.confirmation}</small>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export function QuestionCard({ index, question, score, onScoreChange, comment, onCommentChange }) {
   return (
     <article className="card question-card">
@@ -31,7 +53,7 @@ export function QuestionCard({ index, question, score, onScoreChange, comment, o
       </div>
       <h3>{question.text}</h3>
       <div className="score-grid" role="group" aria-label={`Оценка вопроса ${index + 1}`}>
-        {[1, 2, 3, 4, 5].map((value) => (
+        {[0, 1, 2, 3, 4, 5].map((value) => (
           <button
             className={score === value ? "score active" : "score"}
             key={value}

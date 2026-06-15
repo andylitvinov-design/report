@@ -214,6 +214,22 @@ h3 {
   margin-top: 18px;
 }
 
+.secondary-btn {
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 850;
+}
+
+.secondary-btn:disabled,
+.primary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -298,6 +314,10 @@ h3 {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
   gap: 18px;
+}
+
+.result-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .section-head {
@@ -391,6 +411,143 @@ h3 {
   background: var(--green-soft);
   color: var(--green);
   font-weight: 800;
+}
+
+.self-overview,
+.focused-form,
+.remedy-result-list {
+  display: grid;
+  gap: 16px;
+}
+
+.self-start-card {
+  display: grid;
+  gap: 14px;
+}
+
+.self-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.status-card {
+  display: grid;
+  gap: 8px;
+}
+
+.status-card span,
+.self-counts span,
+.remedy-result span,
+.remedy-result small,
+.question-section-head span {
+  color: var(--muted);
+}
+
+.status-card strong {
+  color: var(--green);
+  font-size: 26px;
+}
+
+.overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.self-counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
+
+.form-progress {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.form-progress h1 {
+  font-size: 28px;
+}
+
+.step-nav {
+  position: sticky;
+  top: 92px;
+  z-index: 4;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.step-pill {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.step-pill.active {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.question-section-head {
+  display: grid;
+  gap: 8px;
+}
+
+.remedy-result {
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbf7ee;
+}
+
+.remedy-result > div {
+  display: grid;
+  gap: 3px;
+}
+
+.remedy-result b {
+  color: var(--green);
+  font-size: 22px;
+}
+
+.empty-result {
+  padding: 14px;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+
+.form-actions {
+  position: sticky;
+  bottom: 14px;
+  z-index: 5;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
 }
 
 .form-grid {
@@ -644,8 +801,24 @@ h3 {
   .dashboard-grid,
   .analysis-grid,
   .result-grid,
+  .result-grid.three,
+  .self-overview-grid,
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .form-progress {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .step-nav {
+    top: 0;
+  }
+
+  .overview-actions,
+  .form-actions {
+    display: grid;
   }
 
   .card {
