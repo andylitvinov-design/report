@@ -138,6 +138,22 @@ The `/delivery` command itself is the user's delegation to proceed through the f
 
 Do not ask the user to additionally confirm merge/deploy/live verification merely because `/delivery` was invoked.
 
+## PR checkpoint policy
+
+For `/delivery`, an opened pull request is an intermediate checkpoint, not the normal finish line.
+
+Default behavior after PR creation:
+
+1. inspect PR health and CI;
+2. run or confirm project-required checks;
+3. run the Spiral Validator-Critic Loop until the verdict is `READY_FOR_MERGE` or `READY_WITH_NOTES`;
+4. merge when the PR is healthy and merge is permitted;
+5. continue to deploy and live verification when the project adapter requires it.
+
+Review-only mode is used only when the user explicitly asks for review-only, PR-only, draft-only, or no-deploy work.
+
+If merge cannot proceed, return `STATUS: BLOCKED` with the exact reason and next action.
+
 Ask or stop with `STATUS: BLOCKED` only when there is a real external blocker: missing permission, required human review, failed checks that cannot be fixed safely, project-specific safety risk, missing secret/env, deployment access missing, or unsafe/destructive action required.
 
 ## Spiral Validator-Critic Loop
