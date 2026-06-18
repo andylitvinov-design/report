@@ -1,6 +1,6 @@
 import React from "react";
-import { client, expertBlocks } from "../data/mockData.js";
 import { getAnswerText, hasAnswerContent } from "../lib/firstIntakeAnswers.js";
+import { client } from "../data/mockData.js";
 import { readFirstIntakeResult } from "../lib/firstIntakeStorage.js";
 import "../results.css";
 
@@ -70,6 +70,39 @@ const reportDetails = {
   },
 };
 
+const notebookMetricItems = [
+  ["Проблема", "problemStrength"],
+  ["Ресурс", "resourceLevel"],
+  ["Тревога", "anxietyLevel"],
+  ["Усталость", "fatigueLevel"],
+  ["Влияние", "lifeImpact"],
+];
+
+const compactReportTabs = ["Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"];
+
+const formatScore = (value) => (value === undefined || value === null || value === "" ? "не указано" : `${value}/10`);
+
+const formatAnswer = (value, fallback = "требует уточнения") => getAnswerText(value) || fallback;
+
+const formatResultDate = (value) => {
+  if (!value) return "сегодня";
+
+  try {
+    return new Intl.DateTimeFormat("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(value));
+  } catch {
+    return "сегодня";
+  }
+};
+
+const getTopBachCandidates = (result, limit = 4) => {
+  const bach = result?.bachResults || { main: [], support: [] };
+  return [...(bach.main || []), ...(bach.support || [])].slice(0, limit);
+};
+
 function EmptyFirstConsultation({ onStartSelfAnalysis }) {
   return (
     <section className="results-modal-shell" aria-label="Нет доступных отчётов">
@@ -109,6 +142,246 @@ function EmptyFirstConsultation({ onStartSelfAnalysis }) {
         </article>
       </div>
     </section>
+  );
+}
+
+function ResultsSummaryCard({ firstIntakeResult }) {
+  const baseline = firstIntakeResult?.symptomBaseline || {};
+
+  if (!firstIntakeResult) {
+    return (
+      <div className="results-summary-card">
+        <span className="card-kicker">Текущий summary</span>
+        <h2>Тетрадь результатов пока пустая.</h2>
+        <p>Первый приём создаст базовую точку сравнения: силу проблемы, ресурс, тревогу, усталость и влияние на жизнь.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="results-summary-card">
+      <span className="card-kicker">Текущий summary</span>
+      <h2>Первичная карта сохранена.</h2>
+      <p>
+        Это baseline для будущей динамики: предварительная карта состояния, Bach-группировка и направление поддержки.
+        Материал требует проверки специалистом и не заменяет медицинскую помощь.
+      </p>
+      <div className="results-baseline-marker">
+        <strong>Baseline</strong>
+        <span>{formatResultDate(firstIntakeResult.completedAt || baseline.updatedAt)}</span>
+      </div>
+    </div>
+  );
+}
+
+function ResultsDynamicSnapshot({ firstIntakeResult }) {
+  const baseline = firstIntakeResult?.symptomBaseline || {};
+
+  return (
+    <section className="results-dynamic-strip" aria-label="Будущая динамика">
+      <div>
+        <span>Стартовая точка</span>
+        <strong>{firstIntakeResult ? formatScore(baseline.problemStrength) : "ожидает первого приёма"}</strong>
+      </div>
+      <div>
+        <span>Следующий срез</span>
+        <strong>готовится</strong>
+      </div>
+      <div>
+        <span>Что сравним</span>
+        <strong>ресурс, тревогу, усталость</strong>
+      </div>
+    </section>
+  );
+}
+
+function ResultsReportPreview({ firstIntakeResult, onSelectReport }) {
+  const baseline = firstIntakeResult?.symptomBaseline || {};
+  const candidates = getTopBachCandidates(firstIntakeResult, 3);
+
+  return (
+    <section className="results-report-preview" aria-label="Предпросмотр отчёта">
+      <div className="section-head">
+        <div>
+          <span className="card-kicker">Report preview</span>
+          <h3>Что уже собрано</h3>
+        </div>
+        {firstIntakeResult ? <span className="lab-badge">предварительная карта</span> : <span className="lab-badge">пока пусто</span>}
+      </div>
+
+      {firstIntakeResult ? (
+        <>
+          <p>
+            Фокус: {formatAnswer(baseline.mainConcern)}. Триггер: {formatAnswer(baseline.trigger)}.
+            Облегчает: {formatAnswer(baseline.relief)}.
+          </p>
+          <div className="results-preview-remedies">
+            {candidates.length > 0 ? (
+              candidates.map((item) => (
+                <span key={item.remedy}>{item.remedy}</span>
+              ))
+            ) : (
+              <span>Bach-группировка требует уточнения</span>
+            )}
+          </div>
+          <button className="secondary-btn" onClick={() => onSelectReport("Самоотчёт")} type="button">
+            Открыть самоотчёт
+          </button>
+        </>
+      ) : (
+        <p>После первого приёма здесь появится краткий предпросмотр самоотчёта и направлений поддержки.</p>
+      )}
+    </section>
+  );
+}
+
+function ResultsNotebookPanel({ firstIntakeResult, onSelectReport }) {
+  const baseline = firstIntakeResult?.symptomBaseline || {};
+  const candidates = getTopBachCandidates(firstIntakeResult);
+
+  return (
+    <article className="results-notebook-panel" aria-label="Тетрадь результатов">
+      <div className="results-notebook-surface">
+        <header className="results-notebook-hero">
+          <span className="card-kicker">Тетрадь результатов</span>
+          <h2>{firstIntakeResult ? "Baseline для будущей динамики" : "Место для первой рабочей карты"}</h2>
+          <p>
+            {firstIntakeResult
+              ? "Здесь собрана первая измеримая точка: как клиент описал состояние, где ресурс, что усиливает напряжение и какие Bach-темы требуют проверки."
+              : "Первый приём создаст базовую точку сравнения и аккуратно откроет историю результатов в кабинете."}
+          </p>
+        </header>
+
+        <ResultsSummaryCard firstIntakeResult={firstIntakeResult} />
+
+        <section className="results-notebook-grid" aria-label="Baseline-метрики">
+          {notebookMetricItems.map(([label, key]) => (
+            <div className="results-notebook-metric" key={key}>
+              <span>{label}</span>
+              <strong>{formatScore(baseline[key])}</strong>
+            </div>
+          ))}
+          <div className="results-notebook-metric text-metric">
+            <span>Что усиливает</span>
+            <strong>{formatAnswer(baseline.trigger, "появится после первого приёма")}</strong>
+          </div>
+          <div className="results-notebook-metric text-metric">
+            <span>Что облегчает</span>
+            <strong>{formatAnswer(baseline.relief, "появится после первого приёма")}</strong>
+          </div>
+        </section>
+
+        <section className="results-bach-preview" aria-label="Bach preview">
+          <div className="section-head">
+            <div>
+              <span className="card-kicker">Bach preview</span>
+              <h3>Направление поддержки</h3>
+            </div>
+            <span className="lab-badge">требует проверки специалистом</span>
+          </div>
+          {candidates.length > 0 ? (
+            <div className="results-bach-list">
+              {candidates.map((item) => (
+                <div className="results-bach-item" key={item.remedy}>
+                  <strong>{item.remedy}</strong>
+                  <span>{item.theme}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>Bach preview появится после первого приёма. Он показывает гипотезы, а не медицинские диагнозы.</p>
+          )}
+        </section>
+
+        <ResultsReportPreview firstIntakeResult={firstIntakeResult} onSelectReport={onSelectReport} />
+        <ResultsDynamicSnapshot firstIntakeResult={firstIntakeResult} />
+      </div>
+    </article>
+  );
+}
+
+function ResultsActionMenu({ firstIntakeResult, onSelectReport, onStartSelfAnalysis }) {
+  if (!firstIntakeResult) {
+    return (
+      <section className="results-action-card" aria-label="Действия">
+        <span className="card-kicker">Следующий шаг</span>
+        <h3>Создать первую точку сравнения</h3>
+        <p>Короткий самоанализ сохранит baseline и откроет раздел результатов.</p>
+        <button className="primary-btn full" onClick={onStartSelfAnalysis} type="button">
+          Пройти первый приём (Анализ)
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="results-action-card" aria-label="Действия">
+      <span className="card-kicker">Действия</span>
+      <h3>Работать с текущей картой</h3>
+      <div className="results-action-list">
+        <button className="primary-btn full" onClick={() => onSelectReport("Самоотчёт")} type="button">
+          Открыть самоотчёт
+        </button>
+        <button className="secondary-btn full" onClick={() => onSelectReport("Диагностика эксперта")} type="button">
+          Диагностика эксперта
+        </button>
+        <button className="secondary-btn full" disabled type="button">
+          Повторный ИИ-приём · готовится
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function ResultsHistoryPreview({ firstIntakeResult }) {
+  return (
+    <section className="results-action-card" aria-label="История результатов">
+      <span className="card-kicker">История</span>
+      <h3>Срезы по датам</h3>
+      <div className="results-history-list">
+        <div>
+          <strong>{firstIntakeResult ? "Первый приём" : "Первый приём ожидается"}</strong>
+          <span>{firstIntakeResult ? formatResultDate(firstIntakeResult.completedAt) : "создаст baseline"}</span>
+        </div>
+        <div className="planned">
+          <strong>Повторный срез</strong>
+          <span>следующий этап после #38</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ResultsCompactMenu({ firstIntakeResult, onSelectReport }) {
+  return (
+    <section className="results-compact-menu" aria-label="Меню отчёта">
+      <span className="card-kicker">Меню отчёта</span>
+      {compactReportTabs.map((tab) => (
+        <button key={tab} onClick={() => onSelectReport(tab)} type="button">
+          <span>{tab}</span>
+          <small>{tab === "Самоотчёт" && firstIntakeResult ? "готов" : "открыть раздел"}</small>
+        </button>
+      ))}
+    </section>
+  );
+}
+
+function ResultsInteractivePanel({ firstIntakeResult, onSelectReport, onStartSelfAnalysis }) {
+  return (
+    <aside className="results-interactive-panel" aria-label="Интерактивная панель результатов">
+      <ResultsActionMenu
+        firstIntakeResult={firstIntakeResult}
+        onSelectReport={onSelectReport}
+        onStartSelfAnalysis={onStartSelfAnalysis}
+      />
+      <ResultsCompactMenu firstIntakeResult={firstIntakeResult} onSelectReport={onSelectReport} />
+      <ResultsHistoryPreview firstIntakeResult={firstIntakeResult} />
+      <section className="results-chat-placeholder" aria-label="Будущий чат">
+        <span className="card-kicker">Future chat</span>
+        <h3>Повторный ИИ-приём</h3>
+        <p>Здесь появится короткий диалог для динамики: что изменилось, что усилилось, что ушло и что требует проверки.</p>
+      </section>
+    </aside>
   );
 }
 
@@ -261,40 +534,19 @@ function FirstIntakeResultBlock({ result }) {
   );
 }
 
-function ReportOverview({ activeTab, onSelectReport, firstIntakeResult }) {
+function ReportOverview({ onSelectReport, firstIntakeResult, onStartSelfAnalysis }) {
   return (
-    <>
-      <ReportsMenu
-        activeTab={activeTab}
-        hasFirstIntakeResult={Boolean(firstIntakeResult)}
+    <section className="results-notebook-shell">
+      <ResultsNotebookPanel
+        firstIntakeResult={firstIntakeResult}
         onSelectReport={onSelectReport}
       />
-      <FirstIntakeResultBlock result={firstIntakeResult} />
-
-      <article className="card lab-report-card">
-        <div className="section-head">
-          <div>
-            <span className="card-kicker">Последний результат</span>
-            <h2>Экспертная картина</h2>
-          </div>
-          <span className="lab-badge">14.05.2026</span>
-        </div>
-        <p>
-          Анализ соединяет самооценку клиента, повторяющиеся Bach-темы и текущий уровень ресурса.
-          Это рабочая версия интерпретации перед финальной рекомендацией.
-        </p>
-      </article>
-
-      <div className="analysis-grid">
-        {expertBlocks.map((block) => (
-          <article className="card analysis-card" key={block.title}>
-            <span>{block.title}</span>
-            <h2>{block.remedy}</h2>
-            <p>{block.text}</p>
-          </article>
-        ))}
-      </div>
-    </>
+      <ResultsInteractivePanel
+        firstIntakeResult={firstIntakeResult}
+        onSelectReport={onSelectReport}
+        onStartSelfAnalysis={onStartSelfAnalysis}
+      />
+    </section>
   );
 }
 
@@ -363,6 +615,7 @@ export default function ExpertAnalysis({
         activeTab={activeTab}
         firstIntakeResult={savedFirstIntakeResult}
         onSelectReport={onSelectReport}
+        onStartSelfAnalysis={onStartSelfAnalysis}
       />
     );
   }
