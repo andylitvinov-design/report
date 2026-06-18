@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Layout from "./components/Layout.jsx";
 import { clientProgress, selfAnalysis } from "./data/mockData.js";
+import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -8,13 +9,15 @@ import Overview from "./pages/Overview.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
+import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js";
 import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
 export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
-  expert: ["Меню отчётов", "Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
+  expert: ["Меню отчётов", "Самоотчёт", "Расширенный ИИ-анализ", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: [],
+  advanced: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
 };
 
@@ -78,11 +81,14 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
+  const [advancedAiResult, setAdvancedAiResult] = useState(() => readAdvancedAiAnalysisResult());
+  const [advancedAnalysisMode, setAdvancedAnalysisMode] = useState("overview");
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
     expert: pageTabs.expert[0],
     recommendations: pageTabs.recommendations[0],
     self: selfAnalysis.tabs[0],
+    advanced: "",
     history: pageTabs.history[0],
   });
   const completedFromProgress =
@@ -121,6 +127,9 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     if (page !== "self") {
       setSelfAnalysisMode("overview");
     }
+    if (page !== "advanced") {
+      setAdvancedAnalysisMode("overview");
+    }
   };
 
   const openFirstIntake = () => {
@@ -154,6 +163,18 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   const handleFirstIntakeSaveAndExit = () => {
     setActivePage("overview");
     setSelfAnalysisMode("overview");
+  };
+
+  const handleAdvancedAiSaveAndExit = () => {
+    setActivePage("overview");
+    setAdvancedAnalysisMode("overview");
+  };
+
+  const handleAdvancedAiResultSaved = (result) => {
+    setAdvancedAiResult(result);
+    setActivePage("expert");
+    setAdvancedAnalysisMode("overview");
+    setActiveTabs((current) => ({ ...current, expert: "Меню отчётов" }));
   };
 
   const renderPage = () => {
@@ -200,6 +221,15 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
         />
       );
     }
+    if (activePage === "advanced") {
+      return (
+        <AdvancedAiAnalysis
+          onModeChange={setAdvancedAnalysisMode}
+          onResultSaved={handleAdvancedAiResultSaved}
+          onSaveAndExit={handleAdvancedAiSaveAndExit}
+        />
+      );
+    }
     if (!hasCompletedResults && activePage === "expert") {
       return (
         <LockedReportState
@@ -213,6 +243,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       return (
         <ExpertAnalysis
           activeTab={activeTabs.expert}
+          advancedAiResult={advancedAiResult}
           clientOverride={clientOverride}
           firstIntakeResult={firstIntakeResult}
           onSelectReport={openResultReport}
@@ -237,13 +268,14 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   };
 
   const isSelfAnalysisFocusMode = activePage === "self" && selfAnalysisMode === "form";
+  const isAdvancedAnalysisFocusMode = activePage === "advanced" && advancedAnalysisMode === "form";
 
   return (
     <Layout
       activePage={activePage}
       activeTab={activeTabs[activePage]}
       clientOverride={clientOverride}
-      focusMode={isSelfAnalysisFocusMode}
+      focusMode={isSelfAnalysisFocusMode || isAdvancedAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
       hideSpecialistPanel={["expert", "settings"].includes(activePage)}
       onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}

@@ -262,6 +262,12 @@
   min-width: 0;
 }
 
+.results-notebook-main {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
 .results-notebook-surface,
 .results-action-card,
 .results-chat-placeholder,

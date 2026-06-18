@@ -6,6 +6,7 @@ const clientNavigation = {
   expert: "Результаты (Отчёт)",
   recommendations: "Назначение",
   self: "Первый приём (Анализ)",
+  advanced: "Расширенный ИИ-анализ",
   history: "Рекомендации",
 };
 
@@ -14,11 +15,11 @@ const actionLabels = {
   expert: "Открыть результаты",
   recommendations: "Обновить назначение",
   settings: "Сохранить настройки",
+  advanced: "Выбрать анализ",
   history: "Открыть динамику",
 };
 
 const lockedForNewUser = new Set(["expert", "recommendations", "history"]);
-const advancedAiTab = "Диагностика эксперта";
 
 export default function Layout({
   activePage,
@@ -65,6 +66,8 @@ export default function Layout({
     ? `${cabinetClient.name} · Аккаунт и вход`
     : isNewUser
       ? `${cabinetClient.name} · Первый срез ещё не пройден`
+      : activePage === "advanced"
+        ? `${cabinetClient.name} · Углублённые тесты в формате мягкого диалога`
       : activePage === "self"
         ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
         : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
@@ -73,12 +76,7 @@ export default function Layout({
   const mobileMenuItems = [
     { id: "overview", label: clientNavigation.overview, page: "overview" },
     { id: "self", label: clientNavigation.self, page: "self" },
-    {
-      id: "expert-ai",
-      label: "Расширенный ИИ-анализ",
-      page: "expert",
-      tab: advancedAiTab,
-    },
+    { id: "advanced", label: clientNavigation.advanced, page: "advanced" },
     { id: "expert", label: clientNavigation.expert, page: "expert" },
     { id: "recommendations", label: clientNavigation.recommendations, page: "recommendations" },
     { id: "history", label: clientNavigation.history, page: "history" },
@@ -267,19 +265,26 @@ export default function Layout({
         <section className="workspace">{children}</section>
 
         {hasCompletedResults && !hideSpecialistPanel && <aside className="specialist-panel">
-          {activePage === "self" ? (
+          {activePage === "self" || activePage === "advanced" ? (
             <>
               <article className="card">
-                <h2>Как отвечать</h2>
+                <h2>{activePage === "advanced" ? "Как проходить тест" : "Как отвечать"}</h2>
                 <p>{specialistComments[activePage]}</p>
                 <button className="primary-btn full" type="button">Запросить отчёт</button>
               </article>
               <article className="card soft-card">
-                <h3>Что получится</h3>
-                <p>
-                  После первичного диалога получится рабочая карта: что сейчас главное,
-                  что усиливает состояние, что облегчает и какая поддержка может быть полезна.
-                </p>
+                <h3>{activePage === "advanced" ? "Что сохранится" : "Что получится"}</h3>
+                {activePage === "advanced" ? (
+                  <p>
+                    После завершения можно сохранить последний расширенный анализ в раздел результатов
+                    как материал для специалиста.
+                  </p>
+                ) : (
+                  <p>
+                    После первичного диалога получится рабочая карта: что сейчас главное,
+                    что усиливает состояние, что облегчает и какая поддержка может быть полезна.
+                  </p>
+                )}
               </article>
               <p className="safety-note">Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.</p>
             </>

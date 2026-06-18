@@ -1454,6 +1454,12 @@ h3 {
   margin: 0 auto;
 }
 
+.workspace:has(.advanced-ai-page) {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .workspace:has(.first-intake-dialog) {
   max-width: 860px;
   width: 100%;
@@ -1832,6 +1838,83 @@ h3 {
   display: grid;
   gap: 14px;
   padding: 18px 20px 4px;
+}
+
+.advanced-ai-page {
+  display: grid;
+  gap: 18px;
+}
+
+.advanced-draft-card,
+.advanced-programs-card {
+  display: grid;
+  gap: 18px;
+}
+
+.advanced-programs-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.advanced-programs-head h2 {
+  margin: 4px 0 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.04;
+}
+
+.advanced-programs-head p {
+  max-width: 760px;
+}
+
+.advanced-program-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.advanced-program-card {
+  min-height: 220px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(228, 220, 207, 0.9);
+  border-radius: 20px;
+  background: #fbf8f1;
+}
+
+.advanced-program-card span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.advanced-program-card h3 {
+  margin: 7px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1.08;
+}
+
+.advanced-program-card p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.advanced-program-card .primary-btn {
+  justify-self: start;
+}
+
+.advanced-result-card {
+  border-color: rgba(63, 122, 61, 0.24);
+}
+
+.advanced-result-notice {
+  padding: 0 20px;
 }
 
 .danger-action {
@@ -2251,7 +2334,8 @@ h3 {
   }
 
   .chat-card-header,
-  .answer-panel-head {
+  .answer-panel-head,
+  .advanced-programs-head {
     display: grid;
   }
 
@@ -2361,6 +2445,14 @@ h3 {
 
   .summary-point-grid {
     grid-template-columns: 1fr;
+  }
+
+  .advanced-program-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .advanced-program-card {
+    min-height: 0;
   }
 
   .app-shell.focus-mode h1 {
