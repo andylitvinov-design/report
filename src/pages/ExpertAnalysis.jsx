@@ -1,5 +1,6 @@
 import React from "react";
 import { expertBlocks } from "../data/mockData.js";
+import "../results.css";
 
 const clientHasFirstConsultation = true;
 
