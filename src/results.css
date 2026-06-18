@@ -205,6 +205,51 @@
   line-height: 1.25;
 }
 
+.wide-result-item {
+  grid-column: 1 / -1;
+}
+
+.first-intake-result-card {
+  border-color: rgba(63, 122, 61, 0.24);
+}
+
+.intake-report-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.remedy-candidate-list {
+  display: grid;
+  gap: 10px;
+}
+
+.remedy-candidate {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-lg);
+  background: #fbf7ee;
+}
+
+.remedy-candidate strong {
+  color: var(--green);
+  font-size: 17px;
+}
+
+.remedy-candidate span,
+.remedy-candidate p {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.next-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 @media (max-width: 720px) {
   .results-menu-card .section-head,
   .lab-report-card .section-head {

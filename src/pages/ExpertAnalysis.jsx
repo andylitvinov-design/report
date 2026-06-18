@@ -1,5 +1,6 @@
 import React from "react";
 import { client, expertBlocks } from "../data/mockData.js";
+import { readFirstIntakeResult } from "../lib/firstIntakeStorage.js";
 import "../results.css";
 
 const reports = [
@@ -110,7 +111,21 @@ function EmptyFirstConsultation({ onStartSelfAnalysis }) {
   );
 }
 
-function ReportsMenu({ activeTab, onSelectReport }) {
+function ReportsMenu({ activeTab, onSelectReport, hasFirstIntakeResult = false }) {
+  const availableReports = hasFirstIntakeResult
+    ? [
+        {
+          number: "00",
+          type: "Самоотчёт",
+          date: "сегодня",
+          status: "Готов",
+          summary: "Первый приём: baseline, Bach-группировка и терапевтический запрос.",
+          accent: "Первый приём",
+        },
+        ...reports.slice(1),
+      ]
+    : reports;
+
   return (
     <article className="card results-menu-card">
       <div className="section-head">
@@ -118,10 +133,10 @@ function ReportsMenu({ activeTab, onSelectReport }) {
           <span className="card-kicker">Меню отчётов</span>
           <h2>История результатов</h2>
         </div>
-        <span className="lab-badge">как медицинский анализ</span>
+        <span className="lab-badge">структура отчёта</span>
       </div>
       <div className="report-list">
-        {reports.map((report) => (
+        {availableReports.map((report) => (
           <button
             className={report.type === activeTab ? "report-row active" : "report-row"}
             key={`${report.number}-${report.date}`}
@@ -144,10 +159,116 @@ function ReportsMenu({ activeTab, onSelectReport }) {
   );
 }
 
-function ReportOverview({ activeTab, onSelectReport }) {
+function FirstIntakeResultBlock({ result }) {
+  if (!result) return null;
+
+  const baseline = result.symptomBaseline || {};
+  const bach = result.bachResults || { main: [], support: [] };
+  const request = result.therapyRequest || {};
+  const baselineItems = [
+    ["Проблема", baseline.problemStrength],
+    ["Ресурс", baseline.resourceLevel],
+    ["Тревога", baseline.anxietyLevel],
+    ["Усталость", baseline.fatigueLevel],
+    ["Влияние на жизнь", baseline.lifeImpact],
+  ];
+  const candidates = [...(bach.main || []), ...(bach.support || [])].slice(0, 5);
+
+  return (
+    <article className="card lab-report-card first-intake-result-card">
+      <div className="section-head">
+        <div>
+          <span className="card-kicker">Результаты (Отчёт)</span>
+          <h2>Первый приём: рабочая карта</h2>
+        </div>
+        <span className="lab-badge">требует проверки специалистом</span>
+      </div>
+      <p>
+        Это предварительное понимание: базовая точка состояния, эмоциональная группировка Bach и
+        запрос на дальнейшую работу. Материал не заменяет медицинскую помощь.
+      </p>
+
+      <div className="lab-result-grid">
+        {baselineItems.map(([label, value]) => (
+          <div className="lab-result-item" key={label}>
+            <span>{label}</span>
+            <strong>{value ?? "не указано"}/10</strong>
+          </div>
+        ))}
+        <div className="lab-result-item">
+          <span>Главный триггер</span>
+          <strong>{baseline.trigger || "требует уточнения"}</strong>
+        </div>
+        <div className="lab-result-item">
+          <span>Главная опора</span>
+          <strong>{baseline.relief || "требует уточнения"}</strong>
+        </div>
+        {baseline.freeComment ? (
+          <div className="lab-result-item wide-result-item">
+            <span>Комментарий клиента</span>
+            <strong>{baseline.freeComment}</strong>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="intake-report-section">
+        <h3>Bach: предварительная группировка</h3>
+        <div className="remedy-candidate-list">
+          {candidates.length > 0 ? (
+            candidates.map((item) => (
+              <div className="remedy-candidate" key={item.remedy}>
+                <strong>{item.remedy}</strong>
+                <span>{item.theme}</span>
+                <p>{item.explanation} Кандидат для проверки со специалистом.</p>
+              </div>
+            ))
+          ) : (
+            <p>Ответов Bach пока недостаточно для устойчивой группировки.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="intake-report-section">
+        <h3>Терапевтический запрос</h3>
+        <p>{request.formulatedRequest || "Запрос требует уточнения со специалистом."}</p>
+        <div className="lab-result-grid">
+          <div className="lab-result-item">
+            <span>Что хочется изменить</span>
+            <strong>{request.desiredChange || "не указано"}</strong>
+          </div>
+          <div className="lab-result-item">
+            <span>Результат на 1-3 сессии</span>
+            <strong>{request.desiredResult1to3Sessions || "не указано"}</strong>
+          </div>
+          <div className="lab-result-item">
+            <span>Что отслеживать</span>
+            <strong>Силу проблемы, ресурс, тревогу, усталость и влияние на жизнь.</strong>
+          </div>
+          <div className="lab-result-item">
+            <span>Подходящая поддержка</span>
+            <strong>{request.preferredSupport || "не указано"}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="next-step-actions">
+        <button className="primary-btn" type="button">Запросить отчёт специалиста</button>
+        <button className="secondary-btn" type="button">Записаться на консультацию</button>
+        <button className="secondary-btn" type="button">Пройти повторный срез через 7-10 дней</button>
+      </div>
+    </article>
+  );
+}
+
+function ReportOverview({ activeTab, onSelectReport, firstIntakeResult }) {
   return (
     <>
-      <ReportsMenu activeTab={activeTab} onSelectReport={onSelectReport} />
+      <ReportsMenu
+        activeTab={activeTab}
+        hasFirstIntakeResult={Boolean(firstIntakeResult)}
+        onSelectReport={onSelectReport}
+      />
+      <FirstIntakeResultBlock result={firstIntakeResult} />
 
       <article className="card lab-report-card">
         <div className="section-head">
@@ -176,12 +297,29 @@ function ReportOverview({ activeTab, onSelectReport }) {
   );
 }
 
-function ReportDetail({ activeTab, onSelectReport }) {
+function ReportDetail({ activeTab, firstIntakeResult, onSelectReport }) {
   const detail = reportDetails[activeTab] || reportDetails["Диагностика эксперта"];
+
+  if (activeTab === "Самоотчёт" && firstIntakeResult) {
+    return (
+      <>
+        <ReportsMenu
+          activeTab={activeTab}
+          hasFirstIntakeResult
+          onSelectReport={onSelectReport}
+        />
+        <FirstIntakeResultBlock result={firstIntakeResult} />
+      </>
+    );
+  }
 
   return (
     <>
-      <ReportsMenu activeTab={activeTab} onSelectReport={onSelectReport} />
+      <ReportsMenu
+        activeTab={activeTab}
+        hasFirstIntakeResult={Boolean(firstIntakeResult)}
+        onSelectReport={onSelectReport}
+      />
       <article className="card lab-report-card">
         <div className="section-head">
           <div>
@@ -207,18 +345,32 @@ function ReportDetail({ activeTab, onSelectReport }) {
 export default function ExpertAnalysis({
   activeTab = "Меню отчётов",
   clientOverride = null,
+  firstIntakeResult = null,
   onSelectReport,
   onStartSelfAnalysis,
 }) {
   const cabinetClient = clientOverride || client;
+  const savedFirstIntakeResult = firstIntakeResult || readFirstIntakeResult();
 
-  if (!cabinetClient.hasCompletedFirstConsultation) {
+  if (!cabinetClient.hasCompletedFirstConsultation && !savedFirstIntakeResult) {
     return <EmptyFirstConsultation onStartSelfAnalysis={onStartSelfAnalysis} />;
   }
 
   if (activeTab === "Меню отчётов") {
-    return <ReportOverview activeTab={activeTab} onSelectReport={onSelectReport} />;
+    return (
+      <ReportOverview
+        activeTab={activeTab}
+        firstIntakeResult={savedFirstIntakeResult}
+        onSelectReport={onSelectReport}
+      />
+    );
   }
 
-  return <ReportDetail activeTab={activeTab} onSelectReport={onSelectReport} />;
+  return (
+    <ReportDetail
+      activeTab={activeTab}
+      firstIntakeResult={savedFirstIntakeResult}
+      onSelectReport={onSelectReport}
+    />
+  );
 }

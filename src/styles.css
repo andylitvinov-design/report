@@ -1399,6 +1399,16 @@ h3 {
   gap: 9px;
 }
 
+.scale-grid {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(38px, 1fr));
+}
+
+.bach-scale-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .answer-chip {
   min-height: 38px;
   padding: 9px 14px;
@@ -1460,6 +1470,29 @@ h3 {
 
 .compact-note textarea::placeholder {
   color: #9a9287;
+}
+
+.inline-answer-field {
+  margin: 0;
+}
+
+.inline-answer-field .primary-btn {
+  justify-self: start;
+  min-height: 38px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.restore-intake-body {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px 4px;
+}
+
+.danger-action {
+  border-color: rgba(217, 83, 79, 0.35);
+  color: var(--danger);
 }
 
 .chat-actions {
@@ -1805,6 +1838,21 @@ h3 {
 
   .answer-chip {
     max-width: 100%;
+  }
+
+  .scale-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .scale-chip,
+  .bach-scale-grid .answer-chip {
+    width: auto;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .bach-scale-grid {
+    grid-template-columns: 1fr;
   }
 
   .chat-actions {
