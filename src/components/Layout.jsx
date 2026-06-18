@@ -5,7 +5,7 @@ const clientNavigation = {
   overview: "Профиль / Обзор",
   expert: "Отчёт эксперта",
   recommendations: "Назначение",
-  self: "Сделать самоанализ",
+  self: "Первый приём (Анализ)",
   history: "Рекомендации",
 };
 
@@ -13,7 +13,7 @@ const actionLabels = {
   overview: "+ Новая оценка",
   expert: "Открыть отчёт",
   recommendations: "Обновить назначение",
-  self: "Начать самоанализ",
+  self: "Начать первый приём",
   history: "Открыть динамику",
 };
 
@@ -54,7 +54,9 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
               <p className="eyebrow">{currentLabel}</p>
               <h1>{currentLabel}</h1>
               <p className="subtitle">
-                {client.name} / ID {client.id} · Фокус: {client.focus} · Последний срез: {client.lastSlice}
+                {activePage === "self"
+                  ? `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Первый диалог для прояснения текущего состояния`
+                  : `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Последний срез: ${client.lastSlice}`}
               </p>
             </div>
             <button className="primary-btn" type="button">{actionLabels[activePage] || "+ Новая оценка"}</button>
@@ -92,15 +94,34 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
         <section className="workspace">{children}</section>
 
         <aside className="specialist-panel">
-          <article className="card">
-            <h2>Комментарий специалиста</h2>
-            <p>{specialistComments[activePage]}</p>
-            <button className="primary-btn full" type="button">Запросить отчёт</button>
-          </article>
-          <article className="card soft-card">
-            <h3>Следующий шаг</h3>
-            <p>Если прошло 7-10 дней, лучше пройти короткий повторный срез.</p>
-          </article>
+          {activePage === "self" ? (
+            <>
+              <article className="card">
+                <h2>Как отвечать</h2>
+                <p>{specialistComments[activePage]}</p>
+                <button className="primary-btn full" type="button">Запросить отчёт</button>
+              </article>
+              <article className="card soft-card">
+                <h3>Следующий шаг</h3>
+                <p>
+                  После первичного диалога можно подготовить короткий анализ: что сейчас главное,
+                  где узкое место и какая поддержка может быть полезна.
+                </p>
+              </article>
+            </>
+          ) : (
+            <>
+              <article className="card">
+                <h2>Комментарий специалиста</h2>
+                <p>{specialistComments[activePage]}</p>
+                <button className="primary-btn full" type="button">Запросить отчёт</button>
+              </article>
+              <article className="card soft-card">
+                <h3>Следующий шаг</h3>
+                <p>Если прошло 7-10 дней, лучше пройти короткий повторный срез.</p>
+              </article>
+            </>
+          )}
         </aside>
       </main>
     </div>

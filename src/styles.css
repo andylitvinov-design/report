@@ -579,6 +579,141 @@ h3 {
   gap: 12px 18px;
 }
 
+.first-intake-page {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.first-intake-hero-card,
+.first-intake-summary,
+.intake-chat-card {
+  display: grid;
+  gap: 16px;
+}
+
+.first-intake-hero-card h2,
+.first-intake-summary h2,
+.intake-chat-card h2 {
+  max-width: 760px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.5vw, 44px);
+  line-height: 1.03;
+}
+
+.first-intake-status-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-kicker {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.dialog-description {
+  max-width: 780px;
+}
+
+.chat-window {
+  min-height: 260px;
+  padding: 18px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(234, 243, 226, 0.45), rgba(251, 247, 238, 0.8)),
+    #fbf7ee;
+}
+
+.chat-bubble {
+  max-width: min(100%, 720px);
+  padding: 14px 16px;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.chat-bubble span,
+.chat-bubble small,
+.answer-recap-row span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.therapist-bubble {
+  justify-self: start;
+  border-top-left-radius: 6px;
+}
+
+.user-bubble {
+  justify-self: end;
+  border-color: rgba(63, 122, 61, 0.24);
+  border-top-right-radius: 6px;
+  background: var(--green-soft);
+}
+
+.option-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.answer-chip {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 850;
+  text-align: left;
+}
+
+.answer-chip:hover,
+.answer-chip:focus-visible,
+.answer-chip.active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.first-intake-summary ol {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.answer-recap {
+  display: grid;
+  gap: 10px;
+}
+
+.answer-recap-row {
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbf7ee;
+}
+
+.first-intake-dialog .form-progress {
+  position: static;
+}
+
+.first-intake-dialog .field textarea {
+  min-height: 72px;
+}
+
 .form-progress {
   position: sticky;
   top: 0;
@@ -993,6 +1128,7 @@ history-list,
   .result-grid.three,
   .self-overview-main,
   .self-overview-grid,
+  .first-intake-status-grid,
   .form-grid,
   .profile-grid {
     grid-template-columns: 1fr;
