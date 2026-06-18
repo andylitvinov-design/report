@@ -95,7 +95,7 @@ Before saying `STATUS: SUCCESS`, `done`, `fixed`, `implemented`, `ready`, or `re
 Verify every contract item:
 
 | Requirement | Status | Evidence | Verification method |
-|---|---|---|
+|---|---|---|---|
 
 Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`.
 
@@ -199,7 +199,7 @@ SUCCESS also requires a completed result verification block:
 ```txt
 RESULT VERIFICATION:
 | Requirement | Status | Evidence | Verification method |
-|---|---|---|
+|---|---|---|---|
 ```
 
 BLOCKED requires:
