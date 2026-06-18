@@ -59,9 +59,14 @@
 }
 
 .report-row:hover,
-.report-row:focus-visible {
+.report-row:focus-visible,
+.report-row.active {
   border-color: rgba(63, 122, 61, 0.45);
   background: #fff;
+}
+
+.report-row.active {
+  box-shadow: inset 4px 0 0 var(--green);
 }
 
 .report-number {
@@ -73,6 +78,10 @@
   background: #fff;
   color: var(--green);
   font-weight: 950;
+}
+
+.report-row.active .report-number {
+  background: var(--green-soft);
 }
 
 .report-main,
