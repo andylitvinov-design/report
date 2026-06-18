@@ -70,17 +70,43 @@ const reportDetails = {
 
 function EmptyFirstConsultation({ onStartSelfAnalysis }) {
   return (
-    <article className="card results-empty-card">
-      <span className="card-kicker">Новый клиент</span>
-      <h2>Пройдите первую консультацию бесплатно (самоанализ)</h2>
-      <p>
-        После первичного самоанализа здесь появится перечень отчётов: самоотчёт, диагностика эксперта,
-        повторные срезы и история изменений по датам.
-      </p>
-      <button className="primary-btn" onClick={onStartSelfAnalysis} type="button">
-        Перейти в первый приём (Анализ)
-      </button>
-    </article>
+    <section className="results-modal-shell" aria-label="Нет доступных отчётов">
+      <div className="results-blurred-page" aria-hidden="true">
+        <ReportsMenu activeTab="Меню отчётов" onSelectReport={() => {}} />
+        <article className="card lab-report-card">
+          <div className="section-head">
+            <div>
+              <span className="card-kicker">Результаты появятся после первого шага</span>
+              <h2>История отчётов пока пустая</h2>
+            </div>
+            <span className="lab-badge">ожидает самоанализ</span>
+          </div>
+          <p>
+            После первой консультации здесь появятся самоотчёт, диагностика эксперта,
+            повторные срезы и история изменений по датам.
+          </p>
+        </article>
+      </div>
+
+      <div className="results-modal-backdrop">
+        <article className="card results-intake-modal" role="dialog" aria-modal="true" aria-labelledby="first-intake-modal-title">
+          <span className="card-kicker">Новый клиент</span>
+          <h2 id="first-intake-modal-title">Сначала пройдите первую консультацию бесплатно (самоанализ)</h2>
+          <p>
+            Сейчас отчётов ещё нет. Чтобы открыть раздел «Результаты», нужно пройти первый короткий самоанализ:
+            система соберёт текущую ситуацию, уровень ресурса и основные темы для первичного отчёта.
+          </p>
+          <div className="modal-step-list">
+            <span>1. Ответьте на вопросы первого приёма</span>
+            <span>2. Получите первичный самоотчёт</span>
+            <span>3. После этого здесь появится список отчётов</span>
+          </div>
+          <button className="primary-btn" onClick={onStartSelfAnalysis} type="button">
+            Пройти первый приём (Анализ)
+          </button>
+        </article>
+      </div>
+    </section>
   );
 }
 
