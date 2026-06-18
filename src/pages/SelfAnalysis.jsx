@@ -96,28 +96,27 @@ const FIRST_INTAKE_STEPS = [
 export default function SelfAnalysis({ onModeChange }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState(FIRST_INTAKE_INITIAL_ANSWERS);
-  const [isStarted, setIsStarted] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    onModeChange?.(isStarted && !isComplete ? "form" : "overview");
-  }, [isComplete, isStarted, onModeChange]);
+    onModeChange?.("overview");
+  }, [onModeChange]);
 
   const step = FIRST_INTAKE_STEPS[currentStep];
   const answeredSteps = useMemo(
     () => FIRST_INTAKE_STEPS.filter((item) => answers[item.id]),
     [answers]
   );
-
-  const startDialog = () => {
-    setIsStarted(true);
-    setIsComplete(false);
-  };
+  const visibleSteps = isComplete
+    ? FIRST_INTAKE_STEPS
+    : FIRST_INTAKE_STEPS.slice(0, currentStep + 1);
+  const progressLabel = isComplete
+    ? `Шаг ${FIRST_INTAKE_STEPS.length} из ${FIRST_INTAKE_STEPS.length}`
+    : `Шаг ${currentStep + 1} из ${FIRST_INTAKE_STEPS.length}`;
 
   const resetDialog = () => {
     setCurrentStep(0);
     setAnswers(FIRST_INTAKE_INITIAL_ANSWERS);
-    setIsStarted(false);
     setIsComplete(false);
   };
 
@@ -152,148 +151,127 @@ export default function SelfAnalysis({ onModeChange }) {
     setCurrentStep(FIRST_INTAKE_STEPS.length - 1);
   };
 
-  if (!isStarted) {
-    return (
-      <div className="first-intake-page">
-        <article className="card first-intake-hero-card">
-          <p className="eyebrow">Первичный диалог</p>
-          <h2>Давайте спокойно проясним, что с вами сейчас происходит</h2>
-          <p>
-            Я задам несколько коротких вопросов. Отвечайте не идеально, а как есть сейчас.
-            Нам важно поймать текущее состояние, главный узел и то, что сейчас требует поддержки.
-          </p>
-          <div className="overview-actions">
-            <button className="primary-btn" onClick={startDialog} type="button">
-              Начать первый приём
-            </button>
-            <button className="secondary-btn" onClick={resetDialog} type="button">
-              Начать заново
-            </button>
-          </div>
-        </article>
-
-        <section className="self-overview-grid first-intake-status-grid">
-          <article className="card status-card">
-            <span>Формат</span>
-            <strong>6 коротких шагов</strong>
-            <p>Мягкий диалог вместо длинной анкеты.</p>
-          </article>
-          <article className="card status-card">
-            <span>Цель</span>
-            <strong>Прояснение</strong>
-            <p>Рабочая карта состояния для специалиста, без медицинской диагностики.</p>
-          </article>
-          <article className="card status-card">
-            <span>Черновик</span>
-            <strong>{answeredSteps.length}/6</strong>
-            <p>Ответы хранятся только локально в текущем сеансе.</p>
-          </article>
-        </section>
-      </div>
-    );
-  }
-
-  if (isComplete) {
-    return (
-      <div className="first-intake-page">
-        <article className="card first-intake-summary">
-          <p className="eyebrow">Рабочая гипотеза</p>
-          <h2>Предварительное понимание</h2>
-          <p>Сейчас видно несколько важных точек:</p>
-          <ol>
-            <li>где находится главный дискомфорт;</li>
-            <li>что его усиливает;</li>
-            <li>что даёт хотя бы небольшое облегчение;</li>
-            <li>какой результат первого анализа для вас сейчас важнее всего.</li>
-          </ol>
-          <p>
-            На основе этого можно подготовить первичный отчёт специалиста. Это не медицинская
-            диагностика, а рабочая карта текущего состояния для дальнейшего прояснения.
-          </p>
-
-          <div className="answer-recap" aria-label="Выбранные ответы">
-            {FIRST_INTAKE_STEPS.map((item) => (
-              <div className="answer-recap-row" key={item.id}>
-                <span>{item.label}</span>
-                <strong>{answers[item.id]}</strong>
-              </div>
-            ))}
-          </div>
-
-          <div className="overview-actions">
-            <button className="primary-btn" type="button">Запросить отчёт специалиста</button>
-            <button className="secondary-btn" onClick={continueClarifying} type="button">
-              Продолжить уточнение
-            </button>
-            <button className="secondary-btn" type="button">Сохранить как черновик</button>
-            <button className="secondary-btn" onClick={resetDialog} type="button">
-              Начать заново
-            </button>
-          </div>
-        </article>
-      </div>
-    );
-  }
-
   return (
-    <div className="focused-form first-intake-dialog">
-      <header className="form-progress card">
-        <button className="secondary-btn" disabled={currentStep === 0} onClick={goBack} type="button">
-          Назад
-        </button>
-        <div>
-          <p className="eyebrow">Шаг {currentStep + 1} из {FIRST_INTAKE_STEPS.length}</p>
-          <h1>{step.label}</h1>
-        </div>
-        <button className="secondary-btn" onClick={resetDialog} type="button">
-          Начать заново
-        </button>
-      </header>
-
+    <div className="first-intake-page first-intake-dialog">
       <article className="card intake-chat-card">
-        <p className="card-kicker">Первый приём</p>
-        <h2>Давайте спокойно проясним, что с вами сейчас происходит</h2>
-        <p className="dialog-description">
-          Я задам несколько коротких вопросов. Отвечайте не идеально, а как есть сейчас.
-          Нам важно поймать текущее состояние, главный узел и то, что сейчас требует поддержки.
-        </p>
+        <header className="chat-card-header">
+          <div>
+            <p className="card-kicker">Первый приём</p>
+            <h2>Диалог для прояснения состояния</h2>
+          </div>
+          <span className="chat-progress">{progressLabel}</span>
+        </header>
 
         <div className="chat-window" aria-live="polite">
-          <div className="chat-bubble therapist-bubble">
-            <span>Терапевт</span>
-            <p>{step.therapist}</p>
+          <div className="chat-bubble therapist-bubble intro-bubble">
+            <span>Специалист</span>
+            <p>Я задам несколько коротких вопросов, чтобы прояснить текущее состояние.</p>
           </div>
 
-          {answeredSteps.map((item) => (
-            <div className="chat-bubble user-bubble" key={item.id}>
-              <span>Вы</span>
-              <p>{answers[item.id]}</p>
-              {answers.notes[item.id] ? <small>{answers.notes[item.id]}</small> : null}
+          {visibleSteps.map((item) => (
+            <React.Fragment key={item.id}>
+              <div className="chat-bubble therapist-bubble">
+                <span>Специалист</span>
+                <p>{item.therapist}</p>
+              </div>
+              {answers[item.id] ? (
+                <div className="chat-bubble user-bubble">
+                  <span>Вы</span>
+                  <p>{answers[item.id]}</p>
+                  {answers.notes[item.id] ? <small>{answers.notes[item.id]}</small> : null}
+                </div>
+              ) : null}
+            </React.Fragment>
+          ))}
+
+          {isComplete ? (
+            <div className="chat-bubble therapist-bubble final-bubble">
+              <span>Специалист</span>
+              <p>
+                Спасибо. Уже видно несколько важных точек, из которых можно собрать
+                предварительное понимание и рабочую карту для дальнейшего прояснения.
+              </p>
             </div>
-          ))}
+          ) : null}
         </div>
 
-        <div className="option-grid" aria-label="Варианты ответа">
-          {step.options.map((option) => (
-            <button
-              className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
-              key={option}
-              onClick={() => chooseOption(option)}
-              type="button"
-            >
-              {option}
+        {!isComplete ? (
+          <>
+            <div className="option-grid" aria-label="Варианты ответа">
+              {step.options.map((option) => (
+                <button
+                  className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
+                  key={option}
+                  onClick={() => chooseOption(option)}
+                  type="button"
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+
+            <label className="field compact-note">
+              <span>Добавить своими словами</span>
+              <textarea
+                id={`first-intake-note-${step.id}`}
+                name={`first-intake-note-${step.id}`}
+                onChange={(event) => updateNote(event.target.value)}
+                placeholder="Коротко опишите нюанс, если хочется уточнить ответ."
+                value={answers.notes[step.id] || ""}
+              />
+            </label>
+          </>
+        ) : (
+          <section className="intake-summary-panel" aria-label="Предварительное понимание">
+            <h3>Предварительное понимание</h3>
+            <div className="summary-point-grid">
+              <div>
+                <span>Что сейчас главное</span>
+                <strong>{answers.mainConcern}</strong>
+                <p>{answers.feltArea} · {answers.intensity}</p>
+              </div>
+              <div>
+                <span>Что усиливает</span>
+                <strong>{answers.trigger}</strong>
+                <p>Это может быть полезно проверить в динамике последних дней.</p>
+              </div>
+              <div>
+                <span>Что облегчает</span>
+                <strong>{answers.relief}</strong>
+                <p>Эта опора может войти в короткий план поддержки.</p>
+              </div>
+              <div>
+                <span>Что прояснять дальше</span>
+                <strong>{answers.desiredOutcome}</strong>
+                <p>Это не медицинская диагностика, а материал для специалиста.</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <footer className="chat-actions">
+          {!isComplete && answeredSteps.length > 0 ? (
+            <button className="secondary-btn" onClick={goBack} type="button">
+              Назад
             </button>
-          ))}
-        </div>
-
-        <label className="field">
-          <span>Добавить своими словами</span>
-          <textarea
-            onChange={(event) => updateNote(event.target.value)}
-            placeholder="Коротко опишите нюанс, если хочется уточнить ответ."
-            value={answers.notes[step.id] || ""}
-          />
-        </label>
+          ) : null}
+          {!isComplete && answeredSteps.length > 0 ? (
+            <button className="secondary-btn" onClick={resetDialog} type="button">
+              Начать заново
+            </button>
+          ) : null}
+          {isComplete ? (
+            <>
+              <button className="primary-btn" type="button">Запросить отчёт специалиста</button>
+              <button className="secondary-btn" onClick={continueClarifying} type="button">
+                Продолжить уточнение
+              </button>
+              <button className="secondary-btn" onClick={resetDialog} type="button">
+                Начать заново
+              </button>
+            </>
+          ) : null}
+        </footer>
       </article>
     </div>
   );

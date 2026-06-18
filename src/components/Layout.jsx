@@ -13,7 +13,6 @@ const actionLabels = {
   overview: "+ Новая оценка",
   expert: "Открыть отчёт",
   recommendations: "Обновить назначение",
-  self: "Начать первый приём",
   history: "Открыть динамику",
 };
 
@@ -59,7 +58,11 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
                   : `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Последний срез: ${client.lastSlice}`}
               </p>
             </div>
-            <button className="primary-btn" type="button">{actionLabels[activePage] || "+ Новая оценка"}</button>
+            {activePage !== "self" ? (
+              <button className="primary-btn" type="button">
+                {actionLabels[activePage] || "+ Новая оценка"}
+              </button>
+            ) : null}
           </section>
         )}
 
@@ -102,10 +105,10 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
                 <button className="primary-btn full" type="button">Запросить отчёт</button>
               </article>
               <article className="card soft-card">
-                <h3>Следующий шаг</h3>
+                <h3>Что получится</h3>
                 <p>
-                  После первичного диалога можно подготовить короткий анализ: что сейчас главное,
-                  где узкое место и какая поддержка может быть полезна.
+                  После первичного диалога получится рабочая карта: что сейчас главное,
+                  что усиливает состояние, что облегчает и какая поддержка может быть полезна.
                 </p>
               </article>
             </>
