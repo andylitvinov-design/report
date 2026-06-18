@@ -3,7 +3,7 @@ import { client, navigation, specialistComments } from "../data/mockData.js";
 
 const clientNavigation = {
   overview: "Профиль / Обзор",
-  expert: "Отчёт эксперта",
+  expert: "Результаты (Отчёт)",
   recommendations: "Назначение",
   self: "Первый приём (Анализ)",
   history: "Рекомендации",
@@ -11,7 +11,7 @@ const clientNavigation = {
 
 const actionLabels = {
   overview: "+ Новая оценка",
-  expert: "Открыть отчёт",
+  expert: "Открыть результаты",
   recommendations: "Обновить назначение",
   self: "Начать первый приём",
   history: "Открыть динамику",
