@@ -15,10 +15,11 @@ implement -> checks -> PR -> PR health -> merge if safe/permitted -> deploy -> l
 Follow all source-of-truth docs in order:
 
 1. `.claude/commands/delivery.md`
-2. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
-3. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
-4. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
-5. `AGENTS.md` — project adapter and command registry
+2. `.claude/skills/delivery/SKILL.md`
+3. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
+4. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
+5. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
+6. `AGENTS.md` — project adapter and command registry
 
 These docs are the local source of truth. Do not browse or fetch external loop repos. If a local doc is missing, first run the Local Checkout Recovery Gate below. If the file is still missing after that gate, report `needs verification` and do not invent replacement rules.
 

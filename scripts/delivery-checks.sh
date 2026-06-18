@@ -16,6 +16,14 @@ run_if_script_exists() {
   fi
 }
 
+require_file() {
+  local file="$1"
+  if [ ! -f "$file" ]; then
+    echo "Missing required shared delivery file: $file" >&2
+    exit 1
+  fi
+}
+
 require_text() {
   local pattern="$1"
   local file="$2"
@@ -26,6 +34,34 @@ require_text() {
 }
 
 echo "== Checking /delivery docs =="
+required_shared_files=(
+  "AGENTS.md"
+  ".claude/commands/delivery.md"
+  ".claude/skills/delivery/SKILL.md"
+  "docs/delivery-loop-program.md"
+  "docs/delivery-loop-technical-details.md"
+  "docs/delivery-loop-source-patterns-and-live-proof.md"
+  ".delivery/status.schema.json"
+  "scripts/delivery-status.sh"
+  ".github/pull_request_template.md"
+)
+
+for required_file in "${required_shared_files[@]}"; do
+  require_file "$required_file"
+done
+
+task_specific_docs=(
+  "docs/first-intake-analysis-dialog-plan.md"
+)
+
+for task_doc in "${task_specific_docs[@]}"; do
+  if [ -f "$task_doc" ]; then
+    echo "== Task-specific doc available when relevant: $task_doc =="
+  else
+    echo "== Optional task-specific doc not present; not a global /delivery blocker: $task_doc =="
+  fi
+done
+
 require_text "FINAL RESULT VERIFICATION GATE|Final Result Verification Gate" ".claude/commands/delivery.md"
 require_text "Original Request Contract" ".claude/commands/delivery.md"
 require_text "PASS.*PARTIAL.*FAIL.*NOT VERIFIED|PARTIAL.*FAIL.*NOT VERIFIED" ".claude/commands/delivery.md"
