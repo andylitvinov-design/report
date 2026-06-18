@@ -9,9 +9,9 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
-const pageTabs = {
+export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
-  expert: ["Последний отчёт", "Отчёты по датам", "Механизм", "У-Син", "Препараты"],
+  expert: ["Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
@@ -35,7 +35,7 @@ function RoutedApp() {
   return <LoginPage />;
 }
 
-function ReportApp() {
+export function ReportApp({ clientOverride = null, userAction = null }) {
   const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [activeTabs, setActiveTabs] = useState({
@@ -79,9 +79,11 @@ function ReportApp() {
     <Layout
       activePage={activePage}
       activeTab={activeTabs[activePage]}
+      clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
+      userAction={userAction}
     >
       {renderPage()}
     </Layout>
