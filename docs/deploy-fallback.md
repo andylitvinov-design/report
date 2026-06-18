@@ -7,13 +7,13 @@ This project uses Vercel as the desired primary production target and GitHub Pag
 Primary production URL:
 
 ```text
-https://myalchemy.vercel.app/
+https://psitherapy.vercel.app/
 ```
 
 Primary build-info URL:
 
 ```text
-https://myalchemy.vercel.app/build-info.json
+https://psitherapy.vercel.app/build-info.json
 ```
 
 Possible alternate / previous Vercel alias:
@@ -43,13 +43,13 @@ https://andylitvinov-design.github.io/report/build-info.json
 ## Related Alchemy repositories
 
 ```text
-andylitvinov-design/report         main React/Vite implementation for myalchemy.vercel.app
+andylitvinov-design/report         main React/Vite implementation for psitherapy.vercel.app
 andylitvinov-design/alchemy        concept/MVP notes and static draft materials
 andylitvinov-design/alchemy-method methodology/source logic
 andylitvinov-design/alchemy_site   standalone site-facing HTML bundle / cloud-ready shell
 ```
 
-Use `report` as the main site implementation repo for `myalchemy.vercel.app`.
+Use `report` as the main site implementation repo for `psitherapy.vercel.app`.
 
 ## Workflow
 
@@ -135,8 +135,8 @@ Before fallback deploy:
 After fallback deploy:
 
 ```text
-1. Re-check https://myalchemy.vercel.app/.
-2. Re-check https://myalchemy.vercel.app/build-info.json.
+1. Re-check https://psitherapy.vercel.app/.
+2. Re-check https://psitherapy.vercel.app/build-info.json.
 3. Compare live commitSha with expected SHA.
 4. If relevant, check alternate Vercel alias https://holistichealing.vercel.app/.
 5. During migration, also check legacy GitHub Pages URL/build-info.

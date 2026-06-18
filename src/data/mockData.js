@@ -7,6 +7,12 @@ export const client = {
   hasCompletedFirstConsultation: true,
 };
 
+export const clientProgress = {
+  assessments: [],
+  reports: [],
+  results: [],
+};
+
 export const navigation = [
   { id: "overview", label: "Обзор" },
   { id: "self", label: "Первый приём (Анализ)" },
