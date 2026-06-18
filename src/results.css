@@ -1,0 +1,148 @@
+.results-menu-card,
+.lab-report-card,
+.results-empty-card {
+  display: grid;
+  gap: 16px;
+}
+
+.results-empty-card {
+  min-height: 360px;
+  align-content: center;
+  justify-items: start;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(63, 122, 61, 0.16), transparent 18rem),
+    linear-gradient(135deg, #ffffff, #fbf7ee);
+}
+
+.results-empty-card h2 {
+  max-width: 760px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.8vw, 48px);
+  line-height: 1.03;
+}
+
+.results-empty-card p {
+  max-width: 720px;
+}
+
+.lab-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.report-list {
+  display: grid;
+  gap: 10px;
+}
+
+.report-row {
+  width: 100%;
+  min-height: 84px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fbf7ee;
+  color: var(--text);
+  text-align: left;
+}
+
+.report-row:hover,
+.report-row:focus-visible {
+  border-color: rgba(63, 122, 61, 0.45);
+  background: #fff;
+}
+
+.report-number {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 950;
+}
+
+.report-main,
+.report-meta {
+  display: grid;
+  gap: 5px;
+}
+
+.report-main strong {
+  font-size: 19px;
+}
+
+.report-main small,
+.report-meta small,
+.lab-result-item span {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.report-meta {
+  min-width: 112px;
+  justify-items: end;
+  text-align: right;
+}
+
+.report-meta b {
+  color: var(--green);
+}
+
+.lab-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.lab-result-item {
+  min-height: 92px;
+  padding: 15px;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbf7ee;
+}
+
+.lab-result-item strong {
+  line-height: 1.25;
+}
+
+@media (max-width: 720px) {
+  .report-row {
+    grid-template-columns: 1fr;
+  }
+
+  .report-number {
+    width: fit-content;
+    height: auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+  }
+
+  .report-meta {
+    min-width: 0;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .lab-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
