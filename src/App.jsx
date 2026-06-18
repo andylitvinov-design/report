@@ -199,6 +199,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
       clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
+      hideSpecialistPanel={activePage === "expert"}
       onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}

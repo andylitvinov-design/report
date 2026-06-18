@@ -24,6 +24,7 @@ export default function Layout({
   activeTab,
   focusMode = false,
   hasCompletedResults = true,
+  hideSpecialistPanel = false,
   onPrimaryAction,
   onTabChange,
   children,
@@ -41,6 +42,12 @@ export default function Layout({
     "app-shell",
     focusMode ? "focus-mode" : "",
     isNewUser ? "new-user-shell" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const mainShellClassName = [
+    "main-shell",
+    hideSpecialistPanel ? "no-specialist-panel" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -95,7 +102,7 @@ export default function Layout({
         </div>
       </aside>
 
-      <main className="main-shell">
+      <main className={mainShellClassName}>
         {!focusMode && (
           <section className="topbar">
             <div>
@@ -154,7 +161,7 @@ export default function Layout({
 
         <section className="workspace">{children}</section>
 
-        {hasCompletedResults && <aside className="specialist-panel">
+        {hasCompletedResults && !hideSpecialistPanel && <aside className="specialist-panel">
           {activePage === "self" ? (
             <>
               <article className="card">

@@ -561,6 +561,10 @@ h3 {
   grid-column: 1 / -1;
 }
 
+.main-shell.no-specialist-panel .workspace {
+  grid-column: 1 / -1;
+}
+
 .specialist-panel {
   display: grid;
   align-content: start;
