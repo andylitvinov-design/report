@@ -241,6 +241,36 @@ function BaselineSummaryCard({ baseline }) {
   );
 }
 
+function RestartChoiceSheet({ onCancel, onResetCurrentPart, onResetFullIntake }) {
+  return (
+    <div className="intake-reset-overlay" role="presentation">
+      <article
+        aria-labelledby="intake-reset-title"
+        aria-modal="true"
+        className="intake-reset-sheet"
+        role="dialog"
+      >
+        <header>
+          <p className="card-kicker">Начать заново</p>
+          <h2 id="intake-reset-title">Что начать заново?</h2>
+        </header>
+        <p>Можно очистить только текущую часть или начать весь первый приём сначала.</p>
+        <div className="intake-reset-actions">
+          <button className="secondary-btn" onClick={onResetCurrentPart} type="button">
+            Начать заново текущий раздел
+          </button>
+          <button className="secondary-btn danger-action" onClick={onResetFullIntake} type="button">
+            Начать заново весь диалог
+          </button>
+          <button className="ghost-btn" onClick={onCancel} type="button">
+            Отмена — продолжить
+          </button>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }) {
   const chatWindowRef = useRef(null);
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
@@ -357,12 +387,46 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     setAnswer(value);
   };
 
-  const resetFlow = () => {
+  const resetCurrentPart = () => {
+    const currentPart = parts[state.currentPartIndex] || parts[0];
+    const nextAnswers = {
+      baseline: { ...state.answers.baseline },
+      bach: { ...state.answers.bach },
+      therapyRequest: { ...state.answers.therapyRequest },
+    };
+
+    if (currentPart.kind === "baseline") {
+      nextAnswers.baseline = {};
+    } else if (currentPart.kind === "therapy") {
+      nextAnswers.therapyRequest = {};
+    } else {
+      const currentPartStepIds = new Set(getPartSteps(currentPart).map((item) => item.id));
+      nextAnswers.bach = Object.fromEntries(
+        Object.entries(nextAnswers.bach).filter(([key]) => !currentPartStepIds.has(key))
+      );
+    }
+
+    removeStorageItem(FIRST_INTAKE_RESULT_KEY);
+    persistState({
+      ...state,
+      answers: nextAnswers,
+      currentStepIndex: 0,
+      status: "draft",
+      completedAt: null,
+    });
+    setDraftValue("");
+    setDraftTags([]);
+    setRestoreChoiceVisible(false);
+    setRestartConfirmVisible(false);
+  };
+
+  const resetFullIntake = () => {
     const nextState = makeInitialState();
     removeStorageItem(FIRST_INTAKE_PROGRESS_KEY);
     removeStorageItem(FIRST_INTAKE_RESULT_KEY);
     setState(nextState);
     setDraftValue("");
+    setDraftTags([]);
     setRestoreChoiceVisible(false);
     setRestartConfirmVisible(false);
   };
@@ -379,6 +443,19 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     persistState(state);
     onSaveAndExit?.();
   };
+
+  const goToMainMenu = () => {
+    persistState(state);
+    onSaveAndExit?.();
+  };
+
+  const restartChoiceSheet = restartConfirmVisible ? (
+    <RestartChoiceSheet
+      onCancel={() => setRestartConfirmVisible(false)}
+      onResetCurrentPart={resetCurrentPart}
+      onResetFullIntake={resetFullIntake}
+    />
+  ) : null;
 
   const partLabel = `Часть ${state.currentPartIndex + 1} из ${parts.length} · ${part.shortTitle}`;
   const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
@@ -411,15 +488,11 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
             <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
               Продолжить
             </button>
-            <button className="secondary-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+            <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
               Начать заново
             </button>
-            {restartConfirmVisible ? (
-              <button className="secondary-btn danger-action" onClick={resetFlow} type="button">
-                Подтвердить начало заново
-              </button>
-            ) : null}
           </footer>
+          {restartChoiceSheet}
         </article>
       </div>
     );
@@ -527,21 +600,20 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
             </button>
           ) : null}
           {hasAnyAnswer ? (
-            <button className="secondary-btn" onClick={saveAndExit} type="button">
-              Сохранить и выйти
-            </button>
-          ) : null}
-          {hasAnyAnswer ? (
-            <button className="secondary-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-              Начать заново
-            </button>
-          ) : null}
-          {restartConfirmVisible ? (
-            <button className="secondary-btn danger-action" onClick={resetFlow} type="button">
-              Подтвердить начало заново
-            </button>
+            <div className="intake-navigation-actions" aria-label="Навигация первого приёма">
+              <button className="secondary-btn" onClick={saveAndExit} type="button">
+                Сохранить и выйти
+              </button>
+              <button className="ghost-btn" onClick={goToMainMenu} type="button">
+                Перейти в главное меню
+              </button>
+              <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+                Начать заново
+              </button>
+            </div>
           ) : null}
         </footer>
+        {restartChoiceSheet}
       </article>
     </div>
   );
