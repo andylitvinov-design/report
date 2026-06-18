@@ -1,300 +1,422 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { selfAnalysis } from "../data/mockData.js";
+import { calculateRemedyResults } from "../lib/bachScoring.js";
+import {
+  FIRST_INTAKE_PROGRESS_KEY,
+  FIRST_INTAKE_RESULT_KEY,
+  readJsonStorage,
+  removeStorageItem,
+  writeJsonStorage,
+} from "../lib/firstIntakeStorage.js";
 
-const FIRST_INTAKE_INITIAL_ANSWERS = {
-  mainConcern: "",
-  feltArea: "",
-  intensity: "",
-  trigger: "",
-  relief: "",
-  desiredOutcome: "",
-  notes: {},
-};
-
-const FIRST_INTAKE_STEPS = [
-  {
-    id: "mainConcern",
-    label: "Главный фокус",
-    therapist:
-      "Смотрю на вашу текущую ситуацию. С чего лучше начать: что сейчас сильнее всего беспокоит?",
-    options: [
-      "Физическое состояние / симптомы",
-      "Эмоции и тревога",
-      "Усталость / нет сил",
-      "Отношения / контакт с людьми",
-      "Работа / деньги / реализация",
-      "Не понимаю, что происходит",
-    ],
-  },
-  {
-    id: "feltArea",
-    label: "Где ощущается",
-    therapist: "Где это сейчас ощущается сильнее всего?",
-    options: [
-      "Голова / напряжение",
-      "Грудь / дыхание",
-      "Живот / пищеварение",
-      "Кожа / воспаление",
-      "Общая слабость",
-      "В отношениях / контакте",
-      "В мыслях / невозможности решить",
-      "Другое",
-    ],
-  },
-  {
-    id: "intensity",
-    label: "Сила состояния",
-    therapist: "Насколько это сейчас сильно, если смотреть честно по последним дням?",
-    options: [
-      "1-3: слабо, но заметно",
-      "4-6: мешает жить",
-      "7-8: сильно захватывает",
-      "9-10: почти невозможно выдерживать",
-    ],
-  },
-  {
-    id: "trigger",
-    label: "Что усиливает",
-    therapist: "Что обычно усиливает это состояние?",
-    options: [
-      "Стресс / спешка",
-      "Конфликт / давление",
-      "Одиночество",
-      "Усталость / недосып",
-      "Страх оценки",
-      "Неопределённость",
-      "Не знаю",
-    ],
-  },
-  {
-    id: "relief",
-    label: "Что облегчает",
-    therapist: "Что хотя бы немного облегчает состояние?",
-    options: [
-      "Отдых",
-      "Поддержка другого человека",
-      "Тепло / тело / прикосновение",
-      "Понимание причины",
-      "Природа / прогулка",
-      "Структура и план",
-      "Пока ничего",
-    ],
-  },
-  {
-    id: "desiredOutcome",
-    label: "Желаемый результат",
-    therapist: "Что было бы самым полезным результатом первого приёма?",
-    options: [
-      "Понять главную причину состояния",
-      "Получить короткий план поддержки",
-      "Понять, какой отчёт нужен специалисту",
-      "Определить, что проверить дальше",
-      "Собрать состояние в ясную картину",
-    ],
-  },
+const baselineSteps = [
+  { id: "mainConcern", label: "Главный фокус", question: "Что сейчас главное?", type: "text", placeholder: "Например: тревога, усталость, напряжение в теле." },
+  { id: "feltArea", label: "Где ощущается", question: "Где это ощущается сильнее всего?", type: "text", placeholder: "Тело, эмоции, мысли, отношения, работа..." },
+  { id: "problemStrength", label: "Сила проблемы", question: "Сила проблемы сейчас от 0 до 10?", type: "scale10" },
+  { id: "resourceLevel", label: "Ресурс", question: "Сколько ресурса сейчас от 0 до 10?", type: "scale10" },
+  { id: "anxietyLevel", label: "Тревога / напряжение", question: "Тревога / напряжение сейчас от 0 до 10?", type: "scale10" },
+  { id: "fatigueLevel", label: "Усталость", question: "Усталость сейчас от 0 до 10?", type: "scale10" },
+  { id: "lifeImpact", label: "Влияние на жизнь", question: "Насколько это мешает жить от 0 до 10?", type: "scale10" },
+  { id: "trigger", label: "Что усиливает", question: "Что обычно усиливает это состояние?", type: "text", placeholder: "Ситуации, мысли, люди, время дня..." },
+  { id: "relief", label: "Что облегчает", question: "Что хотя бы немного облегчает?", type: "text", placeholder: "Пауза, тепло, разговор, сон, движение..." },
+  { id: "freeComment", label: "Комментарий", question: "Хотите добавить своими словами?", type: "comment", placeholder: "Коротко добавьте важный нюанс." },
 ];
 
-export default function SelfAnalysis({ onModeChange }) {
+const therapySteps = [
+  { id: "desiredChange", label: "Что изменить", question: "Что хочется изменить?", placeholder: "Что должно стать иначе в состоянии или реакции?" },
+  { id: "desiredResult1to3Sessions", label: "Результат 1-3 сессии", question: "Какой результат был бы ценным через 1-3 сессии?", placeholder: "Например: больше ясности, ниже напряжение, понятный следующий шаг." },
+  { id: "mustNotLose", label: "Что сохранить", question: "Что важно не потерять?", placeholder: "Что должно остаться бережно сохранено?" },
+  { id: "preferredSupport", label: "Поддержка", question: "Какая поддержка кажется подходящей?", placeholder: "Структура, мягкое сопровождение, телесные практики, разговор..." },
+  { id: "formulatedRequest", label: "Формулировка запроса", question: "Сформулируем запрос: что вы хотите получить от работы?", placeholder: "Я хочу прояснить / изменить / укрепить..." },
+];
+
+const parts = [
+  { id: "baseline", title: "Жалоба / симптом / baseline состояния", shortTitle: "Baseline состояния", kind: "baseline", steps: baselineSteps },
+  { id: "bachSituation", title: "Bach: ситуация", shortTitle: "Bach: ситуация", kind: "bach", source: "situation" },
+  { id: "bachCharacter", title: "Bach: характер / устойчивые паттерны", shortTitle: "Bach: характер", kind: "bach", source: "character" },
+  { id: "bachControl", title: "Bach: контроль / острое напряжение", shortTitle: "Bach: контроль", kind: "bach", source: "control" },
+  { id: "therapyRequest", title: "Запрос на терапию", shortTitle: "Запрос на терапию", kind: "therapy", steps: therapySteps },
+];
+
+const makeInitialState = () => ({
+  version: 1,
+  currentPartIndex: 0,
+  currentStepIndex: 0,
+  answers: {
+    baseline: {},
+    bach: {},
+    therapyRequest: {},
+  },
+  status: "draft",
+  updatedAt: null,
+  completedAt: null,
+});
+
+const formatDateTime = (value) => {
+  if (!value) return "нет даты";
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+};
+
+const answerLabel = (step, value) => {
+  if (value === undefined || value === null || value === "") {
+    return "";
+  }
+  if (step.type === "scale10") {
+    return `${value}/10`;
+  }
+  if (step.kind === "bach") {
+    const labels = ["0 - нет / не про меня", "1 - немного", "2 - заметно", "3 - сильно"];
+    return labels[Number(value)] || String(value);
+  }
+  return String(value);
+};
+
+const getPartSteps = (part) => {
+  if (part.kind === "bach") {
+    return selfAnalysis.questions
+      .filter((question) => question.section === part.source)
+      .map((question, index) => ({
+        id: question.id,
+        label: `Bach ${index + 1}`,
+        question: question.text,
+        kind: "bach",
+        source: part.source,
+        remedy: question.remedy,
+        theme: question.theme,
+      }));
+  }
+
+  return part.steps;
+};
+
+const getAnswerGroup = (state, part) => {
+  if (part.kind === "baseline") return state.answers.baseline;
+  if (part.kind === "therapy") return state.answers.therapyRequest;
+  return state.answers.bach;
+};
+
+const buildFormulatedRequest = (therapyRequest, baseline) =>
+  [
+    `Я хочу прояснить / изменить / укрепить: ${therapyRequest.formulatedRequest || therapyRequest.desiredChange || "текущий запрос требует уточнения"}.`,
+    `Сейчас больше всего мешает: ${baseline.mainConcern || "не указано"}.`,
+    `Хочу прийти к: ${therapyRequest.desiredResult1to3Sessions || "понятному результату на ближайшие 1-3 сессии"}.`,
+    `Важно учитывать: ${therapyRequest.mustNotLose || "сохранить ресурс и устойчивость"}.`,
+  ].join(" ");
+
+const calculateIntakeResult = (state) => {
+  const now = new Date().toISOString();
+  const baseline = {
+    ...state.answers.baseline,
+    updatedAt: now,
+  };
+  const bachResults = calculateRemedyResults({
+    questions: selfAnalysis.questions,
+    scores: state.answers.bach,
+  });
+  const therapyRequest = {
+    ...state.answers.therapyRequest,
+    formulatedRequest: buildFormulatedRequest(state.answers.therapyRequest, baseline),
+    updatedAt: now,
+  };
+
+  return {
+    version: 1,
+    symptomBaseline: baseline,
+    bachResults,
+    therapyRequest,
+    status: "completed",
+    completedAt: now,
+  };
+};
+
+function BaselineSummaryCard({ baseline }) {
+  return (
+    <section className="intake-summary-panel" aria-label="Базовая точка состояния">
+      <h3>Базовая точка состояния</h3>
+      <div className="summary-point-grid">
+        <div>
+          <span>Проблема</span>
+          <strong>{baseline.problemStrength ?? "не указано"}/10</strong>
+          <p>{baseline.mainConcern || "Главный фокус требует уточнения."}</p>
+        </div>
+        <div>
+          <span>Ресурс</span>
+          <strong>{baseline.resourceLevel ?? "не указано"}/10</strong>
+          <p>{baseline.relief || "Опора требует уточнения."}</p>
+        </div>
+        <div>
+          <span>Тревога / усталость</span>
+          <strong>{baseline.anxietyLevel ?? "не указано"}/10 · {baseline.fatigueLevel ?? "не указано"}/10</strong>
+          <p>Первая измеримая точка для будущего сравнения.</p>
+        </div>
+        <div>
+          <span>Влияние и триггер</span>
+          <strong>{baseline.lifeImpact ?? "не указано"}/10</strong>
+          <p>{baseline.trigger || "Триггер требует уточнения."}</p>
+        </div>
+        {baseline.freeComment ? (
+          <div>
+            <span>Комментарий клиента</span>
+            <strong>{baseline.freeComment}</strong>
+            <p>Сохранено в рабочую карту.</p>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }) {
   const chatWindowRef = useRef(null);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState(FIRST_INTAKE_INITIAL_ANSWERS);
-  const [isComplete, setIsComplete] = useState(false);
+  const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
+  const [restoreChoiceVisible, setRestoreChoiceVisible] = useState(() => {
+    const saved = readJsonStorage(FIRST_INTAKE_PROGRESS_KEY);
+    return Boolean(saved && saved.status !== "completed" && saved.updatedAt);
+  });
+  const [draftValue, setDraftValue] = useState("");
+  const [restartConfirmVisible, setRestartConfirmVisible] = useState(false);
+
+  const part = parts[state.currentPartIndex] || parts[0];
+  const steps = useMemo(() => getPartSteps(part), [part]);
+  const step = steps[state.currentStepIndex] || steps[0];
+  const answerGroup = getAnswerGroup(state, part);
+  const currentAnswer = answerGroup[step?.id];
+  const isComplete = state.status === "completed";
+  const visibleSteps = isComplete ? steps : steps.slice(0, state.currentStepIndex + 1);
+  const hasAnyAnswer =
+    Object.keys(state.answers.baseline).length > 0 ||
+    Object.keys(state.answers.bach).length > 0 ||
+    Object.keys(state.answers.therapyRequest).length > 0;
 
   useEffect(() => {
-    onModeChange?.("overview");
+    onModeChange?.("form");
   }, [onModeChange]);
 
   useEffect(() => {
+    setDraftValue(currentAnswer === undefined ? "" : String(currentAnswer));
+  }, [currentAnswer, step?.id]);
+
+  useEffect(() => {
     const chatWindow = chatWindowRef.current;
-    if (!chatWindow) {
+    if (!chatWindow) return;
+    chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: "smooth" });
+  }, [state, restoreChoiceVisible]);
+
+  const persistState = (nextState) => {
+    const prepared = { ...nextState, updatedAt: new Date().toISOString() };
+    setState(prepared);
+    writeJsonStorage(FIRST_INTAKE_PROGRESS_KEY, prepared);
+    return prepared;
+  };
+
+  const setAnswer = (value) => {
+    const nextAnswers = { ...state.answers };
+    if (part.kind === "baseline") {
+      nextAnswers.baseline = { ...nextAnswers.baseline, [step.id]: value };
+    } else if (part.kind === "therapy") {
+      nextAnswers.therapyRequest = { ...nextAnswers.therapyRequest, [step.id]: value };
+    } else {
+      nextAnswers.bach = { ...nextAnswers.bach, [step.id]: value };
+    }
+
+    const isLastStep = state.currentStepIndex >= steps.length - 1;
+    const isLastPart = state.currentPartIndex >= parts.length - 1;
+    let nextState = {
+      ...state,
+      answers: nextAnswers,
+      currentStepIndex: isLastStep ? 0 : state.currentStepIndex + 1,
+      currentPartIndex: isLastStep && !isLastPart ? state.currentPartIndex + 1 : state.currentPartIndex,
+    };
+
+    if (isLastStep && isLastPart) {
+      const completedAt = new Date().toISOString();
+      nextState = { ...nextState, status: "completed", completedAt };
+      const result = calculateIntakeResult(nextState);
+      writeJsonStorage(FIRST_INTAKE_RESULT_KEY, result);
+      writeJsonStorage(FIRST_INTAKE_PROGRESS_KEY, nextState);
+      setState(nextState);
+      onComplete?.(result);
       return;
     }
 
-    chatWindow.scrollTo({
-      top: chatWindow.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [answers, currentStep, isComplete]);
-
-  const step = FIRST_INTAKE_STEPS[currentStep];
-  const answeredSteps = useMemo(
-    () => FIRST_INTAKE_STEPS.filter((item) => answers[item.id]),
-    [answers]
-  );
-  const visibleSteps = isComplete
-    ? FIRST_INTAKE_STEPS
-    : FIRST_INTAKE_STEPS.slice(0, currentStep + 1);
-  const progressLabel = isComplete
-    ? `Шаг ${FIRST_INTAKE_STEPS.length} из ${FIRST_INTAKE_STEPS.length}`
-    : `Шаг ${currentStep + 1} из ${FIRST_INTAKE_STEPS.length}`;
-
-  const resetDialog = () => {
-    setCurrentStep(0);
-    setAnswers(FIRST_INTAKE_INITIAL_ANSWERS);
-    setIsComplete(false);
+    persistState(nextState);
   };
 
-  const chooseOption = (option) => {
-    setAnswers((current) => ({ ...current, [step.id]: option }));
-
-    if (currentStep < FIRST_INTAKE_STEPS.length - 1) {
-      setCurrentStep((value) => value + 1);
-      return;
-    }
-
-    setIsComplete(true);
+  const submitDraft = () => {
+    if (!step || draftValue.trim() === "") return;
+    const value = step.type === "scale10" ? Number(draftValue) : draftValue.trim();
+    setAnswer(value);
   };
 
-  const updateNote = (value) => {
-    setAnswers((current) => ({
-      ...current,
-      notes: {
-        ...current.notes,
-        [step.id]: value,
-      },
-    }));
+  const resetFlow = () => {
+    const nextState = makeInitialState();
+    removeStorageItem(FIRST_INTAKE_PROGRESS_KEY);
+    removeStorageItem(FIRST_INTAKE_RESULT_KEY);
+    setState(nextState);
+    setDraftValue("");
+    setRestoreChoiceVisible(false);
+    setRestartConfirmVisible(false);
   };
 
   const goBack = () => {
-    setIsComplete(false);
-    setCurrentStep((value) => Math.max(value - 1, 0));
+    const nextPartIndex = state.currentStepIndex > 0 ? state.currentPartIndex : Math.max(state.currentPartIndex - 1, 0);
+    const nextSteps = getPartSteps(parts[nextPartIndex]);
+    const nextStepIndex =
+      state.currentStepIndex > 0 ? state.currentStepIndex - 1 : nextPartIndex === state.currentPartIndex ? 0 : nextSteps.length - 1;
+    persistState({ ...state, status: "draft", currentPartIndex: nextPartIndex, currentStepIndex: nextStepIndex });
   };
 
-  const continueClarifying = () => {
-    setIsComplete(false);
-    setCurrentStep(FIRST_INTAKE_STEPS.length - 1);
+  const saveAndExit = () => {
+    persistState(state);
+    onSaveAndExit?.();
   };
+
+  const partLabel = `Часть ${state.currentPartIndex + 1} из ${parts.length} · ${part.shortTitle}`;
+  const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
+
+  if (restoreChoiceVisible) {
+    return (
+      <div className="first-intake-page first-intake-dialog">
+        <article className="card intake-chat-card restore-intake-card">
+          <header className="chat-card-header">
+            <div>
+              <p className="card-kicker">Первый приём</p>
+              <h2>У вас есть незавершённый первый приём</h2>
+            </div>
+            <span className="chat-progress">{partLabel}</span>
+          </header>
+          <section className="restore-intake-body">
+            <p>Продолжить с места остановки или начать заново?</p>
+            <div className="summary-point-grid">
+              <div>
+                <span>Текущая часть</span>
+                <strong>{partLabel}</strong>
+              </div>
+              <div>
+                <span>Обновлено</span>
+                <strong>{formatDateTime(state.updatedAt)}</strong>
+              </div>
+            </div>
+          </section>
+          <footer className="chat-actions">
+            <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
+              Продолжить
+            </button>
+            <button className="secondary-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+              Начать заново
+            </button>
+            {restartConfirmVisible ? (
+              <button className="secondary-btn danger-action" onClick={resetFlow} type="button">
+                Подтвердить начало заново
+              </button>
+            ) : null}
+          </footer>
+        </article>
+      </div>
+    );
+  }
 
   return (
     <div className="first-intake-page first-intake-dialog">
       <article className="card intake-chat-card">
         <header className="chat-card-header">
           <div>
-            <p className="card-kicker">Первый приём</p>
-            <h2>Диалог для прояснения состояния</h2>
+            <p className="card-kicker">{partLabel}</p>
+            <h2>{part.title}</h2>
           </div>
-          <span className="chat-progress">{progressLabel}</span>
+          <span className="chat-progress">{stepLabel}</span>
         </header>
 
         <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
           <div className="chat-bubble therapist-bubble intro-bubble">
             <span>Специалист</span>
-            <p>Я задам несколько коротких вопросов, чтобы прояснить текущее состояние.</p>
+            <p>Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты.</p>
           </div>
 
           {visibleSteps.map((item) => (
             <React.Fragment key={item.id}>
-              <div
-                className={
-                  item.id === step?.id && !answers[item.id] && !isComplete
-                    ? "chat-bubble therapist-bubble current-question-bubble"
-                    : "chat-bubble therapist-bubble"
-                }
-              >
+              <div className={item.id === step?.id && !currentAnswer && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
                 <span>Специалист</span>
-                <p>{item.therapist}</p>
+                <p>{item.question}</p>
               </div>
-              {answers[item.id] ? (
+              {answerGroup[item.id] !== undefined && answerGroup[item.id] !== "" ? (
                 <div className="chat-bubble user-bubble">
                   <span>Вы</span>
-                  <p>{answers[item.id]}</p>
-                  {answers.notes[item.id] ? <small>{answers.notes[item.id]}</small> : null}
+                  <p>{answerLabel(item, answerGroup[item.id])}</p>
                 </div>
               ) : null}
             </React.Fragment>
           ))}
-
-          {isComplete ? (
-            <div className="chat-bubble therapist-bubble final-bubble">
-              <span>Специалист</span>
-              <p>
-                Спасибо. Уже видно несколько важных точек, из которых можно собрать
-                предварительное понимание и рабочую карту для дальнейшего прояснения.
-              </p>
-            </div>
-          ) : null}
         </div>
 
-        {!isComplete ? (
-          <>
-            <section className="answer-panel" aria-label="Варианты ответа">
-              <div className="answer-panel-head">
-                <span>{step.label}</span>
-                <strong>Выберите близкий вариант</strong>
-              </div>
-              <div className="option-grid">
-                {step.options.map((option) => (
-                  <button
-                    className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
-                    key={option}
-                    onClick={() => chooseOption(option)}
-                    type="button"
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </section>
+        {state.currentPartIndex > 0 ? (
+          <BaselineSummaryCard baseline={state.answers.baseline} />
+        ) : null}
 
-            <label className="field compact-note">
-              <span>Добавить своими словами</span>
-              <textarea
-                id={`first-intake-note-${step.id}`}
-                name={`first-intake-note-${step.id}`}
-                onChange={(event) => updateNote(event.target.value)}
-                placeholder="Коротко опишите нюанс, если хочется уточнить ответ."
-                value={answers.notes[step.id] || ""}
-              />
-            </label>
-          </>
-        ) : (
-          <section className="intake-summary-panel" aria-label="Предварительное понимание">
-            <h3>Предварительное понимание</h3>
-            <div className="summary-point-grid">
-              <div>
-                <span>Что сейчас главное</span>
-                <strong>{answers.mainConcern}</strong>
-                <p>{answers.feltArea} · {answers.intensity}</p>
-              </div>
-              <div>
-                <span>Что усиливает</span>
-                <strong>{answers.trigger}</strong>
-                <p>Это может быть полезно проверить в динамике последних дней.</p>
-              </div>
-              <div>
-                <span>Что облегчает</span>
-                <strong>{answers.relief}</strong>
-                <p>Эта опора может войти в короткий план поддержки.</p>
-              </div>
-              <div>
-                <span>Что прояснять дальше</span>
-                <strong>{answers.desiredOutcome}</strong>
-                <p>Это не медицинская диагностика, а материал для специалиста.</p>
-              </div>
+        <section className="answer-panel" aria-label="Ответ на текущий вопрос">
+          <div className="answer-panel-head">
+            <span>{step.label}</span>
+            <strong>{part.kind === "bach" ? "Оцените проявленность" : "Ответьте коротко"}</strong>
+          </div>
+
+          {step.type === "scale10" ? (
+            <div className="option-grid scale-grid">
+              {Array.from({ length: 11 }, (_, value) => (
+                <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
+                  {value}
+                </button>
+              ))}
             </div>
-          </section>
-        )}
+          ) : part.kind === "bach" ? (
+            <div className="option-grid bach-scale-grid">
+              {[0, 1, 2, 3].map((value) => (
+                <button className="answer-chip" key={value} onClick={() => setAnswer(value)} type="button">
+                  {answerLabel(step, value)}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <label className="field compact-note inline-answer-field">
+              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваш ответ"}</span>
+              <textarea
+                id={`first-intake-${step.id}`}
+                name={`first-intake-${step.id}`}
+                onChange={(event) => setDraftValue(event.target.value)}
+                placeholder={step.placeholder}
+                value={draftValue}
+              />
+              <button className="primary-btn" onClick={submitDraft} type="button">
+                {step.type === "comment" ? "Сохранить комментарий" : "Сохранить ответ"}
+              </button>
+            </label>
+          )}
+        </section>
 
         <footer className="chat-actions">
-          {!isComplete && answeredSteps.length > 0 ? (
+          {hasAnyAnswer ? (
             <button className="secondary-btn" onClick={goBack} type="button">
               Назад
             </button>
           ) : null}
-          {!isComplete && answeredSteps.length > 0 ? (
-            <button className="secondary-btn" onClick={resetDialog} type="button">
+          {hasAnyAnswer ? (
+            <button className="secondary-btn" onClick={saveAndExit} type="button">
+              Сохранить и выйти
+            </button>
+          ) : null}
+          {hasAnyAnswer ? (
+            <button className="secondary-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
               Начать заново
             </button>
           ) : null}
-          {isComplete ? (
-            <>
-              <button className="primary-btn" type="button">Запросить отчёт специалиста</button>
-              <button className="secondary-btn" onClick={continueClarifying} type="button">
-                Продолжить уточнение
-              </button>
-              <button className="secondary-btn" onClick={resetDialog} type="button">
-                Начать заново
-              </button>
-            </>
+          {restartConfirmVisible ? (
+            <button className="secondary-btn danger-action" onClick={resetFlow} type="button">
+              Подтвердить начало заново
+            </button>
           ) : null}
         </footer>
       </article>

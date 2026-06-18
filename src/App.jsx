@@ -8,6 +8,7 @@ import Overview from "./pages/Overview.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
+import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
 export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
@@ -76,6 +77,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
   const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
+  const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
     expert: pageTabs.expert[0],
@@ -89,6 +91,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
     clientProgress.results.some((item) => item.status === "completed");
   const hasCompletedResults =
     forceDemo ||
+    Boolean(firstIntakeResult) ||
     completedFromProgress ||
     clientOverride?.hasCompletedFirstConsultation === true ||
     clientOverride?.hasCompletedResults === true;
@@ -129,9 +132,27 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
     setActiveTabs((current) => ({ ...current, expert: tab }));
   };
 
+  const handleFirstIntakeComplete = (result) => {
+    setFirstIntakeResult(result);
+    setActivePage("expert");
+    setSelfAnalysisMode("overview");
+    setActiveTabs((current) => ({ ...current, expert: "Самоотчёт" }));
+  };
+
+  const handleFirstIntakeSaveAndExit = () => {
+    setActivePage("overview");
+    setSelfAnalysisMode("overview");
+  };
+
   const renderPage = () => {
     if (activePage === "self") {
-      return <SelfAnalysis onModeChange={setSelfAnalysisMode} />;
+      return (
+        <SelfAnalysis
+          onComplete={handleFirstIntakeComplete}
+          onModeChange={setSelfAnalysisMode}
+          onSaveAndExit={handleFirstIntakeSaveAndExit}
+        />
+      );
     }
     if (!hasCompletedResults && activePage === "expert") {
       return (
@@ -147,6 +168,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
         <ExpertAnalysis
           activeTab={activeTabs.expert}
           clientOverride={clientOverride}
+          firstIntakeResult={firstIntakeResult}
           onSelectReport={openResultReport}
           onStartSelfAnalysis={openFirstIntake}
         />
