@@ -119,7 +119,7 @@ export default function ProfilePage() {
         <div>
           <p className="eyebrow">Личный кабинет PsiTherapy</p>
           <h1>{userDisplayName(user)}</h1>
-          <p className="subtitle">Вход через Google работает. Следующий слой — подключение личных отчётов, самоанализа и рекомендаций.</p>
+          <p className="subtitle">Вход через Google работает. Следующий слой — подключение личных отчётов, первого приёма и рекомендаций.</p>
         </div>
         <button className="secondary-btn" type="button" onClick={handleSignOut}>Выйти</button>
       </section>
@@ -138,9 +138,9 @@ export default function ProfilePage() {
         </article>
 
         <article className="card profile-card">
-          <span>Самоанализ</span>
+          <span>Первый приём</span>
           <strong>Следующий этап</strong>
-          <p>Форма самоанализа будет подключена к отдельным таблицам PsiTherapy.</p>
+          <p>Диалог первого приёма будет подключен к отдельным таблицам PsiTherapy.</p>
         </article>
       </section>
     </main>
