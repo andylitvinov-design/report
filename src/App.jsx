@@ -58,12 +58,23 @@ function ReportApp() {
     setSelfAnalysisMode("overview");
   };
 
+  const openResultReport = (tab) => {
+    setActivePage("expert");
+    setActiveTabs((current) => ({ ...current, expert: tab }));
+  };
+
   const renderPage = () => {
     if (activePage === "self") {
       return <SelfAnalysis onModeChange={setSelfAnalysisMode} />;
     }
     if (activePage === "expert") {
-      return <ExpertAnalysis activeTab={activeTabs.expert} onStartSelfAnalysis={openFirstIntake} />;
+      return (
+        <ExpertAnalysis
+          activeTab={activeTabs.expert}
+          onSelectReport={openResultReport}
+          onStartSelfAnalysis={openFirstIntake}
+        />
+      );
     }
     if (activePage === "recommendations") {
       return <Recommendations />;
