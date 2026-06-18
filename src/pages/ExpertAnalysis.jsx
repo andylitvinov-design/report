@@ -1,6 +1,7 @@
 import React from "react";
-import { getAnswerText, hasAnswerContent } from "../lib/firstIntakeAnswers.js";
 import { client } from "../data/mockData.js";
+import { readAdvancedAiAnalysisResult } from "../lib/advancedAiAnalysisStorage.js";
+import { getAnswerText, hasAnswerContent } from "../lib/firstIntakeAnswers.js";
 import { readFirstIntakeResult } from "../lib/firstIntakeStorage.js";
 import "../results.css";
 
@@ -333,7 +334,7 @@ function ResultsActionMenu({ firstIntakeResult, onSelectReport, onStartSelfAnaly
   );
 }
 
-function ResultsHistoryPreview({ firstIntakeResult }) {
+function ResultsHistoryPreview({ advancedAiResult, firstIntakeResult }) {
   return (
     <section className="results-action-card" aria-label="История результатов">
       <span className="card-kicker">История</span>
@@ -344,29 +345,33 @@ function ResultsHistoryPreview({ firstIntakeResult }) {
           <span>{firstIntakeResult ? formatResultDate(firstIntakeResult.completedAt) : "создаст baseline"}</span>
         </div>
         <div className="planned">
-          <strong>Повторный срез</strong>
-          <span>следующий этап после #38</span>
+          <strong>{advancedAiResult ? "Расширенный ИИ-анализ" : "Повторный срез"}</strong>
+          <span>{advancedAiResult ? formatResultDate(advancedAiResult.completedAt) : "следующий этап после #38"}</span>
         </div>
       </div>
     </section>
   );
 }
 
-function ResultsCompactMenu({ firstIntakeResult, onSelectReport }) {
+function ResultsCompactMenu({ advancedAiResult, firstIntakeResult, onSelectReport }) {
+  const tabs = advancedAiResult ? ["Расширенный ИИ-анализ", ...compactReportTabs] : compactReportTabs;
+
   return (
     <section className="results-compact-menu" aria-label="Меню отчёта">
       <span className="card-kicker">Меню отчёта</span>
-      {compactReportTabs.map((tab) => (
+      {tabs.map((tab) => (
         <button key={tab} onClick={() => onSelectReport(tab)} type="button">
           <span>{tab}</span>
-          <small>{tab === "Самоотчёт" && firstIntakeResult ? "готов" : "открыть раздел"}</small>
+          <small>
+            {tab === "Расширенный ИИ-анализ" || (tab === "Самоотчёт" && firstIntakeResult) ? "готов" : "открыть раздел"}
+          </small>
         </button>
       ))}
     </section>
   );
 }
 
-function ResultsInteractivePanel({ firstIntakeResult, onSelectReport, onStartSelfAnalysis }) {
+function ResultsInteractivePanel({ advancedAiResult, firstIntakeResult, onSelectReport, onStartSelfAnalysis }) {
   return (
     <aside className="results-interactive-panel" aria-label="Интерактивная панель результатов">
       <ResultsActionMenu
@@ -374,8 +379,12 @@ function ResultsInteractivePanel({ firstIntakeResult, onSelectReport, onStartSel
         onSelectReport={onSelectReport}
         onStartSelfAnalysis={onStartSelfAnalysis}
       />
-      <ResultsCompactMenu firstIntakeResult={firstIntakeResult} onSelectReport={onSelectReport} />
-      <ResultsHistoryPreview firstIntakeResult={firstIntakeResult} />
+      <ResultsCompactMenu
+        advancedAiResult={advancedAiResult}
+        firstIntakeResult={firstIntakeResult}
+        onSelectReport={onSelectReport}
+      />
+      <ResultsHistoryPreview advancedAiResult={advancedAiResult} firstIntakeResult={firstIntakeResult} />
       <section className="results-chat-placeholder" aria-label="Будущий чат">
         <span className="card-kicker">Future chat</span>
         <h3>Повторный ИИ-приём</h3>
@@ -385,7 +394,7 @@ function ResultsInteractivePanel({ firstIntakeResult, onSelectReport, onStartSel
   );
 }
 
-function ReportsMenu({ activeTab, onSelectReport, hasFirstIntakeResult = false }) {
+function ReportsMenu({ activeTab, onSelectReport, hasAdvancedAiResult = false, hasFirstIntakeResult = false }) {
   const availableReports = hasFirstIntakeResult
     ? [
         {
@@ -396,9 +405,31 @@ function ReportsMenu({ activeTab, onSelectReport, hasFirstIntakeResult = false }
           summary: "Первый приём: baseline, Bach-группировка и терапевтический запрос.",
           accent: "Первый приём",
         },
+        ...(hasAdvancedAiResult
+          ? [{
+              number: "A1",
+              type: "Расширенный ИИ-анализ",
+              date: "сегодня",
+              status: "Готов",
+              summary: "Последний завершённый углублённый тест с ключевыми показателями и рабочим направлением.",
+              accent: "ИИ-анализ",
+            }]
+          : []),
         ...reports.slice(1),
       ]
-    : reports;
+    : hasAdvancedAiResult
+      ? [
+          {
+            number: "A1",
+            type: "Расширенный ИИ-анализ",
+            date: "сегодня",
+            status: "Готов",
+            summary: "Последний завершённый углублённый тест с ключевыми показателями и рабочим направлением.",
+            accent: "ИИ-анализ",
+          },
+          ...reports,
+        ]
+      : reports;
 
   return (
     <article className="card results-menu-card">
@@ -429,6 +460,55 @@ function ReportsMenu({ activeTab, onSelectReport, hasFirstIntakeResult = false }
           </button>
         ))}
       </div>
+    </article>
+  );
+}
+
+function AdvancedAiResultBlock({ result }) {
+  if (!result) return null;
+
+  const completedDate = result.completedAt
+    ? new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(result.completedAt))
+    : "дата не указана";
+
+  return (
+    <article className="card lab-report-card advanced-ai-report-card">
+      <div className="section-head">
+        <div>
+          <span className="card-kicker">Расширенный ИИ-анализ</span>
+          <h2>{result.programTitle || "Последний завершённый анализ"}</h2>
+        </div>
+        <span className="lab-badge">{completedDate}</span>
+      </div>
+      <p>
+        {result.hypothesis || "Итоговая рабочая гипотеза требует проверки специалистом."}
+      </p>
+      <div className="lab-result-grid">
+        {(result.keyMetrics || []).slice(0, 4).map(([label, value]) => (
+          <div className="lab-result-item" key={label}>
+            <span>{label}</span>
+            <strong>{value ?? "не указано"}{typeof value === "number" ? "/10" : ""}</strong>
+          </div>
+        ))}
+        <div className="lab-result-item wide-result-item">
+          <span>Направление для специалиста</span>
+          <strong>{result.hypothesis || "Сверить ответы и собрать рабочую карту на консультации."}</strong>
+        </div>
+      </div>
+      <div className="intake-report-section">
+        <h3>Ключевые наблюдения</h3>
+        <div className="lab-result-grid">
+          {(result.sections || []).slice(0, 4).map(([label, value]) => (
+            <div className="lab-result-item" key={label}>
+              <span>{label}</span>
+              <strong>{value ?? "требует уточнения"}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="safety-note">
+        Это предварительное понимание и рабочая карта, не медицинское заключение и не медицинское назначение.
+      </p>
     </article>
   );
 }
@@ -534,14 +614,18 @@ function FirstIntakeResultBlock({ result }) {
   );
 }
 
-function ReportOverview({ onSelectReport, firstIntakeResult, onStartSelfAnalysis }) {
+function ReportOverview({ advancedAiResult, onSelectReport, firstIntakeResult, onStartSelfAnalysis }) {
   return (
     <section className="results-notebook-shell">
-      <ResultsNotebookPanel
-        firstIntakeResult={firstIntakeResult}
-        onSelectReport={onSelectReport}
-      />
+      <div className="results-notebook-main">
+        <ResultsNotebookPanel
+          firstIntakeResult={firstIntakeResult}
+          onSelectReport={onSelectReport}
+        />
+        <AdvancedAiResultBlock result={advancedAiResult} />
+      </div>
       <ResultsInteractivePanel
+        advancedAiResult={advancedAiResult}
         firstIntakeResult={firstIntakeResult}
         onSelectReport={onSelectReport}
         onStartSelfAnalysis={onStartSelfAnalysis}
@@ -550,14 +634,29 @@ function ReportOverview({ onSelectReport, firstIntakeResult, onStartSelfAnalysis
   );
 }
 
-function ReportDetail({ activeTab, firstIntakeResult, onSelectReport }) {
+function ReportDetail({ activeTab, advancedAiResult, firstIntakeResult, onSelectReport }) {
   const detail = reportDetails[activeTab] || reportDetails["Диагностика эксперта"];
+
+  if (activeTab === "Расширенный ИИ-анализ" && advancedAiResult) {
+    return (
+      <>
+        <ReportsMenu
+          activeTab={activeTab}
+          hasAdvancedAiResult
+          hasFirstIntakeResult={Boolean(firstIntakeResult)}
+          onSelectReport={onSelectReport}
+        />
+        <AdvancedAiResultBlock result={advancedAiResult} />
+      </>
+    );
+  }
 
   if (activeTab === "Самоотчёт" && firstIntakeResult) {
     return (
       <>
         <ReportsMenu
           activeTab={activeTab}
+          hasAdvancedAiResult={Boolean(advancedAiResult)}
           hasFirstIntakeResult
           onSelectReport={onSelectReport}
         />
@@ -570,6 +669,7 @@ function ReportDetail({ activeTab, firstIntakeResult, onSelectReport }) {
     <>
       <ReportsMenu
         activeTab={activeTab}
+        hasAdvancedAiResult={Boolean(advancedAiResult)}
         hasFirstIntakeResult={Boolean(firstIntakeResult)}
         onSelectReport={onSelectReport}
       />
@@ -597,6 +697,7 @@ function ReportDetail({ activeTab, firstIntakeResult, onSelectReport }) {
 
 export default function ExpertAnalysis({
   activeTab = "Меню отчётов",
+  advancedAiResult = null,
   clientOverride = null,
   firstIntakeResult = null,
   onSelectReport,
@@ -604,6 +705,7 @@ export default function ExpertAnalysis({
 }) {
   const cabinetClient = clientOverride || client;
   const savedFirstIntakeResult = firstIntakeResult || readFirstIntakeResult();
+  const savedAdvancedAiResult = advancedAiResult || readAdvancedAiAnalysisResult();
 
   if (!cabinetClient.hasCompletedFirstConsultation && !savedFirstIntakeResult) {
     return <EmptyFirstConsultation onStartSelfAnalysis={onStartSelfAnalysis} />;
@@ -613,6 +715,7 @@ export default function ExpertAnalysis({
     return (
       <ReportOverview
         activeTab={activeTab}
+        advancedAiResult={savedAdvancedAiResult}
         firstIntakeResult={savedFirstIntakeResult}
         onSelectReport={onSelectReport}
         onStartSelfAnalysis={onStartSelfAnalysis}
@@ -623,6 +726,7 @@ export default function ExpertAnalysis({
   return (
     <ReportDetail
       activeTab={activeTab}
+      advancedAiResult={savedAdvancedAiResult}
       firstIntakeResult={savedFirstIntakeResult}
       onSelectReport={onSelectReport}
     />
