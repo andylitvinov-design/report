@@ -11,7 +11,7 @@ const clientNavigation = {
 
 const actionLabels = {
   overview: "+ Новая оценка",
-  expert: "Открыть отчёт",
+  expert: "Открыть результаты",
   recommendations: "Обновить назначение",
   history: "Открыть динамику",
 };

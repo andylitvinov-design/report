@@ -11,7 +11,7 @@ import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
 export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
-  expert: ["Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
+  expert: ["Меню отчётов", "Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
@@ -57,12 +57,29 @@ export function ReportApp({ clientOverride = null, userAction = null }) {
     }
   };
 
+  const openFirstIntake = () => {
+    setActivePage("self");
+    setSelfAnalysisMode("overview");
+  };
+
+  const openResultReport = (tab) => {
+    setActivePage("expert");
+    setActiveTabs((current) => ({ ...current, expert: tab }));
+  };
+
   const renderPage = () => {
     if (activePage === "self") {
       return <SelfAnalysis onModeChange={setSelfAnalysisMode} />;
     }
     if (activePage === "expert") {
-      return <ExpertAnalysis />;
+      return (
+        <ExpertAnalysis
+          activeTab={activeTabs.expert}
+          clientOverride={clientOverride}
+          onSelectReport={openResultReport}
+          onStartSelfAnalysis={openFirstIntake}
+        />
+      );
     }
     if (activePage === "recommendations") {
       return <Recommendations />;

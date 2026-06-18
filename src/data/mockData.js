@@ -4,6 +4,7 @@ export const client = {
   focus: "Здоровье / тело",
   lastSlice: "14.05.2026",
   nextSession: "04.06.2026, 12:00",
+  hasCompletedFirstConsultation: true,
 };
 
 export const navigation = [
