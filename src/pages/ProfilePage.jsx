@@ -77,7 +77,7 @@ export default function ProfilePage() {
   };
 
   const signOutAction = (
-    <button className="secondary-btn sidebar-logout" type="button" onClick={handleSignOut}>Выйти</button>
+    <button className="secondary-btn sidebar-logout" type="button" onClick={handleSignOut}>Выйти из кабинета</button>
   );
 
   if (authStatus === "loading") {
@@ -131,5 +131,5 @@ export default function ProfilePage() {
     );
   }
 
-  return <ReportApp clientOverride={clientOverride} userAction={signOutAction} />;
+  return <ReportApp clientOverride={clientOverride} onSignOut={handleSignOut} userAction={signOutAction} />;
 }

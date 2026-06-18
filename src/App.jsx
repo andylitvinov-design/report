@@ -73,7 +73,7 @@ function RoutedApp() {
   return <LoginPage />;
 }
 
-export function ReportApp({ clientOverride = null, forceDemo = false, userAction = null }) {
+export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut = null, userAction = null }) {
   const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
@@ -97,6 +97,12 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
     clientOverride?.hasCompletedResults === true;
 
   const handleNavigation = (page, tab) => {
+    if (page === "settings") {
+      setActivePage("settings");
+      setBookingNoticeVisible(false);
+      setSelfAnalysisMode("overview");
+      return;
+    }
     if (!hasCompletedResults && page === "expert") {
       setActivePage("expert");
       setBookingNoticeVisible(false);
@@ -127,6 +133,12 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
     setBookingNoticeVisible(true);
   };
 
+  const openSettings = () => {
+    setActivePage("settings");
+    setBookingNoticeVisible(false);
+    setSelfAnalysisMode("overview");
+  };
+
   const openResultReport = (tab) => {
     setActivePage("expert");
     setActiveTabs((current) => ({ ...current, expert: tab }));
@@ -145,6 +157,40 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
   };
 
   const renderPage = () => {
+    if (activePage === "settings") {
+      const accountName = clientOverride?.name || "Клиент PsiTherapy";
+      const accountEmail = clientOverride?.email || "Email не указан";
+      const accountStatus = clientOverride?.nextSession || (forceDemo ? "демо-режим" : "вход через Google подтверждён");
+      const accountId = clientOverride?.id ? `ID ${clientOverride.id}` : "ID демо-кабинета";
+
+      return (
+        <section className="settings-page" aria-labelledby="settings-title">
+          <article className="card settings-card">
+            <p className="eyebrow">Аккаунт</p>
+            <h2 id="settings-title">Настройки</h2>
+            <div className="settings-grid">
+              <div>
+                <span>Профиль</span>
+                <strong>{accountName}</strong>
+              </div>
+              <div>
+                <span>Email</span>
+                <strong>{accountEmail}</strong>
+              </div>
+              <div>
+                <span>Статус входа</span>
+                <strong>{accountStatus}</strong>
+              </div>
+              <div>
+                <span>Сессия</span>
+                <strong>{accountId}</strong>
+              </div>
+            </div>
+            {userAction ? <div className="settings-actions">{userAction}</div> : null}
+          </article>
+        </section>
+      );
+    }
     if (activePage === "self") {
       return (
         <SelfAnalysis
@@ -199,8 +245,10 @@ export function ReportApp({ clientOverride = null, forceDemo = false, userAction
       clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
-      hideSpecialistPanel={activePage === "expert"}
+      hideSpecialistPanel={["expert", "settings"].includes(activePage)}
       onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}
+      onOpenSettings={openSettings}
+      onSignOut={onSignOut}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
       userAction={userAction}

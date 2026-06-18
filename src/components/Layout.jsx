@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { client, navigation, specialistComments } from "../data/mockData.js";
 
 const clientNavigation = {
@@ -13,10 +13,12 @@ const actionLabels = {
   overview: "+ Новая оценка",
   expert: "Открыть результаты",
   recommendations: "Обновить назначение",
+  settings: "Сохранить настройки",
   history: "Открыть динамику",
 };
 
 const lockedForNewUser = new Set(["expert", "recommendations", "history"]);
+const advancedAiTab = "Диагностика эксперта";
 
 export default function Layout({
   activePage,
@@ -27,18 +29,22 @@ export default function Layout({
   hideSpecialistPanel = false,
   onPrimaryAction,
   onTabChange,
+  onOpenSettings,
+  onSignOut,
   children,
   clientOverride = null,
   userAction = null,
 }) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const currentNav = navigation.find((item) => item.id === activePage);
   const navLabel = clientNavigation[activePage] || currentNav?.label;
   const cabinetClient = clientOverride || client;
   const isNewUser = !hasCompletedResults;
-  const currentLabel = isNewUser && activePage === "expert"
-    ? "Результаты появятся после первого анализа"
-    : navLabel;
+  const currentLabel = activePage === "settings"
+    ? "Настройки"
+    : isNewUser && activePage === "expert"
+      ? "Результаты появятся после первого анализа"
+      : navLabel;
   const shellClassName = [
     "app-shell",
     focusMode ? "focus-mode" : "",
@@ -55,14 +61,42 @@ export default function Layout({
   const topbarActionLabel = isNewUser && ["overview", "expert"].includes(activePage)
     ? "Пройти первый анализ"
     : actionLabels[activePage] || "+ Новая оценка";
-  const subtitle = isNewUser
-    ? `${cabinetClient.name} · Первый срез ещё не пройден`
-    : activePage === "self"
-      ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
-      : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
-  const handleMobileNavChange = (pageId) => {
-    onTabChange(pageId);
+  const subtitle = activePage === "settings"
+    ? `${cabinetClient.name} · Аккаунт и вход`
+    : isNewUser
+      ? `${cabinetClient.name} · Первый срез ещё не пройден`
+      : activePage === "self"
+        ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
+        : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
+  const accountStatus = cabinetClient.nextSession || (isNewUser ? "первый срез не пройден" : "первичный анализ");
+  const accountId = cabinetClient.id ? `ID ${cabinetClient.id}` : null;
+  const mobileMenuItems = [
+    { id: "overview", label: clientNavigation.overview, page: "overview" },
+    { id: "self", label: clientNavigation.self, page: "self" },
+    {
+      id: "expert-ai",
+      label: "Расширенный ИИ-анализ",
+      page: "expert",
+      tab: advancedAiTab,
+    },
+    { id: "expert", label: clientNavigation.expert, page: "expert" },
+    { id: "recommendations", label: clientNavigation.recommendations, page: "recommendations" },
+    { id: "history", label: clientNavigation.history, page: "history" },
+  ];
+
+  const handleMobileNavigation = (item) => {
+    onTabChange(item.page, item.tab);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleOpenSettings = () => {
+    onOpenSettings?.();
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSignOut = () => {
+    setIsMobileMenuOpen(false);
+    onSignOut?.();
   };
 
   return (
@@ -101,8 +135,14 @@ export default function Layout({
         </nav>
         <div className="client-mini">
           <strong>{cabinetClient.name}</strong>
-          <span>{cabinetClient.email || `ID ${cabinetClient.id}`}</span>
-          <span>{isNewUser ? "Первый срез не пройден" : `Статус: ${cabinetClient.nextSession || "первичный анализ"}`}</span>
+          <span>{cabinetClient.email || accountId}</span>
+          <span>Статус: {accountStatus}</span>
+          {accountId && <span>{accountId}</span>}
+          {onOpenSettings && (
+            <button className="secondary-btn sidebar-settings" type="button" onClick={onOpenSettings}>
+              Настройки
+            </button>
+          )}
           {userAction}
         </div>
       </aside>
@@ -115,7 +155,7 @@ export default function Layout({
               <h1>{currentLabel}</h1>
               <p className="subtitle">{subtitle}</p>
             </div>
-            {activePage !== "self" ? (
+            {activePage !== "self" && activePage !== "settings" ? (
               <button className="primary-btn" onClick={onPrimaryAction} type="button">
                 {topbarActionLabel}
               </button>
@@ -129,11 +169,11 @@ export default function Layout({
               className="mobile-menu-toggle"
               type="button"
               aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-section-menu"
+              aria-controls="mobile-cabinet-menu"
               onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
             >
               <span aria-hidden="true">☰</span>
-              Меню разделов
+              Меню
             </button>
 
             {isMobileMenuOpen && (
@@ -141,43 +181,68 @@ export default function Layout({
                 <button
                   className="mobile-menu-backdrop"
                   type="button"
-                  aria-label="Закрыть меню разделов"
+                  aria-label="Закрыть меню"
                   onClick={() => setIsMobileMenuOpen(false)}
                 />
-                <div className="mobile-menu-panel" id="mobile-section-menu">
+                <div className="mobile-menu-panel" id="mobile-cabinet-menu">
                   <div className="mobile-menu-header">
-                    <strong>Разделы кабинета</strong>
-                    <button type="button" onClick={() => setIsMobileMenuOpen(false)}>
+                    <strong>PsiTherapy</strong>
+                    <button className="ghost-btn mobile-menu-close" type="button" onClick={() => setIsMobileMenuOpen(false)}>
                       Закрыть
                     </button>
                   </div>
-                  {navigation.map((item) => {
-                    const locked = isNewUser && lockedForNewUser.has(item.id);
-                    const nextStep = isNewUser && item.id === "self";
-                    const isActive = item.id === activePage;
-                    const className = [
-                      "mobile-menu-item",
-                      isActive ? "active" : "",
-                      locked ? "locked" : "",
-                      nextStep ? "next-step" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
 
-                    return (
-                      <button
-                        className={className}
-                        key={item.id}
-                        onClick={() => handleMobileNavChange(item.id)}
-                        type="button"
-                      >
-                        <span>{clientNavigation[item.id] || item.label}</span>
-                        {isActive && <small>✓ текущий</small>}
-                        {!isActive && nextStep && <small>главный следующий шаг</small>}
-                        {locked && <small>после первого среза</small>}
+                  <div className="mobile-menu-section">
+                    <p className="mobile-menu-title">Разделы</p>
+                    {mobileMenuItems.map((item) => {
+                      const locked = isNewUser && lockedForNewUser.has(item.page);
+                      const nextStep = isNewUser && item.page === "self";
+                      const active = item.tab
+                        ? activePage === item.page && activeTab === item.tab
+                        : activePage === item.page;
+                      const className = [
+                        "mobile-menu-item",
+                        active ? "active" : "",
+                        locked ? "locked" : "",
+                        nextStep ? "next-step" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
+
+                      return (
+                        <button
+                          className={className}
+                          key={item.id}
+                          onClick={() => handleMobileNavigation(item)}
+                          type="button"
+                        >
+                          <span>{item.label}</span>
+                          {active && <small>текущий раздел</small>}
+                          {!active && nextStep && <small>главный следующий шаг</small>}
+                          {locked && <small>после первого среза</small>}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mobile-account-card">
+                    <p className="mobile-menu-title">Аккаунт</p>
+                    <strong>{cabinetClient.name}</strong>
+                    <span>{cabinetClient.email || accountId || "Email не указан"}</span>
+                    <span>Статус: {accountStatus}</span>
+                    {accountId && <span>{accountId}</span>}
+                  </div>
+
+                  <div className="mobile-account-actions">
+                    <button className="secondary-btn" type="button" onClick={handleOpenSettings}>
+                      Настройки
+                    </button>
+                    {onSignOut && (
+                      <button className="ghost-warning-btn" type="button" onClick={handleSignOut}>
+                        Выйти из кабинета
                       </button>
-                    );
-                  })}
+                    )}
+                  </div>
                 </div>
               </>
             )}

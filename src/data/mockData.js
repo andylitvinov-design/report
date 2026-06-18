@@ -1,5 +1,6 @@
 export const client = {
   name: "Анна",
+  email: "anna@example.com",
   id: "C-1024",
   focus: "Здоровье / тело",
   lastSlice: "14.05.2026",
