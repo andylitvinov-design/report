@@ -2,8 +2,14 @@ export const client = {
   name: "Анна",
   id: "C-1024",
   focus: "Здоровье / тело",
-  lastSlice: "14.05.2026",
-  nextSession: "04.06.2026, 12:00",
+  lastSlice: null,
+  nextSession: null,
+};
+
+export const clientProgress = {
+  assessments: [],
+  reports: [],
+  results: [],
 };
 
 export const navigation = [

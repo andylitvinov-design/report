@@ -1437,14 +1437,14 @@ PROJECT-SPECIFIC DELIVERY SETTINGS
 - Lint: not available
 - Typecheck: not available
 - Tests: not available
-- Smoke test: LIVE_URL=https://myalchemy.vercel.app node scripts/live-smoke-test.mjs if the script exists
+- Smoke test: LIVE_URL=https://psitherapy.vercel.app node scripts/live-smoke-test.mjs if the script exists
 - CI provider: GitHub Actions
 - Deployment provider: Vercel (auto-deploy from GitHub plus fallback workflow when configured)
-- Primary production/live URL: https://myalchemy.vercel.app  ← default /delivery target
+- Primary production/live URL: https://psitherapy.vercel.app  ← default /delivery target
 - Alternate Vercel URL: https://holistichealing.vercel.app
 - Legacy/fallback URL: https://andylitvinov-design.github.io/report/
 - Preview URL: Vercel preview per PR (SSO-protected, verify via Vercel dashboard)
-- Default /delivery target: Primary production/live URL (https://myalchemy.vercel.app).
+- Default /delivery target: Primary production/live URL (https://psitherapy.vercel.app).
   Alternate and legacy URLs cannot satisfy SUCCESS for production delivery by default.
   They are allowed only when explicitly requested by the user or used as diagnostic fallback.
 - Required env vars: none committed; Vercel/GitHub deployment secrets are managed outside the repo

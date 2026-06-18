@@ -100,47 +100,49 @@ export default function SelfAnalysis({ onModeChange }) {
   if (mode === "overview") {
     return (
       <div className="self-overview">
-        <article className="card self-start-card">
-          <p className="eyebrow">Самоанализ</p>
-          <h2>Подготовьте новый срез без лишнего шума</h2>
-          <p>
-            Откройте сфокусированный режим, чтобы пройти данные, ситуацию, характер, контроль и получить
-            предварительную Bach-группировку.
-          </p>
-          <div className="overview-actions">
-            <button className="primary-btn" onClick={() => goToStep("data")} type="button">
-              Начать самоанализ
-            </button>
-            <button className="secondary-btn" onClick={() => goToStep(activeStep)} type="button">
-              Продолжить черновик
-            </button>
-            <button className="secondary-btn" onClick={() => goToStep("data")} type="button">
-              Пройти повторную анкету
-            </button>
-            <button className="secondary-btn" type="button">Обновить только силу проблемы</button>
-            <button className="secondary-btn" type="button">Добавить комментарий к состоянию</button>
-          </div>
-        </article>
-
-        <section className="self-overview-grid">
-          <article className="card status-card">
-            <span>Статус</span>
-            <strong>Черновик готов</strong>
-            <p>Последний самоанализ: 21.05.2026. Следующая проверка нужна после изменения состояния.</p>
-          </article>
-          <article className="card status-card">
-            <span>Сила проблемы</span>
-            <strong>{strength}/10</strong>
-            <p>Фокус: {focus}</p>
-          </article>
-          <article className="card status-card">
-            <span>Черновик</span>
-            <strong>{steps[currentStepIndex]?.label}</strong>
+        <section className="self-overview-main">
+          <article className="card self-start-card">
+            <p className="eyebrow">Самоанализ</p>
+            <h2>Подготовьте новый срез без лишнего шума</h2>
             <p>
-              Сохранены ответы: {Object.values(scores).filter((score) => score > 0).length} из{" "}
-              {selfAnalysis.questions.length}.
+              Откройте сфокусированный режим, чтобы пройти данные, ситуацию, характер, контроль и получить
+              предварительную Bach-группировку.
             </p>
+            <div className="overview-actions">
+              <button className="primary-btn" onClick={() => goToStep("data")} type="button">
+                Начать самоанализ
+              </button>
+              <button className="secondary-btn" onClick={() => goToStep(activeStep)} type="button">
+                Продолжить черновик
+              </button>
+              <button className="secondary-btn" onClick={() => goToStep("data")} type="button">
+                Повторная анкета
+              </button>
+              <button className="secondary-btn" type="button">Обновить силу</button>
+              <button className="secondary-btn" type="button">Добавить комментарий</button>
+            </div>
           </article>
+
+          <section className="self-overview-grid">
+            <article className="card status-card">
+              <span>Статус</span>
+              <strong>Черновик готов</strong>
+              <p>Последний самоанализ: 21.05.2026. Следующая проверка нужна после изменения состояния.</p>
+            </article>
+            <article className="card status-card">
+              <span>Сила проблемы</span>
+              <strong>{strength}/10</strong>
+              <p>Фокус: {focus}</p>
+            </article>
+            <article className="card status-card">
+              <span>Черновик</span>
+              <strong>{steps[currentStepIndex]?.label}</strong>
+              <p>
+                Сохранены ответы: {Object.values(scores).filter((score) => score > 0).length} из{" "}
+                {selfAnalysis.questions.length}.
+              </p>
+            </article>
+          </section>
         </section>
 
         <article className="card">

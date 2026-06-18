@@ -9,8 +9,8 @@ Repo: andylitvinov-design/report
 Product: My Alchemy / Alchemy / homeopathy-oriented client report system
 Primary platform: Vercel
 Legacy platform: GitHub Pages
-Primary production URL: https://myalchemy.vercel.app/
-Primary build-info URL: https://myalchemy.vercel.app/build-info.json
+Primary production URL: https://psitherapy.vercel.app/
+Primary build-info URL: https://psitherapy.vercel.app/build-info.json
 Alternate Vercel URL: https://holistichealing.vercel.app/
 Alternate build-info URL: https://holistichealing.vercel.app/build-info.json
 Legacy URL: https://andylitvinov-design.github.io/report/
@@ -26,8 +26,8 @@ Agents must check the current live version themselves. Do not ask Andrey to open
 Use:
 
 ```text
-GET https://myalchemy.vercel.app/
-GET https://myalchemy.vercel.app/build-info.json
+GET https://psitherapy.vercel.app/
+GET https://psitherapy.vercel.app/build-info.json
 ```
 
 If relevant, also check the alternate Vercel alias:
@@ -62,14 +62,14 @@ Expected fields:
 
 ```json
 {
-  "project": "myalchemy-report",
+  "project": "psitherapy-report",
   "productName": "My Alchemy",
   "repo": "andylitvinov-design/report",
   "commitSha": "...",
   "commitRef": "main",
   "buildTime": "...",
   "platform": "Vercel or GitHub Pages or local",
-  "productionUrl": "https://myalchemy.vercel.app/",
+  "productionUrl": "https://psitherapy.vercel.app/",
   "alternateUrl": "https://holistichealing.vercel.app/",
   "legacyUrl": "https://andylitvinov-design.github.io/report/"
 }
@@ -114,8 +114,8 @@ Every production/deploy-related report must include:
 
 ```text
 Live version check:
-- Production URL: https://myalchemy.vercel.app/
-- Build-info URL: https://myalchemy.vercel.app/build-info.json
+- Production URL: https://psitherapy.vercel.app/
+- Build-info URL: https://psitherapy.vercel.app/build-info.json
 - Expected SHA:
 - Live SHA/build marker:
 - Match: yes/no/unknown

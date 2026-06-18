@@ -42,8 +42,8 @@ Project adapter for this repo:
 - Check: `npm run delivery:check` or `npm run build` when only product code changed
 - CI: GitHub Actions
 - Deployment: Vercel fallback workflow + legacy GitHub Pages workflow
-- Primary live URL: `https://myalchemy.vercel.app/`
-- Primary build info URL: `https://myalchemy.vercel.app/build-info.json`
+- Primary live URL: `https://psitherapy.vercel.app/`
+- Primary build info URL: `https://psitherapy.vercel.app/build-info.json`
 - Alternate Vercel URL: `https://holistichealing.vercel.app/`
 - Legacy URL: `https://andylitvinov-design.github.io/report/`
 

@@ -24,7 +24,7 @@ andylitvinov-design/report
 ## Main production target
 
 ```text
-https://my-alchemist.vercel.app
+https://psitherapy.vercel.app
 ```
 
 ## Main local project path
@@ -54,7 +54,7 @@ Do not use GitHub Pages as the main product URL anymore.
 Use:
 
 ```text
-https://my-alchemist.vercel.app
+https://psitherapy.vercel.app
 ```
 
 Main public site:
@@ -102,7 +102,7 @@ vercel --prod
 After deploy:
 
 ```bash
-curl -I https://my-alchemist.vercel.app
+curl -I https://psitherapy.vercel.app
 ```
 
 Expected:
@@ -363,7 +363,7 @@ git pull origin main
 npm install
 npm run build
 vercel --prod
-curl -I https://my-alchemist.vercel.app
+curl -I https://psitherapy.vercel.app
 ```
 
 ### Manual QA
@@ -371,7 +371,7 @@ curl -I https://my-alchemist.vercel.app
 Open:
 
 ```text
-https://my-alchemist.vercel.app
+https://psitherapy.vercel.app
 ```
 
 Verify left menu:
@@ -957,7 +957,7 @@ product/supabase-schema
 
 ## Deploy note
 
-Live target: https://my-alchemist.vercel.app
+Live target: https://psitherapy.vercel.app
 ```
 
 ---

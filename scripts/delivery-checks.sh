@@ -32,7 +32,7 @@ require_text "PASS.*PARTIAL.*FAIL.*NOT VERIFIED|PARTIAL.*FAIL.*NOT VERIFIED" ".c
 require_text "Implementation is not completion" "docs/delivery-loop-program.md"
 require_text "Spiral Validator-Critic Loop" ".claude/commands/delivery.md"
 require_text "spiralValidatorCritic" "docs/delivery-loop-technical-details.md"
-require_text "https://myalchemy.vercel.app" "AGENTS.md"
+require_text "https://psitherapy.vercel.app" "AGENTS.md"
 
 if [[ -f "$status_file" ]]; then
   echo "== Validating result_verification status =="

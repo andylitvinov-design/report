@@ -6,7 +6,7 @@ Bring the client cabinet from a visual MVP to a usable product for natural thera
 
 Live target:
 
-- `https://my-alchemist.vercel.app`
+- `https://psitherapy.vercel.app`
 
 Main product promise:
 
@@ -23,7 +23,7 @@ The cabinet must feel like a living support system, not just a dashboard.
 ## 0.1 Main public URLs
 
 - Main public site: `https://alchemist.vercel.app`
-- Client cabinet: `https://my-alchemist.vercel.app`
+- Client cabinet: `https://psitherapy.vercel.app`
 - Do not treat GitHub Pages as the main product URL anymore.
 - `my.alchemist.vercel.app` is not available because Vercel reserves `*.alchemist.vercel.app` for another account.
 
@@ -264,7 +264,7 @@ Make sure current code and live site are synchronized before adding new product 
 2. Run `npm install` if needed.
 3. Run `npm run build`.
 4. Deploy latest `main` to Vercel production.
-5. Open `https://my-alchemist.vercel.app` and verify that live UI matches current `main`.
+5. Open `https://psitherapy.vercel.app` and verify that live UI matches current `main`.
 6. Close or supersede outdated PRs that duplicate changes already committed directly to `main`, especially PR #9 if no longer needed.
 7. Run desktop visual QA.
 8. Run mobile visual QA.
@@ -273,7 +273,7 @@ Make sure current code and live site are synchronized before adding new product 
 ## Acceptance criteria
 
 - `npm run build` passes.
-- `https://my-alchemist.vercel.app` returns HTTP 200.
+- `https://psitherapy.vercel.app` returns HTTP 200.
 - Live site shows:
   - `Профиль / Обзор`;
   - `Отчёт эксперта`;
@@ -284,7 +284,7 @@ Make sure current code and live site are synchronized before adding new product 
 - There is one clear source of truth:
 
 ```text
-main → Vercel production → https://my-alchemist.vercel.app
+main → Vercel production → https://psitherapy.vercel.app
 ```
 
 ---

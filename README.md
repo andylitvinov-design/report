@@ -8,11 +8,11 @@ Main target: build a dynamic HTML/React A4 report page and client cabinet for **
 
 Desired Vercel production URL:
 
-`https://myalchemy.vercel.app/`
+`https://psitherapy.vercel.app/`
 
 Build info / live version check:
 
-`https://myalchemy.vercel.app/build-info.json`
+`https://psitherapy.vercel.app/build-info.json`
 
 Possible alternate / previous Vercel alias:
 
@@ -22,7 +22,7 @@ Vercel fallback deployment is handled by:
 
 `.github/workflows/deploy-production.yml`
 
-The Vercel project should be connected to this repo and configured to deploy `main` to `myalchemy.vercel.app`.
+The Vercel project should be connected to this repo and configured to deploy `main` to `psitherapy.vercel.app`.
 
 ## Legacy GitHub Pages site
 
@@ -49,7 +49,7 @@ The project historically appears under several names/places:
 - `andylitvinov-design/alchemy-method` — methodology/source logic for DAO / У-Син / Bach / homeopathy-oriented interpretation.
 - `andylitvinov-design/alchemy_site` — standalone site-facing Alchemy HTML bundle / cloud-ready shell.
 
-Current rule: use `report` as the main site implementation repo for `myalchemy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
+Current rule: use `report` as the main site implementation repo for `psitherapy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
 
 ## Local run
 

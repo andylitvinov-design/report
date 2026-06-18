@@ -4,7 +4,7 @@
 
 Canonical repo: `andylitvinov-design/report`.
 Project/product: dynamic client report system for **My Alchemy / Алхимия Души / Holistic Therapy / homeopathy-oriented reports**.
-Primary production target: `https://myalchemy.vercel.app/`.
+Primary production target: `https://psitherapy.vercel.app/`.
 Possible alternate / previous Vercel alias: `https://holistichealing.vercel.app/`.
 Legacy GitHub Pages URL: `https://andylitvinov-design.github.io/report/`.
 Framework: Vite + React.
@@ -13,12 +13,12 @@ Legacy hosting: GitHub Pages via `.github/workflows/pages.yml`.
 
 ## Related Alchemy repositories
 
-- `andylitvinov-design/report` — main React/Vite implementation repo for the client report/cabinet and `myalchemy.vercel.app`.
+- `andylitvinov-design/report` — main React/Vite implementation repo for the client report/cabinet and `psitherapy.vercel.app`.
 - `andylitvinov-design/alchemy` — concept/MVP notes and static draft materials for the Alchemy project.
 - `andylitvinov-design/alchemy-method` — methodology/source logic for DAO / У-Син / Bach / homeopathy-oriented interpretation.
 - `andylitvinov-design/alchemy_site` — standalone site-facing Alchemy HTML bundle / cloud-ready shell.
 
-Current rule: use `report` as the main site implementation repo for `myalchemy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
+Current rule: use `report` as the main site implementation repo for `psitherapy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
 
 ## Context-first rules
 
@@ -72,8 +72,8 @@ Before starting, create a project adapter:
 - delivery check command: `npm run delivery:check`;
 - CI provider: GitHub Actions;
 - deployment provider: Vercel fallback workflow + legacy GitHub Pages;
-- primary live URL: `https://myalchemy.vercel.app/`;
-- primary build-info URL: `https://myalchemy.vercel.app/build-info.json`;
+- primary live URL: `https://psitherapy.vercel.app/`;
+- primary build-info URL: `https://psitherapy.vercel.app/build-info.json`;
 - alternate URL: `https://holistichealing.vercel.app/`;
 - legacy URL: `https://andylitvinov-design.github.io/report/`;
 - required deploy secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
@@ -87,7 +87,7 @@ Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`.
 
 Only all required items as `PASS` allow `STATUS: SUCCESS`. If any required item is `PARTIAL`, `FAIL`, or `NOT VERIFIED`, repair and rerun the gate. After 2 failed gate repair attempts, report `STATUS: BLOCKED`.
 
-For this repo, production delivery success requires live proof on `https://myalchemy.vercel.app/` and matching `build-info.commitSha`, unless the user explicitly requests another target. Legacy GitHub Pages can be reported as legacy proof only; it cannot satisfy primary Vercel production success by default.
+For this repo, production delivery success requires live proof on `https://psitherapy.vercel.app/` and matching `build-info.commitSha`, unless the user explicitly requests another target. Legacy GitHub Pages can be reported as legacy proof only; it cannot satisfy primary Vercel production success by default.
 
 ## Absolute deployment escalation rule
 
@@ -125,11 +125,11 @@ andylitvinov-design/active-projects-ops/docs/no-user-terminal-deploy-policy.md
 
 ## Production target rules
 
-- Treat `https://myalchemy.vercel.app/` as the desired primary production URL.
+- Treat `https://psitherapy.vercel.app/` as the desired primary production URL.
 - Treat `https://holistichealing.vercel.app/` as possible alternate/previous Vercel alias, not the primary target unless explicitly changed later.
 - Treat `https://andylitvinov-design.github.io/report/` as legacy/reference until migration is fully verified.
 - Do not remove GitHub Pages deployment until Vercel production is verified end-to-end.
-- Vercel project should be connected to this repo and configured so production deploys from `main` serve `myalchemy.vercel.app`.
+- Vercel project should be connected to this repo and configured so production deploys from `main` serve `psitherapy.vercel.app`.
 
 ## Deploy fallback
 
@@ -151,8 +151,8 @@ Platform: Vercel
 Target ref: normally main
 Expected SHA: known commit SHA
 Changes: committed and pushed/merged
-Primary production URL: https://myalchemy.vercel.app/
-Primary build info URL: https://myalchemy.vercel.app/build-info.json
+Primary production URL: https://psitherapy.vercel.app/
+Primary build info URL: https://psitherapy.vercel.app/build-info.json
 Alternate URL: https://holistichealing.vercel.app/
 Alternate build info URL: https://holistichealing.vercel.app/build-info.json
 Legacy URL: https://andylitvinov-design.github.io/report/
@@ -186,7 +186,7 @@ Agents must check the current live deployment version themselves.
 Primary check:
 
 ```text
-https://myalchemy.vercel.app/build-info.json
+https://psitherapy.vercel.app/build-info.json
 ```
 
 Alternate check if needed:
@@ -224,8 +224,8 @@ npm run delivery:check
 After deploy, verify:
 
 ```text
-https://myalchemy.vercel.app/
-https://myalchemy.vercel.app/build-info.json
+https://psitherapy.vercel.app/
+https://psitherapy.vercel.app/build-info.json
 ```
 
 If relevant, also verify alternate Vercel alias:
@@ -293,10 +293,10 @@ PR creation, green checks, merge, or deployment. Stop only with:
 - Build: `npm run build`
 - CI: GitHub Actions
 - Deployment: Vercel
-- Primary live URL: `https://myalchemy.vercel.app/` ← default SUCCESS target
+- Primary live URL: `https://psitherapy.vercel.app/` ← default SUCCESS target
 
 **Live target rule:** Unless the user explicitly specifies another target, SUCCESS requires
-LIVE PROOF on `https://myalchemy.vercel.app/`.
+LIVE PROOF on `https://psitherapy.vercel.app/`.
 
 **Result verification gate:** STATUS: SUCCESS also requires the Final Result Verification
 Gate from `.claude/commands/delivery.md`. Every required item must be `PASS`.

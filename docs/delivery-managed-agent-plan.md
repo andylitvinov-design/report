@@ -23,7 +23,7 @@ Start message:
 Follow .claude/commands/delivery.md and AGENTS.md for andylitvinov-design/report.
 Run the /delivery protocol for the provided task.
 Finish only with STATUS: SUCCESS or STATUS: BLOCKED.
-SUCCESS requires live proof on https://myalchemy.vercel.app/.
+SUCCESS requires live proof on https://psitherapy.vercel.app/.
 ```
 
 ### 2. `delivery-watchdog`
@@ -45,7 +45,7 @@ Start message:
 
 ```txt
 Check production health:
-- https://myalchemy.vercel.app/ — primary live URL
+- https://psitherapy.vercel.app/ — primary live URL
 - https://holistichealing.vercel.app/ — alternate
 Verify HTTP 200 and page renders. Do not mutate data. Report STATUS: SUCCESS or STATUS: BLOCKED.
 ```
@@ -60,8 +60,8 @@ Names only. Never commit values.
 GITHUB_TOKEN       — GitHub API access
 VERCEL_TOKEN       — Vercel API access
 VERCEL_ORG_ID      — Vercel org (andylitvinov-design)
-VERCEL_PROJECT_ID  — Vercel project ID for report/myalchemy
-LIVE_URL           — https://myalchemy.vercel.app/
+VERCEL_PROJECT_ID  — Vercel project ID for report/psitherapy
+LIVE_URL           — https://psitherapy.vercel.app/
 ```
 
 ---

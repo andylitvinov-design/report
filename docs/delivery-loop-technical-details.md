@@ -40,10 +40,49 @@ Minimum machine-readable fields, when a status file is used:
 - `not_verified_items`
 - `merge_readiness`
 - `repair_attempts`
+- `spiralValidatorCritic`
 
 Allowed requirement statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`.
 `PARTIAL`, `FAIL`, and `NOT VERIFIED` block completion language and block
 `STATUS: SUCCESS`.
+
+Optional top-level `spiralValidatorCritic` status field:
+
+```json
+{
+  "loopNumber": 1,
+  "verdict": "READY_FOR_MERGE",
+  "requirements": [
+    {
+      "requirement": "Original request requirement",
+      "status": "PASS",
+      "evidence": "Diff, check, CI, or live proof",
+      "nextAction": "None"
+    }
+  ],
+  "nextImprovementPlan": [],
+  "notVerified": [],
+  "missing": [],
+  "safetyRisks": []
+}
+```
+
+Allowed `spiralValidatorCritic.verdict` values:
+
+- `READY_FOR_MERGE`
+- `READY_WITH_NOTES`
+- `IMPROVE`
+- `IMPROVE_MINOR`
+- `SAFETY_STOP`
+- `NEEDS_HUMAN_DECISION`
+
+Allowed `spiralValidatorCritic.requirements[].status` values:
+
+- `PASS`
+- `IMPROVE`
+- `PARTIAL`
+- `FAIL`
+- `NOT VERIFIED`
 
 ---
 
