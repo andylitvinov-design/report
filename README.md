@@ -2,27 +2,65 @@
 
 This repository stores the product, design, and implementation materials for the dynamic client report system.
 
-Main target: build a dynamic HTML/React A4 report page and client cabinet for **My Alchemy / Алхимия Души / Holistic Therapy / homeopathy-oriented reports**.
+Current implementation target: **PsiTherapy** client report and therapy cabinet at `https://psitherapy.vercel.app/`.
+
+Historical/legacy naming: My Alchemy / Алхимия Души / Holistic Therapy / homeopathy-oriented reports.
 
 ## Primary live site target
 
 Desired Vercel production URL:
 
-`https://myalchemy.vercel.app/`
+`https://psitherapy.vercel.app/`
+
+Core auth routes:
+
+- `https://psitherapy.vercel.app/login`
+- `https://psitherapy.vercel.app/profile`
 
 Build info / live version check:
 
-`https://myalchemy.vercel.app/build-info.json`
+`https://psitherapy.vercel.app/build-info.json`
 
-Possible alternate / previous Vercel alias:
+Historical / previous possible Vercel aliases:
 
-`https://holistichealing.vercel.app/`
+- `https://myalchemy.vercel.app/`
+- `https://holistichealing.vercel.app/`
 
 Vercel fallback deployment is handled by:
 
 `.github/workflows/deploy-production.yml`
 
-The Vercel project should be connected to this repo and configured to deploy `main` to `myalchemy.vercel.app`.
+The Vercel project should be connected to this repo and configured to deploy `main` to `psitherapy.vercel.app`.
+
+## Google Auth setup
+
+The first PsiTherapy cabinet layer uses Supabase Auth with Google OAuth.
+
+Required frontend env names:
+
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_ADMIN_EMAIL=
+```
+
+Use `.env.example` as the local template. Do not commit real env values.
+
+Required Supabase Auth redirect URLs for production:
+
+```text
+https://psitherapy.vercel.app/login
+https://psitherapy.vercel.app/profile
+```
+
+For local development, also add:
+
+```text
+http://localhost:5173/login
+http://localhost:5173/profile
+```
+
+Google provider must be enabled in Supabase Auth, and the Supabase callback URL must be added to Google Cloud OAuth redirect URIs.
 
 ## Legacy GitHub Pages site
 
@@ -44,12 +82,12 @@ Keep GitHub Pages as a reference during migration. Do not remove it until Vercel
 
 The project historically appears under several names/places:
 
-- `andylitvinov-design/report` — working React/Vite implementation for the client report and cabinet.
+- `andylitvinov-design/report` — working React/Vite implementation for the client report and cabinet; current PsiTherapy foundation.
 - `andylitvinov-design/alchemy` — concept/MVP notes and static draft materials for the Alchemy project.
 - `andylitvinov-design/alchemy-method` — methodology/source logic for DAO / У-Син / Bach / homeopathy-oriented interpretation.
 - `andylitvinov-design/alchemy_site` — standalone site-facing Alchemy HTML bundle / cloud-ready shell.
 
-Current rule: use `report` as the main site implementation repo for `myalchemy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
+Current rule: use `report` as the main site implementation repo for `psitherapy.vercel.app`, while keeping methodology and historical concept materials in the related Alchemy repos.
 
 ## Local run
 
