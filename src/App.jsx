@@ -11,7 +11,7 @@ import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
 const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
-  expert: ["Последний отчёт", "Отчёты по датам", "Механизм", "У-Син", "Препараты"],
+  expert: ["Меню отчётов", "Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
@@ -53,12 +53,17 @@ function ReportApp() {
     }
   };
 
+  const openFirstIntake = () => {
+    setActivePage("self");
+    setSelfAnalysisMode("overview");
+  };
+
   const renderPage = () => {
     if (activePage === "self") {
       return <SelfAnalysis onModeChange={setSelfAnalysisMode} />;
     }
     if (activePage === "expert") {
-      return <ExpertAnalysis />;
+      return <ExpertAnalysis activeTab={activeTabs.expert} onStartSelfAnalysis={openFirstIntake} />;
     }
     if (activePage === "recommendations") {
       return <Recommendations />;
