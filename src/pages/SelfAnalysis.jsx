@@ -1,315 +1,303 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { QuestionCard, RemedyResultList } from "../components/Cards.jsx";
-import { selfAnalysis } from "../data/mockData.js";
-import { calculateBachScore, calculateRemedyResults } from "../lib/bachScoring.js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
-const steps = [
-  { id: "data", label: "Данные" },
-  { id: "situation", label: "Ситуация", title: "Как я себя чувствую в данной ситуации?" },
-  { id: "character", label: "Характер", title: "Какие устойчивые моменты особенно мешают мне?" },
-  { id: "control", label: "Контроль", title: "Что сейчас больше всего напрягает или мучает меня?" },
-  { id: "result", label: "Итог" },
-];
-
-const sectionIntro = {
-  situation: "Оцените каждое утверждение по текущему состоянию.",
-  character: "Здесь важны устойчивые паттерны, а не только сегодняшний день.",
-  control: "Отметьте 5-7 самых точных пунктов или оцените всё, что явно проявлено.",
+const FIRST_INTAKE_INITIAL_ANSWERS = {
+  mainConcern: "",
+  feltArea: "",
+  intensity: "",
+  trigger: "",
+  relief: "",
+  desiredOutcome: "",
+  notes: {},
 };
 
+const FIRST_INTAKE_STEPS = [
+  {
+    id: "mainConcern",
+    label: "Главный фокус",
+    therapist:
+      "Смотрю на вашу текущую ситуацию. С чего лучше начать: что сейчас сильнее всего беспокоит?",
+    options: [
+      "Физическое состояние / симптомы",
+      "Эмоции и тревога",
+      "Усталость / нет сил",
+      "Отношения / контакт с людьми",
+      "Работа / деньги / реализация",
+      "Не понимаю, что происходит",
+    ],
+  },
+  {
+    id: "feltArea",
+    label: "Где ощущается",
+    therapist: "Где это сейчас ощущается сильнее всего?",
+    options: [
+      "Голова / напряжение",
+      "Грудь / дыхание",
+      "Живот / пищеварение",
+      "Кожа / воспаление",
+      "Общая слабость",
+      "В отношениях / контакте",
+      "В мыслях / невозможности решить",
+      "Другое",
+    ],
+  },
+  {
+    id: "intensity",
+    label: "Сила состояния",
+    therapist: "Насколько это сейчас сильно, если смотреть честно по последним дням?",
+    options: [
+      "1-3: слабо, но заметно",
+      "4-6: мешает жить",
+      "7-8: сильно захватывает",
+      "9-10: почти невозможно выдерживать",
+    ],
+  },
+  {
+    id: "trigger",
+    label: "Что усиливает",
+    therapist: "Что обычно усиливает это состояние?",
+    options: [
+      "Стресс / спешка",
+      "Конфликт / давление",
+      "Одиночество",
+      "Усталость / недосып",
+      "Страх оценки",
+      "Неопределённость",
+      "Не знаю",
+    ],
+  },
+  {
+    id: "relief",
+    label: "Что облегчает",
+    therapist: "Что хотя бы немного облегчает состояние?",
+    options: [
+      "Отдых",
+      "Поддержка другого человека",
+      "Тепло / тело / прикосновение",
+      "Понимание причины",
+      "Природа / прогулка",
+      "Структура и план",
+      "Пока ничего",
+    ],
+  },
+  {
+    id: "desiredOutcome",
+    label: "Желаемый результат",
+    therapist: "Что было бы самым полезным результатом первого приёма?",
+    options: [
+      "Понять главную причину состояния",
+      "Получить короткий план поддержки",
+      "Понять, какой отчёт нужен специалисту",
+      "Определить, что проверить дальше",
+      "Собрать состояние в ясную картину",
+    ],
+  },
+];
+
 export default function SelfAnalysis({ onModeChange }) {
-  const today = new Date().toISOString().slice(0, 10);
-  const [mode, setMode] = useState("overview");
-  const [activeStep, setActiveStep] = useState("data");
-  const [focus, setFocus] = useState(selfAnalysis.focusOptions[0]);
-  const [strength, setStrength] = useState(7);
-  const [description, setDescription] = useState(
-    "Усталость, внутренний шум, напряжение в теле. Хочется восстановить опору и не перегружаться."
-  );
-  const [scores, setScores] = useState(
-    Object.fromEntries(selfAnalysis.questions.map((question) => [question.id, question.score]))
-  );
-  const [comments, setComments] = useState(
-    Object.fromEntries(selfAnalysis.questions.map((question) => [question.id, ""]))
-  );
+  const chatWindowRef = useRef(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState(FIRST_INTAKE_INITIAL_ANSWERS);
+  const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    onModeChange?.(mode);
-  }, [mode, onModeChange]);
+    onModeChange?.("overview");
+  }, [onModeChange]);
 
-  const sectionTotals = useMemo(() => {
-    return selfAnalysis.questions.reduce(
-      (acc, question) => {
-        acc[question.section] += scores[question.id] || 0;
-        return acc;
-      },
-      { situation: 0, character: 0, control: 0 }
-    );
-  }, [scores]);
+  useEffect(() => {
+    const chatWindow = chatWindowRef.current;
+    if (!chatWindow) {
+      return;
+    }
 
-  const questionCounts = useMemo(() => {
-    return selfAnalysis.questions.reduce(
-      (acc, question) => {
-        acc[question.section] += 1;
-        return acc;
-      },
-      { situation: 0, character: 0, control: 0 }
-    );
-  }, []);
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [answers, currentStep, isComplete]);
 
-  const bachScore = calculateBachScore({
-    situation: sectionTotals.situation,
-    character: sectionTotals.character,
-    control: sectionTotals.control,
-    crossSectionBonus: strength >= 7 ? 1 : 0,
-    peakBonus: Math.max(...Object.values(scores)) >= 5 ? 1 : 0,
-    controlPresenceBonus: sectionTotals.control > 0 ? 0.5 : 0,
-  });
-
-  const remedyResults = useMemo(
-    () => calculateRemedyResults({ questions: selfAnalysis.questions, scores }),
-    [scores]
+  const step = FIRST_INTAKE_STEPS[currentStep];
+  const answeredSteps = useMemo(
+    () => FIRST_INTAKE_STEPS.filter((item) => answers[item.id]),
+    [answers]
   );
+  const visibleSteps = isComplete
+    ? FIRST_INTAKE_STEPS
+    : FIRST_INTAKE_STEPS.slice(0, currentStep + 1);
+  const progressLabel = isComplete
+    ? `Шаг ${FIRST_INTAKE_STEPS.length} из ${FIRST_INTAKE_STEPS.length}`
+    : `Шаг ${currentStep + 1} из ${FIRST_INTAKE_STEPS.length}`;
 
-  const updateScore = (id, value) => setScores((current) => ({ ...current, [id]: value }));
-  const updateComment = (id, value) => setComments((current) => ({ ...current, [id]: value }));
-  const currentStepIndex = steps.findIndex((step) => step.id === activeStep);
-  const visibleSection = ["situation", "character", "control"].includes(activeStep) ? activeStep : null;
-  const visibleQuestions = visibleSection
-    ? selfAnalysis.questions.filter((question) => question.section === visibleSection)
-    : [];
-  const selectedControlCount = selfAnalysis.questions.filter(
-    (question) => question.section === "control" && (scores[question.id] || 0) > 0
-  ).length;
-
-  const goToStep = (stepId) => {
-    setActiveStep(stepId);
-    setMode("form");
+  const resetDialog = () => {
+    setCurrentStep(0);
+    setAnswers(FIRST_INTAKE_INITIAL_ANSWERS);
+    setIsComplete(false);
   };
 
-  const goNext = () => {
-    const nextStep = steps[Math.min(currentStepIndex + 1, steps.length - 1)];
-    setActiveStep(nextStep.id);
+  const chooseOption = (option) => {
+    setAnswers((current) => ({ ...current, [step.id]: option }));
+
+    if (currentStep < FIRST_INTAKE_STEPS.length - 1) {
+      setCurrentStep((value) => value + 1);
+      return;
+    }
+
+    setIsComplete(true);
+  };
+
+  const updateNote = (value) => {
+    setAnswers((current) => ({
+      ...current,
+      notes: {
+        ...current.notes,
+        [step.id]: value,
+      },
+    }));
   };
 
   const goBack = () => {
-    const previousStep = steps[Math.max(currentStepIndex - 1, 0)];
-    setActiveStep(previousStep.id);
+    setIsComplete(false);
+    setCurrentStep((value) => Math.max(value - 1, 0));
   };
 
-  if (mode === "overview") {
-    return (
-      <div className="self-overview">
-        <section className="self-overview-main">
-          <article className="card self-start-card">
-            <p className="eyebrow">Самоанализ</p>
-            <h2>Подготовьте новый срез без лишнего шума</h2>
-            <p>
-              Откройте сфокусированный режим, чтобы пройти данные, ситуацию, характер, контроль и получить
-              предварительную Bach-группировку.
-            </p>
-            <div className="overview-actions">
-              <button className="primary-btn" onClick={() => goToStep("data")} type="button">
-                Начать самоанализ
-              </button>
-              <button className="secondary-btn" onClick={() => goToStep(activeStep)} type="button">
-                Продолжить черновик
-              </button>
-              <button className="secondary-btn" onClick={() => goToStep("data")} type="button">
-                Повторная анкета
-              </button>
-              <button className="secondary-btn" type="button">Обновить силу</button>
-              <button className="secondary-btn" type="button">Добавить комментарий</button>
-            </div>
-          </article>
-
-          <section className="self-overview-grid">
-            <article className="card status-card">
-              <span>Статус</span>
-              <strong>Черновик готов</strong>
-              <p>Последний самоанализ: 21.05.2026. Следующая проверка нужна после изменения состояния.</p>
-            </article>
-            <article className="card status-card">
-              <span>Сила проблемы</span>
-              <strong>{strength}/10</strong>
-              <p>Фокус: {focus}</p>
-            </article>
-            <article className="card status-card">
-              <span>Черновик</span>
-              <strong>{steps[currentStepIndex]?.label}</strong>
-              <p>
-                Сохранены ответы: {Object.values(scores).filter((score) => score > 0).length} из{" "}
-                {selfAnalysis.questions.length}.
-              </p>
-            </article>
-          </section>
-        </section>
-
-        <article className="card">
-          <div className="section-head">
-            <div>
-              <h2>Последний предварительный срез</h2>
-              <p>Группы пересчитываются от текущих ответов в анкете.</p>
-            </div>
-            <button className="secondary-btn" onClick={() => goToStep("result")} type="button">
-              Открыть итог
-            </button>
-          </div>
-          <div className="result-grid three">
-            <div>
-              <h3>Основные кандидаты</h3>
-              <RemedyResultList items={remedyResults.main} />
-            </div>
-            <div>
-              <h3>Дополнительная поддержка</h3>
-              <RemedyResultList items={remedyResults.support} />
-            </div>
-            <div>
-              <h3>Требует проверки</h3>
-              <RemedyResultList items={remedyResults.verify} />
-            </div>
-          </div>
-        </article>
-
-        <article className="card self-counts">
-          <h2>Полная анкета сохранена</h2>
-          <span>Ситуация: {questionCounts.situation}</span>
-          <span>Характер: {questionCounts.character}</span>
-          <span>Контроль: {questionCounts.control}</span>
-        </article>
-      </div>
-    );
-  }
+  const continueClarifying = () => {
+    setIsComplete(false);
+    setCurrentStep(FIRST_INTAKE_STEPS.length - 1);
+  };
 
   return (
-    <div className="focused-form">
-      <header className="form-progress card">
-        <button className="secondary-btn" onClick={() => setMode("overview")} type="button">
-          В кабинет
-        </button>
-        <div>
-          <p className="eyebrow">Шаг {currentStepIndex + 1} из {steps.length}</p>
-          <h1>{steps[currentStepIndex]?.label}</h1>
-        </div>
-        <button className="secondary-btn" type="button">Сохранить</button>
-      </header>
+    <div className="first-intake-page first-intake-dialog">
+      <article className="card intake-chat-card">
+        <header className="chat-card-header">
+          <div>
+            <p className="card-kicker">Первый приём</p>
+            <h2>Диалог для прояснения состояния</h2>
+          </div>
+          <span className="chat-progress">{progressLabel}</span>
+        </header>
 
-      <nav className="step-nav" aria-label="Шаги самоанализа">
-        {steps.map((step) => (
-          <button
-            className={step.id === activeStep ? "step-pill active" : "step-pill"}
-            key={step.id}
-            onClick={() => setActiveStep(step.id)}
-            type="button"
-          >
-            {step.label}
-          </button>
-        ))}
-      </nav>
-
-      {activeStep === "data" && (
-        <article className="card">
-          <h2>Текущие данные</h2>
-          <div className="form-grid">
-            <label className="field">
-              <span>Дата</span>
-              <input readOnly value={today} />
-            </label>
-            <label className="field">
-              <span>Фокус работы</span>
-              <select onChange={(event) => setFocus(event.target.value)} value={focus}>
-                {selfAnalysis.focusOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </select>
-            </label>
+        <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
+          <div className="chat-bubble therapist-bubble intro-bubble">
+            <span>Специалист</span>
+            <p>Я задам несколько коротких вопросов, чтобы прояснить текущее состояние.</p>
           </div>
 
-          <label className="field">
-            <span>Сила проблемы сейчас: {strength}/10</span>
-            <input
-              max="10"
-              min="0"
-              onChange={(event) => setStrength(Number(event.target.value))}
-              type="range"
-              value={strength}
-            />
-          </label>
-
-          <label className="field">
-            <span>Краткое описание ситуации</span>
-            <textarea onChange={(event) => setDescription(event.target.value)} value={description} />
-          </label>
-        </article>
-      )}
-
-      {visibleSection && (
-        <div className="question-list">
-          <article className="card question-section-head">
-            <h2>{steps[currentStepIndex].title}</h2>
-            <p>{sectionIntro[visibleSection]}</p>
-            <span>
-              Вопросов: {visibleQuestions.length}
-              {visibleSection === "control" ? ` · отмечено: ${selectedControlCount}` : ""}
-            </span>
-          </article>
-          {visibleQuestions.map((question, index) => (
-            <QuestionCard
-              comment={comments[question.id]}
-              index={index}
-              key={question.id}
-              onCommentChange={updateComment}
-              onScoreChange={updateScore}
-              question={question}
-              score={scores[question.id]}
-            />
+          {visibleSteps.map((item) => (
+            <React.Fragment key={item.id}>
+              <div
+                className={
+                  item.id === step?.id && !answers[item.id] && !isComplete
+                    ? "chat-bubble therapist-bubble current-question-bubble"
+                    : "chat-bubble therapist-bubble"
+                }
+              >
+                <span>Специалист</span>
+                <p>{item.therapist}</p>
+              </div>
+              {answers[item.id] ? (
+                <div className="chat-bubble user-bubble">
+                  <span>Вы</span>
+                  <p>{answers[item.id]}</p>
+                  {answers.notes[item.id] ? <small>{answers.notes[item.id]}</small> : null}
+                </div>
+              ) : null}
+            </React.Fragment>
           ))}
+
+          {isComplete ? (
+            <div className="chat-bubble therapist-bubble final-bubble">
+              <span>Специалист</span>
+              <p>
+                Спасибо. Уже видно несколько важных точек, из которых можно собрать
+                предварительное понимание и рабочую карту для дальнейшего прояснения.
+              </p>
+            </div>
+          ) : null}
         </div>
-      )}
 
-      {activeStep === "result" && (
-        <article className="card result-panel">
-          <h2>Итог самоанализа</h2>
-          <p>
-            Это предварительный срез по текущим ответам. Он помогает выбрать гипотезы для экспертной проверки,
-            но не является медицинским выводом.
-          </p>
-          <div className="score-summary">
-            <strong>{bachScore.displayValue}</strong>
-            <span>предварительный Bach score</span>
-          </div>
-          <div className="result-grid three">
-            <div>
-              <h3>Основные кандидаты</h3>
-              <RemedyResultList items={remedyResults.main} />
+        {!isComplete ? (
+          <>
+            <section className="answer-panel" aria-label="Варианты ответа">
+              <div className="answer-panel-head">
+                <span>{step.label}</span>
+                <strong>Выберите близкий вариант</strong>
+              </div>
+              <div className="option-grid">
+                {step.options.map((option) => (
+                  <button
+                    className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
+                    key={option}
+                    onClick={() => chooseOption(option)}
+                    type="button"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <label className="field compact-note">
+              <span>Добавить своими словами</span>
+              <textarea
+                id={`first-intake-note-${step.id}`}
+                name={`first-intake-note-${step.id}`}
+                onChange={(event) => updateNote(event.target.value)}
+                placeholder="Коротко опишите нюанс, если хочется уточнить ответ."
+                value={answers.notes[step.id] || ""}
+              />
+            </label>
+          </>
+        ) : (
+          <section className="intake-summary-panel" aria-label="Предварительное понимание">
+            <h3>Предварительное понимание</h3>
+            <div className="summary-point-grid">
+              <div>
+                <span>Что сейчас главное</span>
+                <strong>{answers.mainConcern}</strong>
+                <p>{answers.feltArea} · {answers.intensity}</p>
+              </div>
+              <div>
+                <span>Что усиливает</span>
+                <strong>{answers.trigger}</strong>
+                <p>Это может быть полезно проверить в динамике последних дней.</p>
+              </div>
+              <div>
+                <span>Что облегчает</span>
+                <strong>{answers.relief}</strong>
+                <p>Эта опора может войти в короткий план поддержки.</p>
+              </div>
+              <div>
+                <span>Что прояснять дальше</span>
+                <strong>{answers.desiredOutcome}</strong>
+                <p>Это не медицинская диагностика, а материал для специалиста.</p>
+              </div>
             </div>
-            <div>
-              <h3>Дополнительная поддержка</h3>
-              <RemedyResultList items={remedyResults.support} />
-            </div>
-            <div>
-              <h3>Требует проверки</h3>
-              <RemedyResultList items={remedyResults.verify} />
-            </div>
-          </div>
-          <div className="overview-actions">
-            <button className="primary-btn" type="button">Сохранить самоанализ</button>
-            <button className="secondary-btn" type="button">Запросить экспертный отчёт</button>
-            <button className="secondary-btn" onClick={() => setMode("overview")} type="button">
-              Вернуться в кабинет
+          </section>
+        )}
+
+        <footer className="chat-actions">
+          {!isComplete && answeredSteps.length > 0 ? (
+            <button className="secondary-btn" onClick={goBack} type="button">
+              Назад
             </button>
-          </div>
-        </article>
-      )}
-
-      <footer className="form-actions">
-        <button className="secondary-btn" disabled={currentStepIndex === 0} onClick={goBack} type="button">
-          Назад
-        </button>
-        <button className="primary-btn" disabled={currentStepIndex === steps.length - 1} onClick={goNext} type="button">
-          Дальше
-        </button>
-      </footer>
+          ) : null}
+          {!isComplete && answeredSteps.length > 0 ? (
+            <button className="secondary-btn" onClick={resetDialog} type="button">
+              Начать заново
+            </button>
+          ) : null}
+          {isComplete ? (
+            <>
+              <button className="primary-btn" type="button">Запросить отчёт специалиста</button>
+              <button className="secondary-btn" onClick={continueClarifying} type="button">
+                Продолжить уточнение
+              </button>
+              <button className="secondary-btn" onClick={resetDialog} type="button">
+                Начать заново
+              </button>
+            </>
+          ) : null}
+        </footer>
+      </article>
     </div>
   );
 }

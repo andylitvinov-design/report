@@ -11,9 +11,8 @@ const clientNavigation = {
 
 const actionLabels = {
   overview: "+ Новая оценка",
-  expert: "Открыть отчёт",
+  expert: "Открыть результаты",
   recommendations: "Обновить назначение",
-  self: "Начать самоанализ",
   history: "Открыть динамику",
 };
 
@@ -28,9 +27,12 @@ export default function Layout({
   onPrimaryAction,
   onTabChange,
   children,
+  clientOverride = null,
+  userAction = null,
 }) {
   const currentNav = navigation.find((item) => item.id === activePage);
   const navLabel = clientNavigation[activePage] || currentNav?.label;
+  const cabinetClient = clientOverride || client;
   const isNewUser = !hasCompletedResults;
   const currentLabel = isNewUser && activePage === "expert"
     ? "Результаты появятся после первого анализа"
@@ -42,17 +44,21 @@ export default function Layout({
   ]
     .filter(Boolean)
     .join(" ");
-  const topbarActionLabel = isNewUser && ["overview", "expert"].includes(activePage) ? "Пройти первый анализ" : actionLabels[activePage] || "+ Новая оценка";
+  const topbarActionLabel = isNewUser && ["overview", "expert"].includes(activePage)
+    ? "Пройти первый анализ"
+    : actionLabels[activePage] || "+ Новая оценка";
   const subtitle = isNewUser
-    ? `${client.name} / ID ${client.id} · Первый срез ещё не пройден`
-    : `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Последний срез: ${client.lastSlice}`;
+    ? `${cabinetClient.name} · Первый срез ещё не пройден`
+    : activePage === "self"
+      ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
+      : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
 
   return (
     <div className={shellClassName}>
       <aside className="sidebar" aria-label="Основная навигация">
         <div className="brand">
-          <strong>Holistic Therapy Cabinet</strong>
-          <span>Кабинет натуральной терапии</span>
+          <strong>PsiTherapy</strong>
+          <span>Личный кабинет</span>
         </div>
         <nav className="nav-list">
           {navigation.map((item) => {
@@ -82,9 +88,10 @@ export default function Layout({
           })}
         </nav>
         <div className="client-mini">
-          <strong>{client.name}</strong>
-          <span>ID {client.id}</span>
-          <span>{isNewUser ? "Первый срез не пройден" : `Сессия: ${client.nextSession}`}</span>
+          <strong>{cabinetClient.name}</strong>
+          <span>{cabinetClient.email || `ID ${cabinetClient.id}`}</span>
+          <span>{isNewUser ? "Первый срез не пройден" : `Статус: ${cabinetClient.nextSession || "первичный анализ"}`}</span>
+          {userAction}
         </div>
       </aside>
 
@@ -96,7 +103,11 @@ export default function Layout({
               <h1>{currentLabel}</h1>
               <p className="subtitle">{subtitle}</p>
             </div>
-            <button className="primary-btn" onClick={onPrimaryAction} type="button">{topbarActionLabel}</button>
+            {activePage !== "self" ? (
+              <button className="primary-btn" onClick={onPrimaryAction} type="button">
+                {topbarActionLabel}
+              </button>
+            ) : null}
           </section>
         )}
 
@@ -144,15 +155,34 @@ export default function Layout({
         <section className="workspace">{children}</section>
 
         {hasCompletedResults && <aside className="specialist-panel">
-          <article className="card">
-            <h2>Комментарий специалиста</h2>
-            <p>{specialistComments[activePage]}</p>
-            <button className="primary-btn full" type="button">Запросить отчёт</button>
-          </article>
-          <article className="card soft-card">
-            <h3>Следующий шаг</h3>
-            <p>Если прошло 7-10 дней, лучше пройти короткий повторный срез.</p>
-          </article>
+          {activePage === "self" ? (
+            <>
+              <article className="card">
+                <h2>Как отвечать</h2>
+                <p>{specialistComments[activePage]}</p>
+                <button className="primary-btn full" type="button">Запросить отчёт</button>
+              </article>
+              <article className="card soft-card">
+                <h3>Что получится</h3>
+                <p>
+                  После первичного диалога получится рабочая карта: что сейчас главное,
+                  что усиливает состояние, что облегчает и какая поддержка может быть полезна.
+                </p>
+              </article>
+            </>
+          ) : (
+            <>
+              <article className="card">
+                <h2>Комментарий специалиста</h2>
+                <p>{specialistComments[activePage]}</p>
+                <button className="primary-btn full" type="button">Запросить отчёт</button>
+              </article>
+              <article className="card soft-card">
+                <h3>Следующий шаг</h3>
+                <p>Если прошло 7-10 дней, лучше пройти короткий повторный срез.</p>
+              </article>
+            </>
+          )}
         </aside>}
       </main>
     </div>

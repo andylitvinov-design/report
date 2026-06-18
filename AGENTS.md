@@ -53,6 +53,14 @@ When the user invokes `/delivery`, follow the local source-of-truth files in thi
 
 `/delivery` is sufficient by itself. Do not ask Andrey for extra confirmation to create a branch, create/update a PR, merge if safe/permitted, run deployment fallback, or verify live merely because `/delivery` was invoked.
 
+Local checkout recovery rules:
+
+- The canonical repository is `andylitvinov-design/report`; the local folder name `reports` is valid when `origin` points to `andylitvinov-design/report`.
+- Before stopping on missing delivery docs, `/delivery` must check the repo root, remote, branch, and `origin/main`, then fetch `origin main`.
+- If `origin/main` contains the required shared delivery docs, sync from `origin/main` or create a clean worktree from `origin/main` and continue.
+- Only report missing shared delivery docs after confirming they are absent both locally and on `origin/main` of `andylitvinov-design/report`.
+- Task-specific docs such as `docs/first-intake-analysis-dialog-plan.md` should be read only when relevant to the current task. Their absence must not block `/delivery` globally.
+
 Act as a release owner, not only a coding assistant.
 
 Do not stop after code changes, PR creation, green checks, merge, or deployment.

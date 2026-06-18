@@ -2,8 +2,9 @@ export const client = {
   name: "Анна",
   id: "C-1024",
   focus: "Здоровье / тело",
-  lastSlice: null,
-  nextSession: null,
+  lastSlice: "14.05.2026",
+  nextSession: "04.06.2026, 12:00",
+  hasCompletedFirstConsultation: true,
 };
 
 export const clientProgress = {
@@ -14,7 +15,7 @@ export const clientProgress = {
 
 export const navigation = [
   { id: "overview", label: "Обзор" },
-  { id: "self", label: "Самоанализ" },
+  { id: "self", label: "Первый приём (Анализ)" },
   { id: "expert", label: "Экспертный анализ" },
   { id: "recommendations", label: "Рекомендации" },
   { id: "history", label: "Динамика / История" },
@@ -45,7 +46,7 @@ export const specialistComments = {
   overview:
     "Сейчас главное - не усиливать нагрузку, а восстановить базовую опору. По последнему срезу видно: напряжение снизилось, но ресурс еще нестабилен.",
   self:
-    "Отвечайте по текущему состоянию, а не по тому, как обычно бывает. Если сомневаетесь, отмечайте то, что сильнее проявлено последние 1-3 дня.",
+    "Отвечайте по текущему состоянию, а не по всей истории жизни. Если сомневаетесь, выбирайте то, что сильнее проявлено последние 1-3 дня.",
   expert:
     "Экспертная часть сопоставляет самооценку, повторяющиеся темы и ресурс. Финальное решение принимается после проверки динамики.",
   recommendations:
@@ -249,7 +250,7 @@ export const recommendations = [
 
 export const history = [
   { date: "01.05.2026", event: "Первичный срез", problem: 9, resource: 2 },
-  { date: "07.05.2026", event: "Самоанализ", problem: 8, resource: 3 },
+  { date: "07.05.2026", event: "Первый приём", problem: 8, resource: 3 },
   { date: "14.05.2026", event: "Экспертная проверка", problem: 7, resource: 4 },
   { date: "21.05.2026", event: "Повторный контроль", problem: 6, resource: 5 },
 ];

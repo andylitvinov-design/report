@@ -15,12 +15,44 @@ implement -> checks -> PR -> PR health -> merge if safe/permitted -> deploy -> l
 Follow all source-of-truth docs in order:
 
 1. `.claude/commands/delivery.md`
-2. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
-3. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
-4. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
-5. `AGENTS.md` — project adapter and command registry
+2. `.claude/skills/delivery/SKILL.md`
+3. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
+4. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
+5. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
+6. `AGENTS.md` — project adapter and command registry
 
-These docs are the local source of truth. Do not browse or fetch external loop repos. If a local doc is missing, report `needs verification` and do not invent replacement rules.
+These docs are the local source of truth. Do not browse or fetch external loop repos. If a local doc is missing, first run the Local Checkout Recovery Gate below. If the file is still missing after that gate, report `needs verification` and do not invent replacement rules.
+
+## Local Checkout Recovery Gate
+
+This repo's canonical GitHub repository is `andylitvinov-design/report`. Local folder names are not authoritative. A local checkout may be named `report`, `reports`, or something else.
+
+Before stopping because delivery docs are missing, verify the checkout:
+
+```bash
+git rev-parse --show-toplevel
+git remote -v
+git branch --show-current
+git fetch origin main
+```
+
+Then apply these rules:
+
+1. If the remote is not `andylitvinov-design/report`, stop with `STATUS: BLOCKED` and report the actual remote/path. Do not copy delivery rules into an unrelated repo.
+2. If the remote is `andylitvinov-design/report` and the current branch is stale, update from `origin/main` or create a clean worktree from `origin/main` before running `/delivery`.
+3. If the local folder is `/Users/andriilitvinov/projects/MYPROJECTS/reports` but the remote is `andylitvinov-design/report`, treat it as the correct repo with a non-canonical local folder name.
+4. If `origin/main` contains the delivery docs but the current checkout does not, sync the checkout from `origin/main` and continue. Do not stop as if the project is unconfigured.
+5. Only report missing shared docs after confirming they are absent from the current checkout and from `origin/main` of `andylitvinov-design/report`.
+
+Required shared docs for this repo:
+
+```txt
+docs/delivery-loop-program.md
+docs/delivery-loop-technical-details.md
+docs/delivery-loop-source-patterns-and-live-proof.md
+```
+
+Task-specific docs such as `docs/first-intake-analysis-dialog-plan.md` should be read when relevant, but absence of a task-specific doc is not a reason to disable `/delivery` globally.
 
 Act as release owner for this project.
 

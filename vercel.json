@@ -2,5 +2,9 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "cleanUrls": true
+  "rewrites": [
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/demo", "destination": "/index.html" }
+  ]
 }

@@ -1,6 +1,8 @@
 name: Deploy Production Fallback
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       ref:
@@ -15,6 +17,10 @@ on:
         description: "Why this fallback deploy was triggered"
         required: false
         default: "fallback production deploy"
+      production_url:
+        description: "Production URL to verify after deploy"
+        required: false
+        default: "https://psitherapy.vercel.app/"
 
 permissions:
   contents: read
@@ -33,10 +39,11 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL: "1"
-      PRODUCTION_URL: https://myalchemy.vercel.app/
-      BUILD_INFO_URL: https://myalchemy.vercel.app/build-info.json
-      ALTERNATE_URL: https://holistichealing.vercel.app/
-      ALTERNATE_BUILD_INFO_URL: https://holistichealing.vercel.app/build-info.json
+      DEPLOY_REF: ${{ inputs.ref || github.ref }}
+      EXPECTED_SHA: ${{ inputs.expected_sha || (github.event_name == 'push' && github.sha) || '' }}
+      DEPLOY_REASON: ${{ inputs.reason || 'automatic production deploy after main push' }}
+      PRODUCTION_URL: ${{ inputs.production_url || 'https://psitherapy.vercel.app/' }}
+      BUILD_INFO_URL: ${{ inputs.production_url || 'https://psitherapy.vercel.app/' }}build-info.json
       LEGACY_URL: https://andylitvinov-design.github.io/report/
       LEGACY_BUILD_INFO_URL: https://andylitvinov-design.github.io/report/build-info.json
 
@@ -44,24 +51,37 @@ jobs:
       - name: Checkout selected ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ env.DEPLOY_REF }}
 
       - name: Print checked-out commit
         run: |
-          echo "ref=${{ inputs.ref }}"
-          echo "reason=${{ inputs.reason }}"
-          echo "expected_sha=${{ inputs.expected_sha }}"
+          echo "ref=$DEPLOY_REF"
+          echo "reason=$DEPLOY_REASON"
+          echo "expected_sha=$EXPECTED_SHA"
+          echo "production_url=$PRODUCTION_URL"
           echo "actual_sha=$(git rev-parse HEAD)"
           git log -1 --oneline
 
-      - name: Verify expected SHA if provided
-        if: ${{ inputs.expected_sha != '' }}
+      - name: Verify expected SHA
         run: |
           ACTUAL_SHA="$(git rev-parse HEAD)"
-          if [ "$ACTUAL_SHA" != "${{ inputs.expected_sha }}" ]; then
+          if [ -n "$EXPECTED_SHA" ] && [ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]; then
             echo "Expected SHA does not match checked-out SHA"
-            echo "expected=${{ inputs.expected_sha }}"
+            echo "expected=$EXPECTED_SHA"
             echo "actual=$ACTUAL_SHA"
+            exit 1
+          fi
+
+      - name: Verify Vercel secrets are configured
+        run: |
+          missing=0
+          for var in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!var}" ]; then
+              echo "::error::$var is not configured"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
             exit 1
           fi
 
@@ -98,12 +118,11 @@ jobs:
       - name: Verify primary build info responds
         run: curl -fsS --retry 6 --retry-delay 10 "$BUILD_INFO_URL" | tee /tmp/build-info.json
 
-      - name: Verify build info commit if expected SHA provided
-        if: ${{ inputs.expected_sha != '' }}
+      - name: Verify build info commit
         run: |
-          if ! grep -q "${{ inputs.expected_sha }}" /tmp/build-info.json; then
+          if [ -n "$EXPECTED_SHA" ] && ! grep -q "$EXPECTED_SHA" /tmp/build-info.json; then
             echo "Live build-info does not contain expected SHA"
-            echo "expected=${{ inputs.expected_sha }}"
+            echo "expected=$EXPECTED_SHA"
             cat /tmp/build-info.json
             exit 1
           fi
@@ -115,13 +134,12 @@ jobs:
             echo "## Production Deploy Fallback"
             echo "- Repository: ${{ github.repository }}"
             echo "- Platform: Vercel"
-            echo "- Ref: ${{ inputs.ref }}"
-            echo "- Expected SHA: ${{ inputs.expected_sha }}"
+            echo "- Ref: $DEPLOY_REF"
+            echo "- Expected SHA: $EXPECTED_SHA"
             echo "- Actual SHA: $(git rev-parse HEAD)"
-            echo "- Reason: ${{ inputs.reason }}"
+            echo "- Reason: $DEPLOY_REASON"
             echo "- Deploy URL: ${DEPLOY_URL:-unknown}"
             echo "- Primary URL: $PRODUCTION_URL"
             echo "- Primary Build Info URL: $BUILD_INFO_URL"
-            echo "- Alternate URL: $ALTERNATE_URL"
             echo "- Legacy URL: $LEGACY_URL"
           } >> "$GITHUB_STEP_SUMMARY"

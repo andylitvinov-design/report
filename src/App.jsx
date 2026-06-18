@@ -3,11 +3,13 @@ import Layout from "./components/Layout.jsx";
 import { clientProgress, selfAnalysis } from "./data/mockData.js";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./pages/Overview.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
-const pageTabs = {
+export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
   expert: ["Меню отчётов", "Самоотчёт", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
@@ -47,7 +49,30 @@ function LockedReportState({
   );
 }
 
-export default function App() {
+function RoutedApp() {
+  const path = window.location.pathname;
+  const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+
+  if (path === "/") {
+    return <ReportApp forceDemo={demoMode} />;
+  }
+
+  if (path === "/login") {
+    return <LoginPage />;
+  }
+
+  if (path === "/profile") {
+    return <ProfilePage />;
+  }
+
+  if (path === "/demo") {
+    return <ReportApp forceDemo />;
+  }
+
+  return <LoginPage />;
+}
+
+export function ReportApp({ clientOverride = null, forceDemo = false, userAction = null }) {
   const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
@@ -58,12 +83,15 @@ export default function App() {
     self: selfAnalysis.tabs[0],
     history: pageTabs.history[0],
   });
-  const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
-  const hasCompletedResults =
-    demoMode ||
+  const completedFromProgress =
     clientProgress.assessments.some((item) => item.status === "completed") ||
     clientProgress.reports.some((item) => item.status === "completed") ||
     clientProgress.results.some((item) => item.status === "completed");
+  const hasCompletedResults =
+    forceDemo ||
+    completedFromProgress ||
+    clientOverride?.hasCompletedFirstConsultation === true ||
+    clientOverride?.hasCompletedResults === true;
 
   const handleNavigation = (page, tab) => {
     if (!hasCompletedResults && page === "expert") {
@@ -72,7 +100,7 @@ export default function App() {
       return;
     }
     if (!hasCompletedResults && ["recommendations", "history"].includes(page)) {
-      handleStartSelfAnalysis();
+      openFirstIntake();
       return;
     }
     if (tab) {
@@ -86,15 +114,19 @@ export default function App() {
     }
   };
 
-  const handleStartSelfAnalysis = () => {
+  const openFirstIntake = () => {
     setActivePage("self");
     setSelfAnalysisMode("overview");
     setBookingNoticeVisible(false);
   };
 
   const handleSpecialistRequest = () => {
-    // TODO: Replace with booking / consultation / specialist request route when it exists.
     setBookingNoticeVisible(true);
+  };
+
+  const openResultReport = (tab) => {
+    setActivePage("expert");
+    setActiveTabs((current) => ({ ...current, expert: tab }));
   };
 
   const renderPage = () => {
@@ -106,12 +138,19 @@ export default function App() {
         <LockedReportState
           bookingNoticeVisible={bookingNoticeVisible}
           onSpecialistRequest={handleSpecialistRequest}
-          onStartSelfAnalysis={handleStartSelfAnalysis}
+          onStartSelfAnalysis={openFirstIntake}
         />
       );
     }
     if (activePage === "expert") {
-      return <ExpertAnalysis />;
+      return (
+        <ExpertAnalysis
+          activeTab={activeTabs.expert}
+          clientOverride={clientOverride}
+          onSelectReport={openResultReport}
+          onStartSelfAnalysis={openFirstIntake}
+        />
+      );
     }
     if (activePage === "recommendations") {
       return <Recommendations />;
@@ -124,7 +163,7 @@ export default function App() {
         bookingNoticeVisible={bookingNoticeVisible}
         hasCompletedResults={hasCompletedResults}
         onSpecialistRequest={handleSpecialistRequest}
-        onStartSelfAnalysis={handleStartSelfAnalysis}
+        onStartSelfAnalysis={openFirstIntake}
       />
     );
   };
@@ -135,13 +174,17 @@ export default function App() {
     <Layout
       activePage={activePage}
       activeTab={activeTabs[activePage]}
+      clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
-      onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? handleStartSelfAnalysis : undefined}
+      onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
+      userAction={userAction}
     >
       {renderPage()}
     </Layout>
   );
 }
+
+export default RoutedApp;

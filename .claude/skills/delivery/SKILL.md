@@ -20,7 +20,29 @@ Read and follow these files in order:
 4. `docs/delivery-loop-source-patterns-and-live-proof.md`
 5. `AGENTS.md`
 
-Do not browse or fetch external loop repos. If a local doc is missing, report `needs verification` and do not invent replacement rules.
+Do not browse or fetch external loop repos. If a local doc is missing, run the Local Checkout Recovery Gate before reporting `needs verification`.
+
+## Local Checkout Recovery Gate
+
+The canonical repo is `andylitvinov-design/report`. Local folder names are not authoritative. A checkout named `/Users/andriilitvinov/projects/MYPROJECTS/reports` can still be valid if its remote points to `andylitvinov-design/report`.
+
+Before stopping for missing delivery docs:
+
+1. Check the current repo root, remote, branch, and `origin/main`.
+2. If the remote is not `andylitvinov-design/report`, stop with `STATUS: BLOCKED` and report the actual remote/path.
+3. If the remote is `andylitvinov-design/report`, fetch `origin/main` and update the local checkout or create a clean worktree from `origin/main`.
+4. If `origin/main` contains the shared delivery docs, sync them locally and continue. Do not classify the repo as unconfigured.
+5. Only report missing shared docs after confirming they are absent both locally and on `origin/main`.
+
+Required shared docs:
+
+```txt
+docs/delivery-loop-program.md
+docs/delivery-loop-technical-details.md
+docs/delivery-loop-source-patterns-and-live-proof.md
+```
+
+Task-specific docs such as `docs/first-intake-analysis-dialog-plan.md` are relevant only to their task. Their absence must not disable `/delivery` globally.
 
 Project adapter: see `AGENTS.md` → Agent Command Registry → `/delivery`.
 
@@ -32,23 +54,24 @@ SUCCESS requires live proof on this URL unless another target is explicitly requ
 Run the embedded loops in this order:
 
 1. Local Source-of-Truth Read
-2. Project Adapter Extraction
-3. Acceptance Criteria Extraction
-4. Task Coverage Audit — initial
-5. Implementation
-6. Build Until Green
-7. Local Checks Until Clean
-8. Spiral Validator-Critic Loop
-9. Ship PR Until Green
-10. CI Failure Watcher if CI fails
-11. PR Babysitter
-12. Task Coverage Audit — pre-merge
-13. Merge Until Confirmed
-14. Deploy Verification Loop
-15. Fix Deploy if deployment/live fails
-16. Live Verification Loop
-17. Task Coverage Audit — live
-18. Final Evidence Report
+2. Local Checkout Recovery Gate if any source file is missing
+3. Project Adapter Extraction
+4. Acceptance Criteria Extraction
+5. Task Coverage Audit — initial
+6. Implementation
+7. Build Until Green
+8. Local Checks Until Clean
+9. Spiral Validator-Critic Loop
+10. Ship PR Until Green
+11. CI Failure Watcher if CI fails
+12. PR Babysitter
+13. Task Coverage Audit — pre-merge
+14. Merge Until Confirmed
+15. Deploy Verification Loop
+16. Fix Deploy if deployment/live fails
+17. Live Verification Loop
+18. Task Coverage Audit — live
+19. Final Evidence Report
 
 ## Stop States
 
