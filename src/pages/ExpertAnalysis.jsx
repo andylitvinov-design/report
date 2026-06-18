@@ -1,8 +1,6 @@
 import React from "react";
-import { expertBlocks } from "../data/mockData.js";
+import { client, expertBlocks } from "../data/mockData.js";
 import "../results.css";
-
-const clientHasFirstConsultation = true;
 
 const reports = [
   {
@@ -44,6 +42,12 @@ const reportDetails = {
       "Здесь специалист сверяет самоотчёт с повторяющимися темами, динамикой и возможным узким местом. Финальное решение принимается после проверки изменений во времени.",
     items: ["Основной узел: истощение", "Когнитивный слой: внутренний шум", "Bottleneck: ресурс ниже нагрузки", "Статус: требует проверки динамики"],
   },
+  "Повторный срез": {
+    title: "Повторный срез",
+    text:
+      "Этот блок нужен для новых отчётов по датам: он показывает, что выросло, что ушло, что осталось актуальным и требует ли поддержка корректировки.",
+    items: ["Сила проблемы: 6/10", "Ресурс: 5/10", "Напряжение снизилось", "Проверить сон и восстановление"],
+  },
   "Механизм": {
     title: "Механизм состояния",
     text:
@@ -80,7 +84,7 @@ function EmptyFirstConsultation({ onStartSelfAnalysis }) {
   );
 }
 
-function ReportsMenu() {
+function ReportsMenu({ activeTab, onSelectReport }) {
   return (
     <article className="card results-menu-card">
       <div className="section-head">
@@ -92,7 +96,12 @@ function ReportsMenu() {
       </div>
       <div className="report-list">
         {reports.map((report) => (
-          <button className="report-row" key={`${report.number}-${report.date}`} type="button">
+          <button
+            className={report.type === activeTab ? "report-row active" : "report-row"}
+            key={`${report.number}-${report.date}`}
+            onClick={() => onSelectReport(report.type)}
+            type="button"
+          >
             <span className="report-number">№ {report.number}</span>
             <span className="report-main">
               <strong>{report.type}</strong>
@@ -109,10 +118,10 @@ function ReportsMenu() {
   );
 }
 
-function ReportOverview() {
+function ReportOverview({ activeTab, onSelectReport }) {
   return (
     <>
-      <ReportsMenu />
+      <ReportsMenu activeTab={activeTab} onSelectReport={onSelectReport} />
 
       <article className="card lab-report-card">
         <div className="section-head">
@@ -141,39 +150,42 @@ function ReportOverview() {
   );
 }
 
-function ReportDetail({ activeTab }) {
+function ReportDetail({ activeTab, onSelectReport }) {
   const detail = reportDetails[activeTab] || reportDetails["Диагностика эксперта"];
 
   return (
-    <article className="card lab-report-card">
-      <div className="section-head">
-        <div>
-          <span className="card-kicker">Раздел отчёта</span>
-          <h2>{detail.title}</h2>
-        </div>
-        <span className="lab-badge">{activeTab}</span>
-      </div>
-      <p>{detail.text}</p>
-      <div className="lab-result-grid">
-        {detail.items.map((item) => (
-          <div className="lab-result-item" key={item}>
-            <span>Показатель</span>
-            <strong>{item}</strong>
+    <>
+      <ReportsMenu activeTab={activeTab} onSelectReport={onSelectReport} />
+      <article className="card lab-report-card">
+        <div className="section-head">
+          <div>
+            <span className="card-kicker">Раздел отчёта</span>
+            <h2>{detail.title}</h2>
           </div>
-        ))}
-      </div>
-    </article>
+          <span className="lab-badge">{activeTab}</span>
+        </div>
+        <p>{detail.text}</p>
+        <div className="lab-result-grid">
+          {detail.items.map((item) => (
+            <div className="lab-result-item" key={item}>
+              <span>Показатель</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
+      </article>
+    </>
   );
 }
 
-export default function ExpertAnalysis({ activeTab = "Меню отчётов", onStartSelfAnalysis }) {
-  if (!clientHasFirstConsultation) {
+export default function ExpertAnalysis({ activeTab = "Меню отчётов", onSelectReport, onStartSelfAnalysis }) {
+  if (!client.hasCompletedFirstConsultation) {
     return <EmptyFirstConsultation onStartSelfAnalysis={onStartSelfAnalysis} />;
   }
 
   if (activeTab === "Меню отчётов") {
-    return <ReportOverview />;
+    return <ReportOverview activeTab={activeTab} onSelectReport={onSelectReport} />;
   }
 
-  return <ReportDetail activeTab={activeTab} />;
+  return <ReportDetail activeTab={activeTab} onSelectReport={onSelectReport} />;
 }
