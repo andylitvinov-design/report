@@ -20,7 +20,7 @@ const pageTabs = {
 function RoutedApp() {
   const path = window.location.pathname;
 
-  if (path === "/login") {
+  if (path === "/" || path === "/login") {
     return <LoginPage />;
   }
 
@@ -28,7 +28,11 @@ function RoutedApp() {
     return <ProfilePage />;
   }
 
-  return <ReportApp />;
+  if (path === "/demo") {
+    return <ReportApp />;
+  }
+
+  return <LoginPage />;
 }
 
 function ReportApp() {
