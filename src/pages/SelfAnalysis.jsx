@@ -8,17 +8,87 @@ import {
   removeStorageItem,
   writeJsonStorage,
 } from "../lib/firstIntakeStorage.js";
+import {
+  createHybridAnswer,
+  getAnswerFreeText,
+  getAnswerTags,
+  getAnswerText,
+  hasAnswerContent,
+} from "../lib/firstIntakeAnswers.js";
 
 const baselineSteps = [
-  { id: "mainConcern", label: "Главный фокус", question: "Что сейчас главное?", type: "text", placeholder: "Например: тревога, усталость, напряжение в теле." },
-  { id: "feltArea", label: "Где ощущается", question: "Где это ощущается сильнее всего?", type: "text", placeholder: "Тело, эмоции, мысли, отношения, работа..." },
+  {
+    id: "mainConcern",
+    label: "Главный фокус",
+    question: "Что сейчас главное?",
+    type: "text",
+    placeholder: "Можно добавить важный нюанс своими словами.",
+    tagOptions: [
+      "Усталость / нет сил",
+      "Тревога",
+      "Напряжение в теле",
+      "Кожа / воспаление",
+      "Сон / восстановление",
+      "Отношения / контакт",
+      "Работа / деньги",
+      "Не понимаю, что происходит",
+    ],
+  },
+  {
+    id: "feltArea",
+    label: "Где ощущается",
+    question: "Где это ощущается сильнее всего?",
+    type: "text",
+    placeholder: "Можно уточнить место, ситуацию или ощущение.",
+    tagOptions: [
+      "Голова",
+      "Грудь / дыхание",
+      "Живот",
+      "Кожа",
+      "Спина / шея",
+      "Всё тело",
+      "Эмоционально",
+      "В мыслях",
+    ],
+  },
   { id: "problemStrength", label: "Сила проблемы", question: "Сила проблемы сейчас от 0 до 10?", type: "scale10" },
   { id: "resourceLevel", label: "Ресурс", question: "Сколько ресурса сейчас от 0 до 10?", type: "scale10" },
   { id: "anxietyLevel", label: "Тревога / напряжение", question: "Тревога / напряжение сейчас от 0 до 10?", type: "scale10" },
   { id: "fatigueLevel", label: "Усталость", question: "Усталость сейчас от 0 до 10?", type: "scale10" },
   { id: "lifeImpact", label: "Влияние на жизнь", question: "Насколько это мешает жить от 0 до 10?", type: "scale10" },
-  { id: "trigger", label: "Что усиливает", question: "Что обычно усиливает это состояние?", type: "text", placeholder: "Ситуации, мысли, люди, время дня..." },
-  { id: "relief", label: "Что облегчает", question: "Что хотя бы немного облегчает?", type: "text", placeholder: "Пауза, тепло, разговор, сон, движение..." },
+  {
+    id: "trigger",
+    label: "Что усиливает",
+    question: "Что обычно усиливает это состояние?",
+    type: "text",
+    placeholder: "Можно добавить свою ситуацию или время дня.",
+    tagOptions: [
+      "Стресс / спешка",
+      "Конфликт / давление",
+      "Одиночество",
+      "Страх оценки",
+      "Усталость / недосып",
+      "Неопределённость",
+      "Перегрузка делами",
+    ],
+  },
+  {
+    id: "relief",
+    label: "Что облегчает",
+    question: "Что хотя бы немного облегчает?",
+    type: "text",
+    placeholder: "Можно добавить свою опору или уточнение.",
+    tagOptions: [
+      "Отдых",
+      "Поддержка человека",
+      "Тепло / тело / прикосновение",
+      "Природа / прогулка",
+      "Понимание причины",
+      "Структура / план",
+      "Тишина",
+      "Пока ничего",
+    ],
+  },
   { id: "freeComment", label: "Комментарий", question: "Хотите добавить своими словами?", type: "comment", placeholder: "Коротко добавьте важный нюанс." },
 ];
 
@@ -73,7 +143,7 @@ const answerLabel = (step, value) => {
     const labels = ["0 - нет / не про меня", "1 - немного", "2 - заметно", "3 - сильно"];
     return labels[Number(value)] || String(value);
   }
-  return String(value);
+  return getAnswerText(value);
 };
 
 const getPartSteps = (part) => {
@@ -102,10 +172,10 @@ const getAnswerGroup = (state, part) => {
 
 const buildFormulatedRequest = (therapyRequest, baseline) =>
   [
-    `Я хочу прояснить / изменить / укрепить: ${therapyRequest.formulatedRequest || therapyRequest.desiredChange || "текущий запрос требует уточнения"}.`,
-    `Сейчас больше всего мешает: ${baseline.mainConcern || "не указано"}.`,
-    `Хочу прийти к: ${therapyRequest.desiredResult1to3Sessions || "понятному результату на ближайшие 1-3 сессии"}.`,
-    `Важно учитывать: ${therapyRequest.mustNotLose || "сохранить ресурс и устойчивость"}.`,
+    `Я хочу прояснить / изменить / укрепить: ${getAnswerText(therapyRequest.formulatedRequest || therapyRequest.desiredChange) || "текущий запрос требует уточнения"}.`,
+    `Сейчас больше всего мешает: ${getAnswerText(baseline.mainConcern) || "не указано"}.`,
+    `Хочу прийти к: ${getAnswerText(therapyRequest.desiredResult1to3Sessions) || "понятному результату на ближайшие 1-3 сессии"}.`,
+    `Важно учитывать: ${getAnswerText(therapyRequest.mustNotLose) || "сохранить ресурс и устойчивость"}.`,
   ].join(" ");
 
 const calculateIntakeResult = (state) => {
@@ -142,12 +212,12 @@ function BaselineSummaryCard({ baseline }) {
         <div>
           <span>Проблема</span>
           <strong>{baseline.problemStrength ?? "не указано"}/10</strong>
-          <p>{baseline.mainConcern || "Главный фокус требует уточнения."}</p>
+          <p>{getAnswerText(baseline.mainConcern) || "Главный фокус требует уточнения."}</p>
         </div>
         <div>
           <span>Ресурс</span>
           <strong>{baseline.resourceLevel ?? "не указано"}/10</strong>
-          <p>{baseline.relief || "Опора требует уточнения."}</p>
+          <p>{getAnswerText(baseline.relief) || "Опора требует уточнения."}</p>
         </div>
         <div>
           <span>Тревога / усталость</span>
@@ -157,12 +227,12 @@ function BaselineSummaryCard({ baseline }) {
         <div>
           <span>Влияние и триггер</span>
           <strong>{baseline.lifeImpact ?? "не указано"}/10</strong>
-          <p>{baseline.trigger || "Триггер требует уточнения."}</p>
+          <p>{getAnswerText(baseline.trigger) || "Триггер требует уточнения."}</p>
         </div>
-        {baseline.freeComment ? (
+        {hasAnswerContent(baseline.freeComment) ? (
           <div>
             <span>Комментарий клиента</span>
-            <strong>{baseline.freeComment}</strong>
+            <strong>{getAnswerText(baseline.freeComment)}</strong>
             <p>Сохранено в рабочую карту.</p>
           </div>
         ) : null}
@@ -180,6 +250,8 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   });
   const [draftValue, setDraftValue] = useState("");
   const [restartConfirmVisible, setRestartConfirmVisible] = useState(false);
+  const [draftTags, setDraftTags] = useState([]);
+  const [answerNotice, setAnswerNotice] = useState("");
 
   const part = parts[state.currentPartIndex] || parts[0];
   const steps = useMemo(() => getPartSteps(part), [part]);
@@ -198,7 +270,9 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   }, [onModeChange]);
 
   useEffect(() => {
-    setDraftValue(currentAnswer === undefined ? "" : String(currentAnswer));
+    setDraftValue(currentAnswer === undefined ? "" : getAnswerFreeText(currentAnswer));
+    setDraftTags(getAnswerTags(currentAnswer));
+    setAnswerNotice("");
   }, [currentAnswer, step?.id]);
 
   useEffect(() => {
@@ -247,8 +321,38 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     persistState(nextState);
   };
 
+  const toggleDraftTag = (tag) => {
+    setAnswerNotice("");
+    setDraftTags((current) => {
+      if (current.includes(tag)) {
+        return current.filter((item) => item !== tag);
+      }
+      if (current.length >= 3) {
+        setAnswerNotice("Можно выбрать до 3 вариантов");
+        return current;
+      }
+      return [...current, tag];
+    });
+  };
+
   const submitDraft = () => {
-    if (!step || draftValue.trim() === "") return;
+    if (!step) return;
+
+    if (step.tagOptions) {
+      const value = createHybridAnswer(draftTags, draftValue);
+      if (!hasAnswerContent(value)) {
+        setAnswerNotice("Выберите 1–3 подсказки или напишите коротко своими словами");
+        return;
+      }
+      setAnswer(value);
+      return;
+    }
+
+    if (draftValue.trim() === "") {
+      setAnswerNotice("Выберите 1–3 подсказки или напишите коротко своими словами");
+      return;
+    }
+
     const value = step.type === "scale10" ? Number(draftValue) : draftValue.trim();
     setAnswer(value);
   };
@@ -340,11 +444,11 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
 
           {visibleSteps.map((item) => (
             <React.Fragment key={item.id}>
-              <div className={item.id === step?.id && !currentAnswer && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
+              <div className={item.id === step?.id && !hasAnswerContent(currentAnswer) && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
                 <span>Специалист</span>
                 <p>{item.question}</p>
               </div>
-              {answerGroup[item.id] !== undefined && answerGroup[item.id] !== "" ? (
+              {hasAnswerContent(answerGroup[item.id]) ? (
                 <div className="chat-bubble user-bubble">
                   <span>Вы</span>
                   <p>{answerLabel(item, answerGroup[item.id])}</p>
@@ -365,13 +469,16 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
           </div>
 
           {step.type === "scale10" ? (
-            <div className="option-grid scale-grid">
-              {Array.from({ length: 11 }, (_, value) => (
-                <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
-                  {value}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="option-grid scale-grid">
+                {Array.from({ length: 11 }, (_, value) => (
+                  <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
+                    {value}
+                  </button>
+                ))}
+              </div>
+              <p className="scale-helper">0 — совсем нет, 10 — максимально сильно.</p>
+            </>
           ) : part.kind === "bach" ? (
             <div className="option-grid bach-scale-grid">
               {[0, 1, 2, 3].map((value) => (
@@ -381,8 +488,23 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
               ))}
             </div>
           ) : (
-            <label className="field compact-note inline-answer-field">
+            <div className="field compact-note inline-answer-field">
               <span>{step.type === "comment" ? "Добавить своими словами" : "Ваш ответ"}</span>
+              {step.tagOptions ? (
+                <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
+                  {step.tagOptions.map((tag) => (
+                    <button
+                      aria-pressed={draftTags.includes(tag)}
+                      className={draftTags.includes(tag) ? "answer-chip tag-chip active" : "answer-chip tag-chip"}
+                      key={tag}
+                      onClick={() => toggleDraftTag(tag)}
+                      type="button"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <textarea
                 id={`first-intake-${step.id}`}
                 name={`first-intake-${step.id}`}
@@ -391,9 +513,10 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
                 value={draftValue}
               />
               <button className="primary-btn" onClick={submitDraft} type="button">
-                {step.type === "comment" ? "Сохранить комментарий" : "Сохранить ответ"}
+                Сохранить ответ
               </button>
-            </label>
+              {answerNotice ? <p className="answer-notice" role="status">{answerNotice}</p> : null}
+            </div>
           )}
         </section>
 
