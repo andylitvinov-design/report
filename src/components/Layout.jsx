@@ -31,6 +31,7 @@ export default function Layout({
   clientOverride = null,
   userAction = null,
 }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const currentNav = navigation.find((item) => item.id === activePage);
   const navLabel = clientNavigation[activePage] || currentNav?.label;
   const cabinetClient = clientOverride || client;
@@ -59,6 +60,10 @@ export default function Layout({
     : activePage === "self"
       ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
       : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
+  const handleMobileNavChange = (pageId) => {
+    onTabChange(pageId);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className={shellClassName}>
@@ -118,31 +123,66 @@ export default function Layout({
           </section>
         )}
 
-        <div className="mobile-nav" aria-label="Мобильная навигация">
-          {navigation.map((item) => {
-            const locked = isNewUser && lockedForNewUser.has(item.id);
-            const nextStep = isNewUser && item.id === "self";
-            const className = [
-              "tab",
-              item.id === activePage ? "active" : "",
-              locked ? "locked" : "",
-              nextStep ? "next-step" : "",
-            ]
-              .filter(Boolean)
-              .join(" ");
+        {!focusMode && (
+          <div className="mobile-menu" aria-label="Мобильная навигация">
+            <button
+              className="mobile-menu-toggle"
+              type="button"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-section-menu"
+              onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+            >
+              <span aria-hidden="true">☰</span>
+              Меню разделов
+            </button>
 
-            return (
-              <button
-                className={className}
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                type="button"
-              >
-                {clientNavigation[item.id] || item.label}
-              </button>
-            );
-          })}
-        </div>
+            {isMobileMenuOpen && (
+              <>
+                <button
+                  className="mobile-menu-backdrop"
+                  type="button"
+                  aria-label="Закрыть меню разделов"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                />
+                <div className="mobile-menu-panel" id="mobile-section-menu">
+                  <div className="mobile-menu-header">
+                    <strong>Разделы кабинета</strong>
+                    <button type="button" onClick={() => setIsMobileMenuOpen(false)}>
+                      Закрыть
+                    </button>
+                  </div>
+                  {navigation.map((item) => {
+                    const locked = isNewUser && lockedForNewUser.has(item.id);
+                    const nextStep = isNewUser && item.id === "self";
+                    const isActive = item.id === activePage;
+                    const className = [
+                      "mobile-menu-item",
+                      isActive ? "active" : "",
+                      locked ? "locked" : "",
+                      nextStep ? "next-step" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
+
+                    return (
+                      <button
+                        className={className}
+                        key={item.id}
+                        onClick={() => handleMobileNavChange(item.id)}
+                        type="button"
+                      >
+                        <span>{clientNavigation[item.id] || item.label}</span>
+                        {isActive && <small>✓ текущий</small>}
+                        {!isActive && nextStep && <small>главный следующий шаг</small>}
+                        {locked && <small>после первого среза</small>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {!focusMode && !isNewUser && pageTabs?.length > 0 && (
           <div className="tabs" aria-label="Разделы страницы">
