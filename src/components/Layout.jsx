@@ -3,7 +3,7 @@ import { client, navigation, specialistComments } from "../data/mockData.js";
 
 const clientNavigation = {
   overview: "Профиль / Обзор",
-  expert: "Отчёт эксперта",
+  expert: "Результаты (Отчёт)",
   recommendations: "Назначение",
   self: "Первый приём (Анализ)",
   history: "Рекомендации",
@@ -16,16 +16,26 @@ const actionLabels = {
   history: "Открыть динамику",
 };
 
-export default function Layout({ activePage, pageTabs, activeTab, focusMode = false, onTabChange, children }) {
+export default function Layout({
+  activePage,
+  pageTabs,
+  activeTab,
+  focusMode = false,
+  onTabChange,
+  children,
+  clientOverride = null,
+  userAction = null,
+}) {
   const currentNav = navigation.find((item) => item.id === activePage);
   const currentLabel = clientNavigation[activePage] || currentNav?.label;
+  const cabinetClient = clientOverride || client;
 
   return (
     <div className={focusMode ? "app-shell focus-mode" : "app-shell"}>
       <aside className="sidebar" aria-label="Основная навигация">
         <div className="brand">
-          <strong>Holistic Therapy Cabinet</strong>
-          <span>Кабинет натуральной терапии</span>
+          <strong>PsiTherapy</strong>
+          <span>Личный кабинет</span>
         </div>
         <nav className="nav-list">
           {navigation.map((item) => (
@@ -40,9 +50,10 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
           ))}
         </nav>
         <div className="client-mini">
-          <strong>{client.name}</strong>
-          <span>ID {client.id}</span>
-          <span>Сессия: {client.nextSession}</span>
+          <strong>{cabinetClient.name}</strong>
+          <span>{cabinetClient.email || `ID ${cabinetClient.id}`}</span>
+          <span>Статус: {cabinetClient.nextSession || "первичный анализ"}</span>
+          {userAction}
         </div>
       </aside>
 
@@ -54,8 +65,8 @@ export default function Layout({ activePage, pageTabs, activeTab, focusMode = fa
               <h1>{currentLabel}</h1>
               <p className="subtitle">
                 {activePage === "self"
-                  ? `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Первый диалог для прояснения текущего состояния`
-                  : `${client.name} / ID ${client.id} · Фокус: ${client.focus} · Последний срез: ${client.lastSlice}`}
+                  ? `${cabinetClient.name} · Первый диалог для прояснения текущего состояния`
+                  : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`}
               </p>
             </div>
             {activePage !== "self" ? (

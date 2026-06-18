@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { ReportApp } from "../App.jsx";
 import {
   authEnv,
   clearStoredSession,
@@ -11,6 +12,17 @@ import {
 
 function userDisplayName(user) {
   return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || "Клиент PsiTherapy";
+}
+
+function buildClientFromUser(user) {
+  return {
+    name: userDisplayName(user),
+    email: user?.email || "",
+    id: user?.id ? user.id.slice(0, 8).toUpperCase() : "CLIENT",
+    focus: "первичный анализ ситуации",
+    lastSlice: "ожидает первого приёма",
+    nextSession: "вход через Google подтверждён",
+  };
 }
 
 export default function ProfilePage() {
@@ -57,10 +69,16 @@ export default function ProfilePage() {
     };
   }, []);
 
+  const clientOverride = useMemo(() => buildClientFromUser(user), [user]);
+
   const handleSignOut = () => {
     signOut();
     window.location.assign("/login");
   };
+
+  const signOutAction = (
+    <button className="secondary-btn sidebar-logout" type="button" onClick={handleSignOut}>Выйти</button>
+  );
 
   if (authStatus === "loading") {
     return (
@@ -68,7 +86,7 @@ export default function ProfilePage() {
         <section className="auth-card card">
           <p className="eyebrow">PsiTherapy</p>
           <h1>Загружаю кабинет…</h1>
-          <p className="subtitle">Проверяю Google-сессию и доступ к профилю.</p>
+          <p className="subtitle">Проверяю Google-сессию и открываю структуру личного кабинета.</p>
         </section>
       </main>
     );
@@ -113,36 +131,5 @@ export default function ProfilePage() {
     );
   }
 
-  return (
-    <main className="profile-page">
-      <section className="profile-hero card">
-        <div>
-          <p className="eyebrow">Личный кабинет PsiTherapy</p>
-          <h1>{userDisplayName(user)}</h1>
-          <p className="subtitle">Вход через Google работает. Следующий слой — подключение личных отчётов, первого приёма и рекомендаций.</p>
-        </div>
-        <button className="secondary-btn" type="button" onClick={handleSignOut}>Выйти</button>
-      </section>
-
-      <section className="profile-grid">
-        <article className="card profile-card">
-          <span>Аккаунт</span>
-          <strong>{user?.email}</strong>
-          <p>Google ID подтверждён через Supabase Auth.</p>
-        </article>
-
-        <article className="card profile-card">
-          <span>Мои отчёты</span>
-          <strong>Готовится</strong>
-          <p>Здесь будет список персональных терапевтических отчётов.</p>
-        </article>
-
-        <article className="card profile-card">
-          <span>Первый приём</span>
-          <strong>Следующий этап</strong>
-          <p>Диалог первого приёма будет подключен к отдельным таблицам PsiTherapy.</p>
-        </article>
-      </section>
-    </main>
-  );
+  return <ReportApp clientOverride={clientOverride} userAction={signOutAction} />;
 }
