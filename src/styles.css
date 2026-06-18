@@ -194,6 +194,12 @@ h2 {
   margin-top: 10px;
 }
 
+.sidebar-settings {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 10px;
+}
+
 .main-shell {
   min-width: 0;
   width: 100%;
@@ -207,7 +213,6 @@ h2 {
 
 .topbar,
 .tabs,
-.mobile-nav,
 .mobile-menu {
   grid-column: 1 / -1;
 }
@@ -532,6 +537,52 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.settings-page {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-card {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settings-grid div {
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-lg);
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.settings-grid span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.settings-grid strong {
+  color: var(--green);
+  overflow-wrap: anywhere;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.settings-actions .sidebar-logout {
+  width: auto;
+  min-width: 180px;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -658,6 +709,65 @@ h3 {
 
 .mobile-menu-item.locked {
   opacity: 0.66;
+}
+
+.mobile-menu-section {
+  display: grid;
+  gap: 8px;
+}
+
+.mobile-menu-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.mobile-account-card {
+  padding: 14px;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-lg);
+  background: rgba(248, 244, 236, 0.82);
+}
+
+.mobile-account-card strong {
+  color: var(--psi-green-dark);
+  overflow-wrap: anywhere;
+}
+
+.mobile-account-card span {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.mobile-account-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.mobile-account-actions .secondary-btn,
+.mobile-account-actions .ghost-warning-btn {
+  flex: 1 1 0;
+  min-height: 44px;
+}
+
+.ghost-warning-btn {
+  border: 1px solid transparent;
+  border-radius: var(--psi-radius-lg);
+  background: transparent;
+  color: #9b3d32;
+  font-weight: 800;
+}
+
+.ghost-warning-btn:hover,
+.ghost-warning-btn:focus-visible {
+  border-color: rgba(155, 61, 50, 0.24);
+  background: rgba(155, 61, 50, 0.07);
 }
 
 .workspace {
@@ -2031,6 +2141,10 @@ h3 {
     display: block;
   }
 
+  .mobile-account-actions {
+    display: grid;
+  }
+
   .tabs {
     margin: 14px 0;
   }
@@ -2048,7 +2162,8 @@ h3 {
   .self-overview-main,
   .self-overview-grid,
   .form-grid,
-  .profile-grid {
+  .profile-grid,
+  .settings-grid {
     grid-template-columns: 1fr;
   }
 
