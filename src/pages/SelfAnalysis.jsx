@@ -124,12 +124,6 @@ const parts = [
   { id: "therapyRequest", title: "Запрос на терапию", shortTitle: "Запрос на терапию", kind: "therapy", steps: therapySteps },
 ];
 
-const bachPromptBySource = {
-  situation: "Посмотрите, насколько это похоже на ваше состояние сейчас.",
-  character: "А теперь посмотрим не только на сегодняшний день, а на то, что часто повторяется.",
-  control: "Теперь проверим, что сейчас сильнее всего держит напряжение.",
-};
-
 const makeInitialState = () => ({
   version: 1,
   currentPartIndex: 0,
@@ -142,7 +136,16 @@ const makeInitialState = () => ({
   status: "draft",
   updatedAt: null,
   completedAt: null,
+  pendingTransitionToPartIndex: null,
 });
+
+const partIntroText = {
+  baseline: "Часть 1 — измеримая базовая точка: что беспокоит и насколько сильно.",
+  bachSituation: "Смотрим текущие эмоциональные состояния, связанные с ситуацией.",
+  bachCharacter: "Смотрим устойчивые эмоциональные паттерны, которые могут повторяться в разных ситуациях.",
+  bachControl: "Смотрим точки острого напряжения и контроля, которые сейчас могут усиливать нагрузку.",
+  therapyRequest: "Формулируем запрос: что хочется изменить и какую поддержку важно получить.",
+};
 
 const formatDateTime = (value) => {
   if (!value) return "нет даты";
@@ -263,6 +266,16 @@ function BaselineSummaryCard({ baseline }) {
   );
 }
 
+function CompactBaselineStrip({ baseline }) {
+  return (
+    <div className="baseline-status-strip" aria-label="Краткая базовая точка">
+      <span>Базовая точка сохранена</span>
+      <strong>Проблема {baseline.problemStrength ?? "не указано"}/10</strong>
+      <strong>Ресурс {baseline.resourceLevel ?? "не указано"}/10</strong>
+    </div>
+  );
+}
+
 function RestartChoiceSheet({ onCancel, onResetCurrentPart, onResetFullIntake }) {
   return (
     <div className="intake-reset-overlay" role="presentation">
@@ -311,7 +324,8 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   const answerGroup = getAnswerGroup(state, part);
   const currentAnswer = answerGroup[step?.id];
   const isComplete = state.status === "completed";
-  const visibleSteps = isComplete ? steps : steps.slice(0, state.currentStepIndex + 1);
+  const isPendingBaselineTransition = state.pendingTransitionToPartIndex === 1;
+  const visibleSteps = isComplete || isPendingBaselineTransition ? steps : steps.slice(0, state.currentStepIndex + 1);
   const hasAnyAnswer =
     Object.keys(state.answers.baseline).length > 0 ||
     Object.keys(state.answers.bach).length > 0 ||
@@ -357,7 +371,17 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
       answers: nextAnswers,
       currentStepIndex: isLastStep ? 0 : state.currentStepIndex + 1,
       currentPartIndex: isLastStep && !isLastPart ? state.currentPartIndex + 1 : state.currentPartIndex,
+      pendingTransitionToPartIndex: null,
     };
+
+    if (part.kind === "baseline" && isLastStep && !isLastPart) {
+      nextState = {
+        ...nextState,
+        currentPartIndex: state.currentPartIndex,
+        currentStepIndex: state.currentStepIndex,
+        pendingTransitionToPartIndex: state.currentPartIndex + 1,
+      };
+    }
 
     if (isLastStep && isLastPart) {
       const completedAt = new Date().toISOString();
@@ -435,6 +459,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
       currentStepIndex: 0,
       status: "draft",
       completedAt: null,
+      pendingTransitionToPartIndex: null,
     });
     setDraftValue("");
     setDraftTags([]);
@@ -469,6 +494,16 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   const goToMainMenu = () => {
     persistState(state);
     onSaveAndExit?.();
+  };
+
+  const continueToBachSituation = () => {
+    persistState({
+      ...state,
+      currentPartIndex: 1,
+      currentStepIndex: 0,
+      pendingTransitionToPartIndex: null,
+      status: "draft",
+    });
   };
 
   const restartChoiceSheet = restartConfirmVisible ? (
@@ -527,17 +562,32 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
           <div>
             <p className="card-kicker">{partLabel}</p>
             <h2>{part.title}</h2>
+            <p className="part-intro-copy">{partIntroText[part.id]}</p>
           </div>
           <span className="chat-progress">{stepLabel}</span>
         </header>
 
+        {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
+          <div className="baseline-strip-wrap">
+            <CompactBaselineStrip baseline={state.answers.baseline} />
+            <details className="baseline-details-drawer">
+              <summary>Показать базовую точку</summary>
+              <BaselineSummaryCard baseline={state.answers.baseline} />
+            </details>
+          </div>
+        ) : null}
+
         <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
           <div className="chat-bubble therapist-bubble intro-bubble">
             <span>Специалист</span>
-            <p>
-              Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
-              Можно выбрать подсказки или добавить пару слов своими словами.
-            </p>
+            {part.kind === "baseline" ? (
+              <p>
+                Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
+                Можно выбрать подсказки или добавить пару слов своими словами.
+              </p>
+            ) : (
+              <p>{partIntroText[part.id] || "Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты."}</p>
+            )}
           </div>
 
           {visibleSteps.map((item) => (
@@ -556,16 +606,31 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
           ))}
         </div>
 
-        {state.currentPartIndex > 0 ? (
-          <BaselineSummaryCard baseline={state.answers.baseline} />
+        {isPendingBaselineTransition ? (
+          <section className="intake-transition-panel" aria-label="Переход к Bach: ситуация">
+            <BaselineSummaryCard baseline={state.answers.baseline} />
+            <div className="transition-message">
+              <p>Спасибо. Базовая точка состояния сохранена.</p>
+              <p>Теперь мы перейдём ко второй части — Bach: ситуация.</p>
+              <p>
+                Здесь мы смотрим не на силу симптома, а на эмоциональные состояния,
+                которые могут быть связаны с текущей ситуацией.
+              </p>
+              <p>Отвечайте по тому, насколько фраза похожа на вас сейчас.</p>
+              <button className="primary-btn" onClick={continueToBachSituation} type="button">
+                Перейти к Bach: ситуация
+              </button>
+            </div>
+          </section>
         ) : null}
 
+        {!isPendingBaselineTransition ? (
         <section className="answer-panel" aria-label="Ответ на текущий вопрос">
           <div className="answer-panel-head">
             <span>{step.label}</span>
             <strong>
               {part.kind === "bach"
-                ? bachPromptBySource[part.source]
+                ? "Насколько это похоже на вас сейчас?"
                 : step.type === "scale10"
                   ? "Отметьте по ощущению от 0 до 10"
                   : "Выберите 1–3 подсказки или добавьте своими словами"}
@@ -623,6 +688,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
             </div>
           )}
         </section>
+        ) : null}
 
         <footer className="chat-actions">
           {hasAnyAnswer ? (
