@@ -3,7 +3,9 @@ import Layout from "./components/Layout.jsx";
 import { selfAnalysis } from "./data/mockData.js";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./pages/Overview.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 
@@ -15,7 +17,21 @@ const pageTabs = {
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
 };
 
-export default function App() {
+function RoutedApp() {
+  const path = window.location.pathname;
+
+  if (path === "/login") {
+    return <LoginPage />;
+  }
+
+  if (path === "/profile") {
+    return <ProfilePage />;
+  }
+
+  return <ReportApp />;
+}
+
+function ReportApp() {
   const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [activeTabs, setActiveTabs] = useState({
@@ -67,3 +83,5 @@ export default function App() {
     </Layout>
   );
 }
+
+export default RoutedApp;
