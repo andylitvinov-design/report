@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const FIRST_INTAKE_INITIAL_ANSWERS = {
   mainConcern: "",
@@ -94,6 +94,7 @@ const FIRST_INTAKE_STEPS = [
 ];
 
 export default function SelfAnalysis({ onModeChange }) {
+  const chatWindowRef = useRef(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState(FIRST_INTAKE_INITIAL_ANSWERS);
   const [isComplete, setIsComplete] = useState(false);
@@ -101,6 +102,18 @@ export default function SelfAnalysis({ onModeChange }) {
   useEffect(() => {
     onModeChange?.("overview");
   }, [onModeChange]);
+
+  useEffect(() => {
+    const chatWindow = chatWindowRef.current;
+    if (!chatWindow) {
+      return;
+    }
+
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [answers, currentStep, isComplete]);
 
   const step = FIRST_INTAKE_STEPS[currentStep];
   const answeredSteps = useMemo(
@@ -162,7 +175,7 @@ export default function SelfAnalysis({ onModeChange }) {
           <span className="chat-progress">{progressLabel}</span>
         </header>
 
-        <div className="chat-window" aria-live="polite">
+        <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
           <div className="chat-bubble therapist-bubble intro-bubble">
             <span>Специалист</span>
             <p>Я задам несколько коротких вопросов, чтобы прояснить текущее состояние.</p>
@@ -170,7 +183,13 @@ export default function SelfAnalysis({ onModeChange }) {
 
           {visibleSteps.map((item) => (
             <React.Fragment key={item.id}>
-              <div className="chat-bubble therapist-bubble">
+              <div
+                className={
+                  item.id === step?.id && !answers[item.id] && !isComplete
+                    ? "chat-bubble therapist-bubble current-question-bubble"
+                    : "chat-bubble therapist-bubble"
+                }
+              >
                 <span>Специалист</span>
                 <p>{item.therapist}</p>
               </div>
@@ -197,18 +216,24 @@ export default function SelfAnalysis({ onModeChange }) {
 
         {!isComplete ? (
           <>
-            <div className="option-grid" aria-label="Варианты ответа">
-              {step.options.map((option) => (
-                <button
-                  className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
-                  key={option}
-                  onClick={() => chooseOption(option)}
-                  type="button"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+            <section className="answer-panel" aria-label="Варианты ответа">
+              <div className="answer-panel-head">
+                <span>{step.label}</span>
+                <strong>Выберите близкий вариант</strong>
+              </div>
+              <div className="option-grid">
+                {step.options.map((option) => (
+                  <button
+                    className={answers[step.id] === option ? "answer-chip active" : "answer-chip"}
+                    key={option}
+                    onClick={() => chooseOption(option)}
+                    type="button"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </section>
 
             <label className="field compact-note">
               <span>Добавить своими словами</span>
