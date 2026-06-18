@@ -1,5 +1,6 @@
 import React from "react";
 import { client, expertBlocks } from "../data/mockData.js";
+import { getAnswerText, hasAnswerContent } from "../lib/firstIntakeAnswers.js";
 import { readFirstIntakeResult } from "../lib/firstIntakeStorage.js";
 import "../results.css";
 
@@ -197,16 +198,16 @@ function FirstIntakeResultBlock({ result }) {
         ))}
         <div className="lab-result-item">
           <span>Главный триггер</span>
-          <strong>{baseline.trigger || "требует уточнения"}</strong>
+          <strong>{getAnswerText(baseline.trigger) || "требует уточнения"}</strong>
         </div>
         <div className="lab-result-item">
           <span>Главная опора</span>
-          <strong>{baseline.relief || "требует уточнения"}</strong>
+          <strong>{getAnswerText(baseline.relief) || "требует уточнения"}</strong>
         </div>
-        {baseline.freeComment ? (
+        {hasAnswerContent(baseline.freeComment) ? (
           <div className="lab-result-item wide-result-item">
             <span>Комментарий клиента</span>
-            <strong>{baseline.freeComment}</strong>
+            <strong>{getAnswerText(baseline.freeComment)}</strong>
           </div>
         ) : null}
       </div>
@@ -230,15 +231,15 @@ function FirstIntakeResultBlock({ result }) {
 
       <div className="intake-report-section">
         <h3>Терапевтический запрос</h3>
-        <p>{request.formulatedRequest || "Запрос требует уточнения со специалистом."}</p>
+        <p>{getAnswerText(request.formulatedRequest) || "Запрос требует уточнения со специалистом."}</p>
         <div className="lab-result-grid">
           <div className="lab-result-item">
             <span>Что хочется изменить</span>
-            <strong>{request.desiredChange || "не указано"}</strong>
+            <strong>{getAnswerText(request.desiredChange) || "не указано"}</strong>
           </div>
           <div className="lab-result-item">
             <span>Результат на 1-3 сессии</span>
-            <strong>{request.desiredResult1to3Sessions || "не указано"}</strong>
+            <strong>{getAnswerText(request.desiredResult1to3Sessions) || "не указано"}</strong>
           </div>
           <div className="lab-result-item">
             <span>Что отслеживать</span>
@@ -246,7 +247,7 @@ function FirstIntakeResultBlock({ result }) {
           </div>
           <div className="lab-result-item">
             <span>Подходящая поддержка</span>
-            <strong>{request.preferredSupport || "не указано"}</strong>
+            <strong>{getAnswerText(request.preferredSupport) || "не указано"}</strong>
           </div>
         </div>
       </div>

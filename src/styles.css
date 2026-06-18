@@ -1360,6 +1360,10 @@ h3 {
   color: #244b24;
 }
 
+.user-bubble p {
+  white-space: pre-line;
+}
+
 .final-bubble {
   border-color: rgba(63, 122, 61, 0.2);
   background: #f4fbef;
@@ -1446,9 +1450,42 @@ h3 {
   transform: translateY(0);
 }
 
+.tag-chip-grid {
+  gap: 8px;
+}
+
+.tag-chip {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-color: rgba(63, 122, 61, 0.42);
+  background: #fbfff7;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.tag-chip.active {
+  border-color: #2f7a32;
+  background: #2f7a32;
+  color: #fff;
+  box-shadow: 0 9px 20px rgba(47, 122, 50, 0.18);
+}
+
+.scale-helper,
+.answer-notice {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.answer-notice {
+  color: #8a5b16;
+}
+
 .compact-note {
   margin: 0 20px 2px;
-  gap: 7px;
+  gap: 9px;
 }
 
 .compact-note span {
@@ -1458,8 +1495,8 @@ h3 {
 }
 
 .compact-note textarea {
-  min-height: 46px;
-  max-height: 96px;
+  min-height: 42px;
+  max-height: 84px;
   padding: 10px 12px;
   border-color: rgba(228, 220, 207, 0.82);
   border-radius: 16px;
@@ -1838,6 +1875,15 @@ h3 {
 
   .answer-chip {
     max-width: 100%;
+  }
+
+  .tag-chip-grid {
+    display: flex;
+  }
+
+  .tag-chip {
+    flex: 1 1 auto;
+    text-align: center;
   }
 
   .scale-grid {
