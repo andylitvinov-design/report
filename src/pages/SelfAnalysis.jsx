@@ -19,18 +19,15 @@ import {
 const baselineSteps = [
   {
     id: "mainConcern",
-    label: "Главный фокус",
-    question: "Что сейчас главное?",
+    label: "Главная точка состояния",
+    question: "Что сейчас больше всего забирает силы или внимание?",
     type: "text",
-    placeholder: "Можно добавить важный нюанс своими словами.",
+    placeholder: "Например: усталость после общения, тревога утром, напряжение в груди...",
     tagOptions: [
       "Усталость / нет сил",
       "Тревога",
       "Напряжение в теле",
       "Кожа / воспаление",
-      "Сон / восстановление",
-      "Отношения / контакт",
-      "Работа / деньги",
       "Не понимаю, что происходит",
     ],
   },
@@ -45,48 +42,67 @@ const baselineSteps = [
       "Грудь / дыхание",
       "Живот",
       "Кожа",
-      "Спина / шея",
-      "Всё тело",
-      "Эмоционально",
       "В мыслях",
     ],
   },
-  { id: "problemStrength", label: "Сила проблемы", question: "Сила проблемы сейчас от 0 до 10?", type: "scale10" },
-  { id: "resourceLevel", label: "Ресурс", question: "Сколько ресурса сейчас от 0 до 10?", type: "scale10" },
-  { id: "anxietyLevel", label: "Тревога / напряжение", question: "Тревога / напряжение сейчас от 0 до 10?", type: "scale10" },
-  { id: "fatigueLevel", label: "Усталость", question: "Усталость сейчас от 0 до 10?", type: "scale10" },
-  { id: "lifeImpact", label: "Влияние на жизнь", question: "Насколько это мешает жить от 0 до 10?", type: "scale10" },
+  {
+    id: "problemStrength",
+    label: "Сила влияния",
+    question: "Насколько сильно это сейчас влияет на состояние — от 0 до 10?",
+    type: "scale10",
+    helper: "0 — почти не влияет, 10 — захватывает почти полностью.",
+  },
+  {
+    id: "resourceLevel",
+    label: "Внутренний ресурс",
+    question: "Сколько внутреннего ресурса сейчас ощущается — от 0 до 10?",
+    type: "scale10",
+    helper: "0 — совсем нет сил, 10 — чувствую устойчивую опору.",
+  },
+  {
+    id: "anxietyLevel",
+    label: "Тревога / напряжение",
+    question: "Сколько тревоги или внутреннего напряжения сейчас — от 0 до 10?",
+    type: "scale10",
+  },
+  {
+    id: "fatigueLevel",
+    label: "Усталость",
+    question: "Насколько выражена усталость — от 0 до 10?",
+    type: "scale10",
+  },
+  {
+    id: "lifeImpact",
+    label: "Влияние на жизнь",
+    question: "Насколько это мешает жить и действовать — от 0 до 10?",
+    type: "scale10",
+  },
   {
     id: "trigger",
     label: "Что усиливает",
-    question: "Что обычно усиливает это состояние?",
+    question: "Что обычно делает это состояние сильнее?",
     type: "text",
     placeholder: "Можно добавить свою ситуацию или время дня.",
     tagOptions: [
       "Стресс / спешка",
       "Конфликт / давление",
-      "Одиночество",
       "Страх оценки",
-      "Усталость / недосып",
+      "Недосып / усталость",
       "Неопределённость",
-      "Перегрузка делами",
     ],
   },
   {
     id: "relief",
     label: "Что облегчает",
-    question: "Что хотя бы немного облегчает?",
+    question: "Что хотя бы немного помогает или возвращает опору?",
     type: "text",
     placeholder: "Можно добавить свою опору или уточнение.",
     tagOptions: [
       "Отдых",
       "Поддержка человека",
-      "Тепло / тело / прикосновение",
+      "Тепло / тело",
       "Природа / прогулка",
       "Понимание причины",
-      "Структура / план",
-      "Тишина",
-      "Пока ничего",
     ],
   },
   { id: "freeComment", label: "Комментарий", question: "Хотите добавить своими словами?", type: "comment", placeholder: "Коротко добавьте важный нюанс." },
@@ -101,12 +117,18 @@ const therapySteps = [
 ];
 
 const parts = [
-  { id: "baseline", title: "Жалоба / симптом / baseline состояния", shortTitle: "Baseline состояния", kind: "baseline", steps: baselineSteps },
-  { id: "bachSituation", title: "Bach: ситуация", shortTitle: "Bach: ситуация", kind: "bach", source: "situation" },
-  { id: "bachCharacter", title: "Bach: характер / устойчивые паттерны", shortTitle: "Bach: характер", kind: "bach", source: "character" },
-  { id: "bachControl", title: "Bach: контроль / острое напряжение", shortTitle: "Bach: контроль", kind: "bach", source: "control" },
+  { id: "baseline", title: "Базовая точка состояния", shortTitle: "Базовая точка состояния", kind: "baseline", steps: baselineSteps },
+  { id: "bachSituation", title: "Bach: что похоже на состояние сейчас", shortTitle: "Bach: состояние сейчас", kind: "bach", source: "situation" },
+  { id: "bachCharacter", title: "Bach: что часто повторяется", shortTitle: "Bach: повторяющиеся темы", kind: "bach", source: "character" },
+  { id: "bachControl", title: "Bach: что держит напряжение", shortTitle: "Bach: острое напряжение", kind: "bach", source: "control" },
   { id: "therapyRequest", title: "Запрос на терапию", shortTitle: "Запрос на терапию", kind: "therapy", steps: therapySteps },
 ];
+
+const bachPromptBySource = {
+  situation: "Посмотрите, насколько это похоже на ваше состояние сейчас.",
+  character: "А теперь посмотрим не только на сегодняшний день, а на то, что часто повторяется.",
+  control: "Теперь проверим, что сейчас сильнее всего держит напряжение.",
+};
 
 const makeInitialState = () => ({
   version: 1,
@@ -212,7 +234,7 @@ function BaselineSummaryCard({ baseline }) {
         <div>
           <span>Проблема</span>
           <strong>{baseline.problemStrength ?? "не указано"}/10</strong>
-          <p>{getAnswerText(baseline.mainConcern) || "Главный фокус требует уточнения."}</p>
+          <p>{getAnswerText(baseline.mainConcern) || "Главная точка состояния требует уточнения."}</p>
         </div>
         <div>
           <span>Ресурс</span>
@@ -341,7 +363,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     if (step.tagOptions) {
       const value = createHybridAnswer(draftTags, draftValue);
       if (!hasAnswerContent(value)) {
-        setAnswerNotice("Выберите 1–3 подсказки или напишите коротко своими словами");
+        setAnswerNotice("Выберите 1–3 подсказки или добавьте пару слов своими словами.");
         return;
       }
       setAnswer(value);
@@ -349,7 +371,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     }
 
     if (draftValue.trim() === "") {
-      setAnswerNotice("Выберите 1–3 подсказки или напишите коротко своими словами");
+      setAnswerNotice("Выберите 1–3 подсказки или добавьте пару слов своими словами.");
       return;
     }
 
@@ -439,7 +461,10 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
         <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
           <div className="chat-bubble therapist-bubble intro-bubble">
             <span>Специалист</span>
-            <p>Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты.</p>
+            <p>
+              Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
+              Можно выбрать подсказки или добавить пару слов своими словами.
+            </p>
           </div>
 
           {visibleSteps.map((item) => (
@@ -465,7 +490,13 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
         <section className="answer-panel" aria-label="Ответ на текущий вопрос">
           <div className="answer-panel-head">
             <span>{step.label}</span>
-            <strong>{part.kind === "bach" ? "Оцените проявленность" : "Ответьте коротко"}</strong>
+            <strong>
+              {part.kind === "bach"
+                ? bachPromptBySource[part.source]
+                : step.type === "scale10"
+                  ? "Отметьте по ощущению от 0 до 10"
+                  : "Выберите 1–3 подсказки или добавьте своими словами"}
+            </strong>
           </div>
 
           {step.type === "scale10" ? (
@@ -477,7 +508,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
                   </button>
                 ))}
               </div>
-              <p className="scale-helper">0 — совсем нет, 10 — максимально сильно.</p>
+              <p className="scale-helper">{step.helper || "0 — совсем не ощущается, 10 — максимально выражено."}</p>
             </>
           ) : part.kind === "bach" ? (
             <div className="option-grid bach-scale-grid">
@@ -489,7 +520,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
             </div>
           ) : (
             <div className="field compact-note inline-answer-field">
-              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваш ответ"}</span>
+              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваши слова"}</span>
               {step.tagOptions ? (
                 <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
                   {step.tagOptions.map((tag) => (
