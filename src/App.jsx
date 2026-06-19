@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
 import { clientProgress, selfAnalysis } from "./data/mockData.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
@@ -6,9 +6,17 @@ import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Overview from "./pages/Overview.jsx";
-import ProfilePage from "./pages/ProfilePage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
+import {
+  authEnv,
+  clearStoredSession,
+  exchangeOAuthCodeFromUrl,
+  getCurrentUser,
+  getStoredSession,
+  isStoredSessionExpired,
+  signOut,
+} from "./lib/authClient.js";
 import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js";
 import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
@@ -53,12 +61,131 @@ function LockedReportState({
   );
 }
 
+const isDemoCabinetEnabled = import.meta.env.VITE_ENABLE_DEMO_CABINET === "true";
+
+function userDisplayName(user) {
+  return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || "Клиент PsiTherapy";
+}
+
+function buildClientFromUser(user) {
+  return {
+    name: userDisplayName(user),
+    email: user?.email || "",
+    id: user?.id ? user.id.slice(0, 8).toUpperCase() : "CLIENT",
+    focus: "первичный анализ ситуации",
+    lastSlice: "ожидает первого приёма",
+    nextSession: "вход через Google подтверждён",
+  };
+}
+
+function CabinetLoadingScreen() {
+  return (
+    <main className="auth-page">
+      <section className="auth-card card">
+        <p className="eyebrow">PsiTherapy</p>
+        <h1>Загружаю кабинет…</h1>
+        <p className="subtitle">Проверяю Google-сессию и открываю структуру личного кабинета.</p>
+      </section>
+    </main>
+  );
+}
+
+function CabinetAuthError({ error }) {
+  return (
+    <main className="auth-page">
+      <section className="auth-card card">
+        <p className="eyebrow">Ошибка входа</p>
+        <h1>Google-сессия не загрузилась</h1>
+        <p className="subtitle">{error}</p>
+        <a className="primary-btn auth-inline-btn" href="/login">Попробовать снова</a>
+      </section>
+    </main>
+  );
+}
+
+export function CabinetAuthGate() {
+  const [authStatus, setAuthStatus] = useState("loading");
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadUser() {
+      if (!authEnv.isConfigured) {
+        if (isMounted) setAuthStatus("signed-out");
+        return;
+      }
+
+      try {
+        const session = await exchangeOAuthCodeFromUrl();
+        const storedSession = session || getStoredSession();
+
+        if (!storedSession?.access_token || isStoredSessionExpired(storedSession)) {
+          clearStoredSession();
+          if (isMounted) setAuthStatus("signed-out");
+          return;
+        }
+
+        const currentUser = await getCurrentUser(storedSession);
+        if (!isMounted) return;
+
+        if (!currentUser) {
+          clearStoredSession();
+          setAuthStatus("signed-out");
+          return;
+        }
+
+        setUser(currentUser);
+        setAuthStatus("signed-in");
+      } catch (loadError) {
+        clearStoredSession();
+        if (!isMounted) return;
+        setError(loadError?.message || "Не удалось загрузить пользователя.");
+        setAuthStatus("error");
+      }
+    }
+
+    void loadUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const clientOverride = useMemo(() => buildClientFromUser(user), [user]);
+
+  const handleSignOut = () => {
+    signOut();
+    window.location.assign("/login");
+  };
+
+  const signOutAction = (
+    <button className="secondary-btn sidebar-logout" type="button" onClick={handleSignOut}>Выйти из кабинета</button>
+  );
+
+  if (authStatus === "loading") {
+    return <CabinetLoadingScreen />;
+  }
+
+  if (authStatus === "signed-out") {
+    return <LoginPage />;
+  }
+
+  if (authStatus === "error") {
+    return <CabinetAuthError error={error} />;
+  }
+
+  return <ReportApp clientOverride={clientOverride} onSignOut={handleSignOut} userAction={signOutAction} />;
+}
+
 function RoutedApp() {
   const path = window.location.pathname;
-  const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+  const requestedDemoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+  const demoMode = isDemoCabinetEnabled && requestedDemoMode;
 
   if (path === "/") {
-    return <ReportApp forceDemo={demoMode} />;
+    return demoMode ? <ReportApp forceDemo /> : <CabinetAuthGate />;
   }
 
   if (path === "/login") {
@@ -66,11 +193,11 @@ function RoutedApp() {
   }
 
   if (path === "/profile") {
-    return <ProfilePage />;
+    return <CabinetAuthGate />;
   }
 
   if (path === "/demo") {
-    return <ReportApp forceDemo />;
+    return isDemoCabinetEnabled ? <ReportApp forceDemo /> : <LoginPage />;
   }
 
   return <LoginPage />;
