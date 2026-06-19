@@ -306,6 +306,78 @@ function RestartChoiceSheet({ onCancel, onResetCurrentPart, onResetFullIntake })
   );
 }
 
+function IntakeProgressMap({ currentPartIndex }) {
+  return (
+    <div className="intake-progress-map" aria-label="Прогресс первого приёма">
+      {parts.map((item, index) => {
+        const status = index < currentPartIndex ? "done" : index === currentPartIndex ? "active" : "";
+        return (
+          <span className={status} key={item.id}>
+            <b>{index + 1}</b>
+            {item.shortTitle}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function IntakeBaselineMini({ baseline }) {
+  const mainConcern = getAnswerText(baseline.mainConcern);
+  const relief = getAnswerText(baseline.relief);
+
+  if (!mainConcern && baseline.problemStrength === undefined && baseline.resourceLevel === undefined) {
+    return null;
+  }
+
+  return (
+    <div className="intake-baseline-mini" aria-label="Сохранённая базовая точка">
+      <span>Сохранённые фрагменты</span>
+      {mainConcern ? <p>{mainConcern}</p> : null}
+      <div>
+        {baseline.problemStrength !== undefined ? <strong>Проблема {baseline.problemStrength}/10</strong> : null}
+        {baseline.resourceLevel !== undefined ? <strong>Ресурс {baseline.resourceLevel}/10</strong> : null}
+      </div>
+      {relief ? <small>Опора: {relief}</small> : null}
+    </div>
+  );
+}
+
+function IntakeContextPanel({ part, state, stepLabel, partLabel }) {
+  const baseline = state.answers.baseline;
+
+  return (
+    <aside className="intake-context-panel" aria-label="Контекст первого приёма">
+      <div className="intake-context-surface">
+        <p className="card-kicker">Первый приём</p>
+        <h2>{part.title}</h2>
+        <p>{partIntroText[part.id]}</p>
+
+        <div className="intake-context-meta">
+          <span>{partLabel}</span>
+          <strong>{stepLabel}</strong>
+        </div>
+
+        <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
+      </div>
+
+      <div className="intake-hint-card">
+        <h3>Как отвечать</h3>
+        <p>
+          Идём по одному вопросу. Отвечайте по текущему состоянию, не идеально и не за всю
+          историю жизни. Подсказки можно сочетать со своими словами.
+        </p>
+      </div>
+
+      <IntakeBaselineMini baseline={baseline} />
+
+      <p className="safety-note">
+        Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
+      </p>
+    </aside>
+  );
+}
+
 export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }) {
   const chatWindowRef = useRef(null);
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
@@ -519,8 +591,14 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
 
   if (restoreChoiceVisible) {
     return (
-      <div className="first-intake-page first-intake-dialog">
-        <article className="card intake-chat-card restore-intake-card">
+      <section className="first-intake-page first-intake-dialog intake-split-shell restore-intake-shell">
+        <IntakeContextPanel
+          part={part}
+          partLabel={partLabel}
+          state={state}
+          stepLabel="Незавершённый диалог"
+        />
+        <article className="intake-question-panel restore-intake-card">
           <header className="chat-card-header">
             <div>
               <p className="card-kicker">Первый приём</p>
@@ -551,13 +629,20 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
           </footer>
           {restartChoiceSheet}
         </article>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="first-intake-page first-intake-dialog">
-      <article className="card intake-chat-card">
+    <section className="first-intake-page first-intake-dialog intake-split-shell">
+      <IntakeContextPanel
+        part={part}
+        partLabel={partLabel}
+        state={state}
+        stepLabel={stepLabel}
+      />
+
+      <article className="intake-question-panel">
         <header className="chat-card-header">
           <div>
             <p className="card-kicker">{partLabel}</p>
@@ -712,6 +797,6 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
         </footer>
         {restartChoiceSheet}
       </article>
-    </div>
+    </section>
   );
 }
