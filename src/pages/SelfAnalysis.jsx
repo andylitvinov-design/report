@@ -389,6 +389,13 @@ function IntakeContextPanel({ part, state, stepLabel, partLabel }) {
   );
 }
 
+const choiceIconForLabel = (label = "") => {
+  if (/голова|мысл/i.test(label)) return "head";
+  if (/груд|дых|отнош|поддерж/i.test(label)) return "heart";
+  if (/живот|тело|кожа|здоров/i.test(label)) return "body";
+  return "leaf";
+};
+
 function AnalysisNavigatorWorkspace({
   activeAnalysis,
   onSelectAnalysis,
@@ -419,6 +426,7 @@ function AnalysisNavigatorWorkspace({
 
 export default function SelfAnalysis({
   activeAnalysis,
+  clientName,
   mode = "form",
   onComplete,
   onModeChange,
@@ -447,6 +455,7 @@ export default function SelfAnalysis({
 
   return (
     <SelfAnalysisForm
+      clientName={clientName}
       onComplete={onComplete}
       onModeChange={onModeChange}
       onNavigate={onNavigate}
@@ -455,7 +464,7 @@ export default function SelfAnalysis({
   );
 }
 
-function SelfAnalysisForm({ onComplete, onModeChange, onNavigate, onSaveAndExit }) {
+function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, onSaveAndExit }) {
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
   const [restoreChoiceVisible, setRestoreChoiceVisible] = useState(() => {
     const saved = readJsonStorage(FIRST_INTAKE_PROGRESS_KEY);
@@ -659,17 +668,18 @@ function SelfAnalysisForm({ onComplete, onModeChange, onNavigate, onSaveAndExit 
   const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
   const currentTheme = step.theme || step.label || part.shortTitle;
   const scaleChoices = [
-    { id: "scale-low", label: "Слабо", description: "примерно 2 из 10", value: 2 },
-    { id: "scale-mid", label: "Заметно", description: "примерно 5 из 10", value: 5 },
-    { id: "scale-high", label: "Сильно", description: "примерно 8 из 10", value: 8 },
+    { id: "scale-low", icon: "leaf", label: "Слабо", description: "примерно 2 из 10", value: 2 },
+    { id: "scale-mid", icon: "body", label: "Заметно", description: "примерно 5 из 10", value: 5 },
+    { id: "scale-high", icon: "heart", label: "Сильно", description: "примерно 8 из 10", value: 8 },
   ];
   const bachChoices = [
-    { id: "bach-no", label: "Нет / не про меня", description: "0", value: 0 },
-    { id: "bach-some", label: "Заметно", description: "2", value: 2 },
-    { id: "bach-strong", label: "Сильно", description: "3", value: 3 },
+    { id: "bach-no", icon: "leaf", label: "Нет / не про меня", description: "0", value: 0 },
+    { id: "bach-some", icon: "body", label: "Заметно", description: "2", value: 2 },
+    { id: "bach-strong", icon: "heart", label: "Сильно", description: "3", value: 3 },
   ];
   const tagChoices = (step.tagOptions || []).slice(0, 3).map((tag) => ({
     id: tag,
+    icon: choiceIconForLabel(tag),
     label: tag,
     isSelected: draftTags.includes(tag),
     onSelect: () => toggleDraftTag(tag),
@@ -682,7 +692,7 @@ function SelfAnalysisForm({ onComplete, onModeChange, onNavigate, onSaveAndExit 
 
   if (restoreChoiceVisible) {
     return (
-      <WorkbookShell activeGroup="intakes" onNavigate={onNavigate}>
+      <WorkbookShell activeGroup="intakes" onNavigate={onNavigate} userName={clientName}>
         <section className="first-intake-page first-intake-dialog restore-intake-shell">
           <WorkbookBook>
             <WorkbookPage side="left" variant="message" backgroundVariant="lake">
@@ -722,19 +732,32 @@ function SelfAnalysisForm({ onComplete, onModeChange, onNavigate, onSaveAndExit 
   }
 
   return (
-    <WorkbookShell activeGroup="intakes" onNavigate={onNavigate}>
+    <WorkbookShell activeGroup="intakes" onNavigate={onNavigate} userName={clientName}>
       <section className="first-intake-page first-intake-dialog">
         <WorkbookBook>
           <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-            <p className="workbook-kicker">Журнал самонаблюдений</p>
-            <h1 className="workbook-title">Сегодня важно заметить, что происходит внутри.</h1>
-            <p className="workbook-body">{partIntroText[part.id]}</p>
-            <WorkbookThemeBadge>Тема: {currentTheme}</WorkbookThemeBadge>
+            <h1 className="workbook-title">Журнал самонаблюдений</h1>
+            <span className="workbook-title-rule" aria-hidden="true" />
+            <p className="workbook-body workbook-lead">Сейчас главное — двигаться мягко и замечать, что меняется.</p>
+            <div className="workbook-news-card">
+              <span aria-hidden="true">☘</span>
+              <div>
+                <strong>Что нового</strong>
+                <p>Ресурс немного вырос</p>
+                <p>Напряжение стало мягче</p>
+              </div>
+            </div>
+            <div className="workbook-topic-card">
+              <span aria-hidden="true">☘</span>
+              <p>Работаем с темой:<br />{currentTheme}</p>
+            </div>
             <div className="workbook-progress-card">
               <span>{partLabel}</span>
               <strong>{stepLabel}</strong>
             </div>
-            <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
+            <div className="workbook-progress-compact">
+              <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
+            </div>
             {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
               <CompactBaselineStrip baseline={state.answers.baseline} />
             ) : null}

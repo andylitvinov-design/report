@@ -458,6 +458,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       return (
         <SelfAnalysis
           activeAnalysis={selectedAnalysis}
+          clientName={clientOverride?.name}
           mode={selfAnalysisMode === "form" ? "form" : "navigator"}
           onComplete={handleFirstIntakeComplete}
           onModeChange={setSelfAnalysisMode}
