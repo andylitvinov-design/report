@@ -344,6 +344,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
         <SelfAnalysis
           onComplete={handleFirstIntakeComplete}
           onModeChange={setSelfAnalysisMode}
+          onNavigate={handleNavigation}
           onSaveAndExit={handleFirstIntakeSaveAndExit}
         />
       );
