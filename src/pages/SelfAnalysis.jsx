@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import WorkbookAssistantInput from "../components/workbook/WorkbookAssistantInput.jsx";
+import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
+import WorkbookChoiceList from "../components/workbook/WorkbookChoiceList.jsx";
+import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
+import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
+import WorkbookShell from "../components/workbook/WorkbookShell.jsx";
+import WorkbookThemeBadge from "../components/workbook/WorkbookThemeBadge.jsx";
 import { selfAnalysis } from "../data/mockData.js";
 import { calculateRemedyResults } from "../lib/bachScoring.js";
 import {
@@ -381,8 +388,7 @@ function IntakeContextPanel({ part, state, stepLabel, partLabel }) {
   );
 }
 
-export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }) {
-  const chatWindowRef = useRef(null);
+export default function SelfAnalysis({ onComplete, onModeChange, onNavigate, onSaveAndExit }) {
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
   const [restoreChoiceVisible, setRestoreChoiceVisible] = useState(() => {
     const saved = readJsonStorage(FIRST_INTAKE_PROGRESS_KEY);
@@ -392,7 +398,6 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   const [restartConfirmVisible, setRestartConfirmVisible] = useState(false);
   const [draftTags, setDraftTags] = useState([]);
   const [answerNotice, setAnswerNotice] = useState("");
-  const [expandedHintSteps, setExpandedHintSteps] = useState({});
 
   const part = parts[state.currentPartIndex] || parts[0];
   const steps = useMemo(() => getPartSteps(part), [part]);
@@ -401,7 +406,6 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   const currentAnswer = answerGroup[step?.id];
   const isComplete = state.status === "completed";
   const isPendingBaselineTransition = state.pendingTransitionToPartIndex === 1;
-  const visibleSteps = isComplete || isPendingBaselineTransition ? steps : steps.slice(0, state.currentStepIndex + 1);
   const hasAnyAnswer =
     Object.keys(state.answers.baseline).length > 0 ||
     Object.keys(state.answers.bach).length > 0 ||
@@ -416,12 +420,6 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     setDraftTags(getAnswerTags(currentAnswer));
     setAnswerNotice("");
   }, [currentAnswer, step?.id]);
-
-  useEffect(() => {
-    const chatWindow = chatWindowRef.current;
-    if (!chatWindow) return;
-    chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: "smooth" });
-  }, [state, restoreChoiceVisible]);
 
   const persistState = (nextState) => {
     const prepared = { ...nextState, updatedAt: new Date().toISOString() };
@@ -509,11 +507,6 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
     setAnswer(value);
   };
 
-  const expandCurrentHints = () => {
-    if (!step?.id) return;
-    setExpandedHintSteps((current) => ({ ...current, [step.id]: true }));
-  };
-
   const resetCurrentPart = () => {
     const currentPart = parts[state.currentPartIndex] || parts[0];
     const nextAnswers = {
@@ -597,235 +590,164 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
 
   const partLabel = `Часть ${state.currentPartIndex + 1} из ${parts.length} · ${part.shortTitle}`;
   const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
+  const currentTheme = step.theme || step.label || part.shortTitle;
+  const scaleChoices = [
+    { id: "scale-low", label: "Слабо", description: "примерно 2 из 10", value: 2 },
+    { id: "scale-mid", label: "Заметно", description: "примерно 5 из 10", value: 5 },
+    { id: "scale-high", label: "Сильно", description: "примерно 8 из 10", value: 8 },
+  ];
+  const bachChoices = [
+    { id: "bach-no", label: "Нет / не про меня", description: "0", value: 0 },
+    { id: "bach-some", label: "Заметно", description: "2", value: 2 },
+    { id: "bach-strong", label: "Сильно", description: "3", value: 3 },
+  ];
+  const tagChoices = (step.tagOptions || []).slice(0, 3).map((tag) => ({
+    id: tag,
+    label: tag,
+    isSelected: draftTags.includes(tag),
+    onSelect: () => toggleDraftTag(tag),
+  }));
+  const workbookChoiceItems = step.type === "scale10"
+    ? scaleChoices.map((item) => ({ ...item, isSelected: Number(currentAnswer) === item.value, onSelect: () => setAnswer(item.value) }))
+    : part.kind === "bach"
+      ? bachChoices.map((item) => ({ ...item, isSelected: Number(currentAnswer) === item.value, onSelect: () => setAnswer(item.value) }))
+      : tagChoices;
 
   if (restoreChoiceVisible) {
     return (
-      <section className="first-intake-page first-intake-dialog intake-split-shell restore-intake-shell">
-        <IntakeContextPanel
-          part={part}
-          partLabel={partLabel}
-          state={state}
-          stepLabel="Незавершённый диалог"
-        />
-        <article className="intake-question-panel restore-intake-card">
-          <header className="chat-card-header">
-            <div>
-              <p className="card-kicker">Первый приём</p>
-              <h2>У вас есть незавершённый первый приём</h2>
-            </div>
-            <span className="chat-progress">{partLabel}</span>
-          </header>
-          <section className="restore-intake-body">
-            <p>Продолжить с места остановки или начать заново?</p>
-            <div className="summary-point-grid">
-              <div>
+      <WorkbookShell activeGroup="intakes" onNavigate={onNavigate}>
+        <section className="first-intake-page first-intake-dialog restore-intake-shell">
+          <WorkbookBook>
+            <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+              <p className="workbook-kicker">Первый приём</p>
+              <h1 className="workbook-title">Вы уже начали журнал.</h1>
+              <p className="workbook-body">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
+              <div className="workbook-progress-card">
                 <span>Текущая часть</span>
                 <strong>{partLabel}</strong>
+                <small>Обновлено: {formatDateTime(state.updatedAt)}</small>
               </div>
-              <div>
-                <span>Обновлено</span>
-                <strong>{formatDateTime(state.updatedAt)}</strong>
+              <WorkbookSafetyNote>
+                Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
+              </WorkbookSafetyNote>
+            </WorkbookPage>
+            <WorkbookPage side="right" variant="response">
+              <p className="workbook-kicker">Продолжить</p>
+              <h2 className="workbook-question">У вас есть незавершённый первый приём.</h2>
+              <p className="workbook-body">Выберите, что сделать сейчас.</p>
+              <div className="workbook-action-row">
+                <button className="secondary-btn" onClick={goToMainMenu} type="button">
+                  В главное меню
+                </button>
+                <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
+                  Продолжить
+                </button>
+                <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+                  Начать заново
+                </button>
               </div>
-            </div>
-          </section>
-          <footer className="chat-actions">
-            <button className="secondary-btn" onClick={goToMainMenu} type="button">
-              В главное меню
-            </button>
-            <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
-              Продолжить
-            </button>
-            <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-              Начать заново
-            </button>
-          </footer>
-          {restartChoiceSheet}
-        </article>
-      </section>
+              {restartChoiceSheet}
+            </WorkbookPage>
+          </WorkbookBook>
+        </section>
+      </WorkbookShell>
     );
   }
 
   return (
-    <section className="first-intake-page first-intake-dialog intake-split-shell">
-      <IntakeContextPanel
-        part={part}
-        partLabel={partLabel}
-        state={state}
-        stepLabel={stepLabel}
-      />
-
-      <article className="intake-question-panel">
-        <header className="chat-card-header">
-          <div>
-            <p className="card-kicker">{partLabel}</p>
-            <h2>{part.title}</h2>
-            <p className="part-intro-copy">{partIntroText[part.id]}</p>
-          </div>
-          <span className="chat-progress">{stepLabel}</span>
-        </header>
-
-        {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
-          <div className="baseline-strip-wrap">
-            <CompactBaselineStrip baseline={state.answers.baseline} />
-            <details className="baseline-details-drawer">
-              <summary>Показать базовую точку</summary>
-              <BaselineSummaryCard baseline={state.answers.baseline} />
-            </details>
-          </div>
-        ) : null}
-
-        <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
-          <div className="chat-bubble therapist-bubble intro-bubble">
-            <span>Специалист</span>
-            {part.kind === "baseline" ? (
-              <p>
-                Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
-                Можно выбрать подсказки или добавить пару слов своими словами.
-              </p>
-            ) : (
-              <p>{partIntroText[part.id] || "Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты."}</p>
-            )}
-          </div>
-
-          {visibleSteps.map((item) => (
-            <React.Fragment key={item.id}>
-              <div className={item.id === step?.id && !hasAnswerContent(currentAnswer) && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
-                <span>Специалист</span>
-                <p>{item.question}</p>
-              </div>
-              {hasAnswerContent(answerGroup[item.id]) ? (
-                <div className="chat-bubble user-bubble">
-                  <span>Вы</span>
-                  <p>{answerLabel(item, answerGroup[item.id])}</p>
-                </div>
-              ) : null}
-            </React.Fragment>
-          ))}
-        </div>
-
-        {isPendingBaselineTransition ? (
-          <section className="intake-transition-panel" aria-label="Переход к Bach: ситуация">
-            <BaselineSummaryCard baseline={state.answers.baseline} />
-            <div className="transition-message">
-              <p>Спасибо. Базовая точка состояния сохранена.</p>
-              <p>Теперь мы перейдём ко второй части — Bach: ситуация.</p>
-              <p>
-                Здесь мы смотрим не на силу симптома, а на эмоциональные состояния,
-                которые могут быть связаны с текущей ситуацией.
-              </p>
-              <p>Отвечайте по тому, насколько фраза похожа на вас сейчас.</p>
-              <button className="primary-btn" onClick={continueToBachSituation} type="button">
-                Перейти к Bach: ситуация
-              </button>
+    <WorkbookShell activeGroup="intakes" onNavigate={onNavigate}>
+      <section className="first-intake-page first-intake-dialog">
+        <WorkbookBook>
+          <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+            <p className="workbook-kicker">Журнал самонаблюдений</p>
+            <h1 className="workbook-title">Сегодня важно заметить, что происходит внутри.</h1>
+            <p className="workbook-body">{partIntroText[part.id]}</p>
+            <WorkbookThemeBadge>Тема: {currentTheme}</WorkbookThemeBadge>
+            <div className="workbook-progress-card">
+              <span>{partLabel}</span>
+              <strong>{stepLabel}</strong>
             </div>
-          </section>
-        ) : null}
+            <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
+            {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
+              <CompactBaselineStrip baseline={state.answers.baseline} />
+            ) : null}
+            <WorkbookSafetyNote>
+              Отвечайте как есть сегодня. Здесь нет правильных или неправильных ответов.
+            </WorkbookSafetyNote>
+          </WorkbookPage>
 
-        {!isPendingBaselineTransition ? (
-        <section className="answer-panel" aria-label="Ответ на текущий вопрос">
-          <div className="answer-panel-head">
-            <span>{step.label}</span>
-            <strong>
-              {part.kind === "bach"
-                ? "Насколько это похоже на вас сейчас?"
-                : step.type === "scale10"
-                  ? "Отметьте по ощущению от 0 до 10"
-                  : "Выберите 1–3 подсказки или добавьте своими словами"}
-            </strong>
-          </div>
+          <WorkbookPage side="right" variant="response">
+            <div className="workbook-response-head">
+              <p className="workbook-kicker">Ваш ответ</p>
+              <WorkbookThemeBadge>{currentTheme}</WorkbookThemeBadge>
+            </div>
+            <h2 className="workbook-question">{step.question}</h2>
+            {step.helper ? <p className="workbook-helper">{step.helper}</p> : null}
 
-          {step.type === "scale10" ? (
-            <>
-              <div className="option-grid scale-grid">
-                {Array.from({ length: 11 }, (_, value) => (
-                  <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
-                    {value}
-                  </button>
-                ))}
-              </div>
-              <p className="scale-helper">{step.helper || "0 — совсем не ощущается, 10 — максимально выражено."}</p>
-            </>
-          ) : part.kind === "bach" ? (
-            <div className="option-grid bach-scale-grid">
-              {[0, 1, 2, 3].map((value) => (
-                <button className="answer-chip" key={value} onClick={() => setAnswer(value)} type="button">
-                  {answerLabel(step, value)}
+            {isPendingBaselineTransition ? (
+              <section className="workbook-transition-panel" aria-label="Переход к Bach: ситуация">
+                <BaselineSummaryCard baseline={state.answers.baseline} />
+                <p>Базовая точка сохранена. Теперь можно перейти к состояниям Bach, связанным с текущей ситуацией.</p>
+                <button className="primary-btn" onClick={continueToBachSituation} type="button">
+                  Перейти к Bach: ситуация
                 </button>
-              ))}
-            </div>
-          ) : (
-            <div className="field compact-note inline-answer-field">
-              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваши слова"}</span>
-              {step.tagOptions ? (
-                <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
-                  {step.tagOptions.map((tag, index) => {
-                    const isCollapsedOnSmallScreen = !expandedHintSteps[step.id] && index >= 6;
-                    const className = [
-                      "answer-chip",
-                      "tag-chip",
-                      draftTags.includes(tag) ? "active" : "",
-                      isCollapsedOnSmallScreen ? "optional-collapsed" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
+              </section>
+            ) : (
+              <section className="workbook-answer-panel" aria-label="Ответ на текущий вопрос">
+                {workbookChoiceItems.length > 0 ? (
+                  <WorkbookChoiceList
+                    choices={workbookChoiceItems}
+                    label={step.type === "scale10" || part.kind === "bach" ? "Шкала ответа" : "Подсказки для ответа"}
+                  />
+                ) : null}
+                {step.type !== "scale10" && part.kind !== "bach" ? (
+                  <WorkbookAssistantInput
+                    id={`first-intake-${step.id}`}
+                    name={`first-intake-${step.id}`}
+                    notice={answerNotice}
+                    onChange={(event) => setDraftValue(event.target.value)}
+                    onSubmit={submitDraft}
+                    placeholder={step.placeholder || "Или напишите своими словами..."}
+                    value={draftValue}
+                  />
+                ) : null}
+                {step.type === "scale10" ? (
+                  <p className="workbook-helper">Число сохранится совместимо со старой шкалой: 2, 5 или 8 из 10.</p>
+                ) : null}
+                {part.kind === "bach" ? (
+                  <p className="workbook-helper">Ответ сохраняется числом для прежнего Bach scoring.</p>
+                ) : null}
+              </section>
+            )}
 
-                    return (
-                    <button
-                      aria-pressed={draftTags.includes(tag)}
-                      className={className}
-                      key={tag}
-                      onClick={() => toggleDraftTag(tag)}
-                      type="button"
-                    >
-                      {tag}
-                    </button>
-                    );
-                  })}
-                  {!expandedHintSteps[step.id] && step.tagOptions.length > 6 ? (
-                    <button className="answer-chip tag-chip more-hints-chip" onClick={expandCurrentHints} type="button">
-                      Ещё
-                    </button>
-                  ) : null}
-                </div>
+            {hasAnswerContent(currentAnswer) ? (
+              <div className="workbook-current-answer" aria-live="polite">
+                <span>Сохранённый ответ</span>
+                <p>{answerLabel(step, currentAnswer)}</p>
+              </div>
+            ) : null}
+
+            <footer className="workbook-actions">
+              {hasAnyAnswer ? (
+                <button className="secondary-btn" onClick={goBack} type="button">
+                  Назад
+                </button>
               ) : null}
-              <textarea
-                id={`first-intake-${step.id}`}
-                name={`first-intake-${step.id}`}
-                onChange={(event) => setDraftValue(event.target.value)}
-                placeholder={step.placeholder}
-                value={draftValue}
-              />
-              <button className="primary-btn" onClick={submitDraft} type="button">
-                Сохранить ответ
-              </button>
-              {answerNotice ? <p className="answer-notice" role="status">{answerNotice}</p> : null}
-            </div>
-          )}
-        </section>
-        ) : null}
-
-        <footer className="chat-actions">
-          {hasAnyAnswer ? (
-            <button className="secondary-btn" onClick={goBack} type="button">
-              Назад
-            </button>
-          ) : null}
-          {hasAnyAnswer ? (
-            <div className="intake-navigation-actions" aria-label="Навигация первого приёма">
-              <button className="secondary-btn" onClick={saveAndExit} type="button">
-                Сохранить и выйти
-              </button>
-              <button className="ghost-btn" onClick={goToMainMenu} type="button">
-                Перейти в главное меню
-              </button>
-              <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-                Начать заново
-              </button>
-            </div>
-          ) : null}
-        </footer>
-        {restartChoiceSheet}
-      </article>
-    </section>
+              {hasAnyAnswer ? (
+                <button className="secondary-btn" onClick={saveAndExit} type="button">
+                  Сохранить и выйти
+                </button>
+              ) : null}
+              {hasAnyAnswer ? (
+                <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+                  Начать заново
+                </button>
+              ) : null}
+            </footer>
+            {restartChoiceSheet}
+          </WorkbookPage>
+        </WorkbookBook>
+      </section>
+    </WorkbookShell>
   );
 }
