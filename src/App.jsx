@@ -342,6 +342,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     if (activePage === "self") {
       return (
         <SelfAnalysis
+          clientName={clientOverride?.name}
           onComplete={handleFirstIntakeComplete}
           onModeChange={setSelfAnalysisMode}
           onNavigate={handleNavigation}
