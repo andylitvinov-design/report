@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
-import { clientProgress, selfAnalysis } from "./data/mockData.js";
+import { analysisCatalog, clientProgress, selfAnalysis } from "./data/mockData.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
@@ -22,11 +22,13 @@ import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
 export const pageTabs = {
   overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
+  profile: [],
   expert: ["Меню отчётов", "Самоотчёт", "Расширенный ИИ-анализ", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
   self: [],
   advanced: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
+  consultations: [],
 };
 
 function LockedReportState({
@@ -54,6 +56,28 @@ function LockedReportState({
         {bookingNoticeVisible && (
           <p className="placeholder-notice" role="status">
             Раздел записи к специалисту ещё подключается. Запрос сохранён как следующий шаг.
+          </p>
+        )}
+      </article>
+    </section>
+  );
+}
+
+function ConsultationPlaceholder({ bookingNoticeVisible, onSpecialistRequest }) {
+  return (
+    <section className="locked-empty-state" aria-labelledby="consultations-title">
+      <article className="card locked-empty-card">
+        <p className="eyebrow">Консультации</p>
+        <h2 id="consultations-title">Запись к специалисту</h2>
+        <p>
+          Здесь будет запись на персональную консультацию. Пока можно оставить запрос как следующий шаг.
+        </p>
+        <button className="primary-btn" onClick={onSpecialistRequest} type="button">
+          Пройти консультацию у специалиста
+        </button>
+        {bookingNoticeVisible && (
+          <p className="placeholder-notice" role="status">
+            Раздел записи ещё подключается. Запрос сохранён как следующий шаг.
           </p>
         )}
       </article>
@@ -210,6 +234,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
   const [advancedAiResult, setAdvancedAiResult] = useState(() => readAdvancedAiAnalysisResult());
   const [advancedAnalysisMode, setAdvancedAnalysisMode] = useState("overview");
+  const [activeAnalysisId, setActiveAnalysisId] = useState("general-state");
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
     expert: pageTabs.expert[0],
@@ -217,6 +242,8 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     self: selfAnalysis.tabs[0],
     advanced: "",
     history: pageTabs.history[0],
+    consultations: "",
+    profile: "",
   });
   const completedFromProgress =
     clientProgress.assessments.some((item) => item.status === "completed") ||
@@ -228,6 +255,48 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     completedFromProgress ||
     clientOverride?.hasCompletedFirstConsultation === true ||
     clientOverride?.hasCompletedResults === true;
+
+  const analysisGroups = useMemo(() => {
+    const completedAt = firstIntakeResult?.completedAt
+      ? new Date(firstIntakeResult.completedAt).toLocaleDateString("ru-RU")
+      : null;
+    const advancedCompletedAt = advancedAiResult?.completedAt
+      ? new Date(advancedAiResult.completedAt).toLocaleDateString("ru-RU")
+      : null;
+
+    return analysisCatalog.map((group) => ({
+      ...group,
+      items: group.items.map((item) => {
+        if (item.id === "general-state" && firstIntakeResult) {
+          return {
+            ...item,
+            status: "single",
+            first: { value: Number(firstIntakeResult.symptomBaseline?.resourceLevel) * 10 || item.first.value, date: completedAt },
+            last: null,
+            currentResult: "Первый самоанализ сохранён. Для динамики нужен повторный срез.",
+          };
+        }
+        if (item.id === "advanced-1" && advancedAiResult) {
+          return {
+            ...item,
+            title: advancedAiResult.programTitle || item.title,
+            status: "single",
+            first: { value: item.first.value, date: advancedCompletedAt },
+            last: null,
+            summary: advancedAiResult.hypothesis || item.summary,
+            currentResult: advancedAiResult.title || item.currentResult,
+          };
+        }
+        return item;
+      }),
+    }));
+  }, [advancedAiResult, firstIntakeResult]);
+
+  const selectedAnalysis = useMemo(
+    () => analysisGroups.flatMap((group) => group.items).find((item) => item.id === activeAnalysisId) ||
+      analysisGroups[1]?.items[0],
+    [activeAnalysisId, analysisGroups]
+  );
 
   const handleNavigation = (page, tab) => {
     if (page === "settings") {
@@ -261,7 +330,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
 
   const openFirstIntake = () => {
     setActivePage("self");
-    setSelfAnalysisMode("overview");
+    setSelfAnalysisMode("form");
     setBookingNoticeVisible(false);
   };
 
@@ -275,6 +344,33 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     setSelfAnalysisMode("overview");
   };
 
+  const handleSelectAnalysis = (analysisId) => {
+    setActiveAnalysisId(analysisId);
+    if (!["profile", "self"].includes(activePage)) {
+      setActivePage("self");
+    }
+    setSelfAnalysisMode("overview");
+    setBookingNoticeVisible(false);
+  };
+
+  const handleStartAnalysis = (analysisId) => {
+    if (analysisId === "expert-consultation") {
+      setActivePage("consultations");
+      handleSpecialistRequest();
+      return;
+    }
+
+    if (analysisId.startsWith("advanced")) {
+      setActivePage("advanced");
+      setAdvancedAnalysisMode("overview");
+      setBookingNoticeVisible(false);
+      return;
+    }
+
+    setActiveAnalysisId(analysisId);
+    openFirstIntake();
+  };
+
   const openResultReport = (tab) => {
     setActivePage("expert");
     setActiveTabs((current) => ({ ...current, expert: tab }));
@@ -282,9 +378,9 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
 
   const handleFirstIntakeComplete = (result) => {
     setFirstIntakeResult(result);
-    setActivePage("expert");
+    setActivePage("self");
     setSelfAnalysisMode("overview");
-    setActiveTabs((current) => ({ ...current, expert: "Самоотчёт" }));
+    setActiveAnalysisId("general-state");
   };
 
   const handleFirstIntakeSaveAndExit = () => {
@@ -299,9 +395,9 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
 
   const handleAdvancedAiResultSaved = (result) => {
     setAdvancedAiResult(result);
-    setActivePage("expert");
+    setActivePage("self");
     setAdvancedAnalysisMode("overview");
-    setActiveTabs((current) => ({ ...current, expert: "Меню отчётов" }));
+    setActiveAnalysisId("advanced-1");
   };
 
   const renderPage = () => {
@@ -339,13 +435,37 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
         </section>
       );
     }
+    if (activePage === "consultations") {
+      return (
+        <ConsultationPlaceholder
+          bookingNoticeVisible={bookingNoticeVisible}
+          onSpecialistRequest={handleSpecialistRequest}
+        />
+      );
+    }
+    if (activePage === "profile") {
+      return (
+        <SelfAnalysis
+          activeAnalysis={selectedAnalysis}
+          mode="navigator"
+          onSelectAnalysis={handleSelectAnalysis}
+          onSpecialistRequest={handleSpecialistRequest}
+          onStartAnalysis={handleStartAnalysis}
+        />
+      );
+    }
     if (activePage === "self") {
       return (
         <SelfAnalysis
+          activeAnalysis={selectedAnalysis}
+          mode={selfAnalysisMode === "form" ? "form" : "navigator"}
           onComplete={handleFirstIntakeComplete}
           onModeChange={setSelfAnalysisMode}
           onNavigate={handleNavigation}
+          onSelectAnalysis={handleSelectAnalysis}
           onSaveAndExit={handleFirstIntakeSaveAndExit}
+          onSpecialistRequest={handleSpecialistRequest}
+          onStartAnalysis={handleStartAnalysis}
         />
       );
     }
@@ -401,14 +521,18 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   return (
     <Layout
       activePage={activePage}
+      activeAnalysisId={activeAnalysisId}
       activeTab={activeTabs[activePage]}
+      analysisGroups={analysisGroups}
       clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode || isAdvancedAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
-      hideSpecialistPanel={["expert", "settings"].includes(activePage)}
+      hideSpecialistPanel={["expert", "settings", "profile", "self", "consultations"].includes(activePage)}
       onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}
       onOpenSettings={openSettings}
+      onSelectAnalysis={handleSelectAnalysis}
       onSignOut={onSignOut}
+      onStartAnalysis={handleStartAnalysis}
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
       userAction={userAction}
