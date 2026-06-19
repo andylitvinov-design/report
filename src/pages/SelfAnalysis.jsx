@@ -24,10 +24,13 @@ const baselineSteps = [
     type: "text",
     placeholder: "Например: усталость после общения, тревога утром, напряжение в груди...",
     tagOptions: [
+      "Тревога / беспокойство",
       "Усталость / нет сил",
-      "Тревога",
       "Напряжение в теле",
-      "Кожа / воспаление",
+      "Эмоциональная тяжесть",
+      "Отношения / одиночество",
+      "Работа / деньги / будущее",
+      "Здоровье / тело",
       "Не понимаю, что происходит",
     ],
   },
@@ -389,6 +392,7 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
   const [restartConfirmVisible, setRestartConfirmVisible] = useState(false);
   const [draftTags, setDraftTags] = useState([]);
   const [answerNotice, setAnswerNotice] = useState("");
+  const [expandedHintSteps, setExpandedHintSteps] = useState({});
 
   const part = parts[state.currentPartIndex] || parts[0];
   const steps = useMemo(() => getPartSteps(part), [part]);
@@ -503,6 +507,11 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
 
     const value = step.type === "scale10" ? Number(draftValue) : draftValue.trim();
     setAnswer(value);
+  };
+
+  const expandCurrentHints = () => {
+    if (!step?.id) return;
+    setExpandedHintSteps((current) => ({ ...current, [step.id]: true }));
   };
 
   const resetCurrentPart = () => {
@@ -620,6 +629,9 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
             </div>
           </section>
           <footer className="chat-actions">
+            <button className="secondary-btn" onClick={goToMainMenu} type="button">
+              В главное меню
+            </button>
             <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
               Продолжить
             </button>
@@ -746,17 +758,34 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
               <span>{step.type === "comment" ? "Добавить своими словами" : "Ваши слова"}</span>
               {step.tagOptions ? (
                 <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
-                  {step.tagOptions.map((tag) => (
+                  {step.tagOptions.map((tag, index) => {
+                    const isCollapsedOnSmallScreen = !expandedHintSteps[step.id] && index >= 6;
+                    const className = [
+                      "answer-chip",
+                      "tag-chip",
+                      draftTags.includes(tag) ? "active" : "",
+                      isCollapsedOnSmallScreen ? "optional-collapsed" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
+
+                    return (
                     <button
                       aria-pressed={draftTags.includes(tag)}
-                      className={draftTags.includes(tag) ? "answer-chip tag-chip active" : "answer-chip tag-chip"}
+                      className={className}
                       key={tag}
                       onClick={() => toggleDraftTag(tag)}
                       type="button"
                     >
                       {tag}
                     </button>
-                  ))}
+                    );
+                  })}
+                  {!expandedHintSteps[step.id] && step.tagOptions.length > 6 ? (
+                    <button className="answer-chip tag-chip more-hints-chip" onClick={expandCurrentHints} type="button">
+                      Ещё
+                    </button>
+                  ) : null}
                 </div>
               ) : null}
               <textarea
