@@ -2047,6 +2047,16 @@ h3 {
   gap: 26px;
 }
 
+.workbook-nav-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.workbook-mobile-nav-trigger,
+.workbook-mobile-nav-menu {
+  display: none;
+}
+
 .workbook-nav-item {
   position: relative;
   min-height: 42px;
@@ -2353,6 +2363,10 @@ h3 {
 
 .workbook-overview-page {
   width: 100%;
+}
+
+.workbook-mobile-overview {
+  display: none;
 }
 
 .workbook-overview-book .workbook-page {
@@ -3704,20 +3718,89 @@ h3 {
   }
 
   .workbook-header {
-    display: grid;
-    gap: 12px;
-    padding: 12px 0;
+    min-height: 64px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .workbook-brand {
+    min-width: 0;
+    gap: 7px;
+  }
+
+  .workbook-brand-mark {
+    display: none;
+  }
+
+  .workbook-brand strong {
+    font-size: 21px;
+    white-space: nowrap;
+  }
+
+  .workbook-nav-wrap {
+    justify-self: end;
   }
 
   .workbook-top-nav {
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 2px;
+    display: none;
   }
 
-  .workbook-nav-item {
-    flex: 0 0 auto;
+  .workbook-mobile-nav-trigger {
+    min-height: 42px;
+    max-width: 130px;
+    padding: 8px 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid rgba(18, 63, 49, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 253, 248, 0.78);
+    color: var(--workbook-green);
+    font-weight: 850;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .workbook-mobile-nav-trigger span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .workbook-mobile-nav-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 40;
+    width: min(240px, calc(100vw - 28px));
+    padding: 8px;
+    display: grid;
+    gap: 4px;
+    border: 1px solid rgba(18, 63, 49, 0.14);
+    border-radius: 18px;
+    background: rgba(255, 253, 248, 0.98);
+    box-shadow: 0 18px 48px rgba(43, 32, 18, 0.18);
+  }
+
+  .workbook-mobile-nav-item {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #1f2725;
+    font-weight: 800;
+    text-align: left;
+  }
+
+  .workbook-mobile-nav-item:hover,
+  .workbook-mobile-nav-item:focus-visible,
+  .workbook-mobile-nav-item.active {
+    background: var(--workbook-sage);
+    color: var(--workbook-green);
   }
 
   .workbook-account {
@@ -3730,15 +3813,63 @@ h3 {
     display: none;
   }
 
+  .workbook-overview-book-desktop {
+    display: none;
+  }
+
+  .workbook-mobile-overview {
+    display: block;
+  }
+
+  .workbook-mobile-hero {
+    min-height: calc(100dvh - 72px);
+    display: grid;
+    align-content: center;
+    gap: 17px;
+    padding: 16px 5px 30px;
+  }
+
+  .workbook-mobile-hero .workbook-title {
+    font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.02;
+  }
+
+  .workbook-mobile-promise {
+    max-width: 340px;
+    color: #27302d;
+    font-size: 18px;
+    line-height: 1.42;
+  }
+
+  .workbook-mobile-primary .workbook-overview-action.primary {
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 16px;
+    border-radius: 17px;
+  }
+
+  .workbook-mobile-primary .workbook-overview-action span {
+    font-size: 24px;
+  }
+
+  .workbook-mobile-secondary {
+    display: grid;
+    gap: 16px;
+    padding: 22px 0 28px;
+  }
+
   .workbook-book {
     width: 100%;
     max-width: calc(100vw - 18px);
-    border-width: 8px;
-    border-radius: 22px;
+    min-height: auto;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .workbook-page {
-    padding: 24px 18px;
+    padding: 22px 18px;
     overflow: hidden;
   }
 
