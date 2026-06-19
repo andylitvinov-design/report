@@ -44,18 +44,44 @@ function NewUserDashboard({
   onStartSelfAnalysis,
 }) {
   return (
-    <section className="new-user-dashboard" aria-labelledby="new-user-title">
-      <article className="card onboarding-card">
-        <div className="onboarding-copy">
+    <section className="new-user-dashboard cabinet-page-shell" aria-labelledby="new-user-title">
+      <article className="cabinet-story-panel">
+        <div className="cabinet-hero-surface">
           <p className="eyebrow">Первый шаг</p>
           <h2 id="new-user-title">Добро пожаловать в кабинет</h2>
           <p>
-            Чтобы подготовить первую оценку состояния, выберите удобный формат первого приёма.
+            Здесь начнётся ваша личная тетрадь состояния: сначала мы мягко соберём
+            базовую точку, а после первого приёма откроются результаты, динамика и рекомендации.
+          </p>
+
+          <div className="cabinet-story-list" aria-label="Что будет создано">
+            <span>Базовая точка текущего состояния</span>
+            <span>Карта эмоциональных тем Bach</span>
+            <span>Первый отчёт для дальнейшей работы</span>
+          </div>
+
+          <p className="cabinet-safety-note">
+            Это пространство для самоанализа и подготовки к разговору со специалистом.
+            Оно не заменяет медицинскую помощь и не ставит диагнозы.
           </p>
         </div>
 
+        <div className="cabinet-notebook-strip" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      </article>
+
+      <aside className="cabinet-action-panel" aria-label="Первое действие">
+        <div className="cabinet-action-head">
+          <p className="card-kicker">С чего начать</p>
+          <h3>Выберите формат первого приёма</h3>
+          <p>Оба варианта ведут к первой рабочей карте, но с разным уровнем сопровождения.</p>
+        </div>
+
         <div className="onboarding-options">
-          <article className="onboarding-option">
+          <article className="onboarding-option primary-option">
             <div>
               <h3>Пройти первый приём — самоанализ</h3>
               <p>
@@ -87,10 +113,12 @@ function NewUserDashboard({
           </p>
         )}
 
-        <p className="onboarding-footnote">
-          После первого приёма здесь появятся результаты, динамика, рекомендации и отчёты.
-        </p>
-      </article>
+        <div className="cabinet-status-block" aria-label="Статус кабинета">
+          <span>Статус</span>
+          <strong>Первый срез ещё не пройден</strong>
+          <p>После завершения самоанализа кабинет откроет Results и сохранит базовую точку.</p>
+        </div>
+      </aside>
     </section>
   );
 }

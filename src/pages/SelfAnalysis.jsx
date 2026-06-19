@@ -306,6 +306,255 @@ function RestartChoiceSheet({ onCancel, onResetCurrentPart, onResetFullIntake })
   );
 }
 
+function IntakeContextPanel({
+  part,
+  partIndex,
+  parts,
+  steps,
+  currentStepIndex,
+  partLabel,
+  stepLabel,
+  baseline,
+}) {
+  const baselineSnippets = [
+    ["Главная точка", getAnswerText(baseline.mainConcern)],
+    ["Сила влияния", baseline.problemStrength !== undefined ? `${baseline.problemStrength}/10` : ""],
+    ["Ресурс", baseline.resourceLevel !== undefined ? `${baseline.resourceLevel}/10` : ""],
+    ["Что облегчает", getAnswerText(baseline.relief)],
+  ].filter(([, value]) => Boolean(value));
+
+  const hintText =
+    part.kind === "bach"
+      ? "Отмечайте не правильный ответ, а степень похожести на ваше состояние сейчас."
+      : part.kind === "therapy"
+        ? "Можно отвечать коротко. Главное — сохранить живую формулировку запроса."
+        : "Выберите подсказки или добавьте несколько своих слов. Этого достаточно для первого среза.";
+
+  return (
+    <aside className="intake-context-panel" aria-label="Контекст первого приёма">
+      <div className="intake-context-surface">
+        <p className="card-kicker">{partLabel}</p>
+        <h2>{part.title}</h2>
+        <p>{partIntroText[part.id]}</p>
+
+        <div className="intake-progress-map" aria-label="Прогресс первого приёма">
+          {parts.map((item, index) => (
+            <span
+              className={
+                index < partIndex
+                  ? "complete"
+                  : index === partIndex
+                    ? "active"
+                    : ""
+              }
+              key={item.id}
+            >
+              {index + 1}. {item.shortTitle}
+            </span>
+          ))}
+        </div>
+
+        <div className="intake-hint-card">
+          <span>{stepLabel}</span>
+          <strong>{steps[currentStepIndex]?.label || part.shortTitle}</strong>
+          <p>{hintText}</p>
+        </div>
+
+        {baselineSnippets.length > 0 ? (
+          <div className="intake-baseline-mini" aria-label="Сохранённая базовая точка">
+            <span>Уже сохранено</span>
+            {baselineSnippets.map(([label, value]) => (
+              <p key={label}>
+                <strong>{label}:</strong> {value}
+              </p>
+            ))}
+          </div>
+        ) : null}
+
+        <p className="cabinet-safety-note">
+          Отвечайте в комфортном темпе. Если состояние острое или небезопасное,
+          лучше обратиться за живой поддержкой.
+        </p>
+      </div>
+    </aside>
+  );
+}
+
+function IntakeQuestionPanel({
+  answerGroup,
+  answerNotice,
+  chatWindowRef,
+  continueToBachSituation,
+  currentAnswer,
+  draftTags,
+  draftValue,
+  goBack,
+  goToMainMenu,
+  hasAnyAnswer,
+  isComplete,
+  isPendingBaselineTransition,
+  part,
+  restartChoiceSheet,
+  saveAndExit,
+  setAnswer,
+  setDraftValue,
+  setRestartConfirmVisible,
+  state,
+  step,
+  submitDraft,
+  toggleDraftTag,
+  visibleSteps,
+}) {
+  return (
+    <article className="intake-question-panel intake-chat-card">
+      {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
+        <div className="baseline-strip-wrap">
+          <CompactBaselineStrip baseline={state.answers.baseline} />
+          <details className="baseline-details-drawer">
+            <summary>Показать базовую точку</summary>
+            <BaselineSummaryCard baseline={state.answers.baseline} />
+          </details>
+        </div>
+      ) : null}
+
+      <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
+        <div className="chat-bubble therapist-bubble intro-bubble">
+          <span>Специалист</span>
+          {part.kind === "baseline" ? (
+            <p>
+              Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
+              Можно выбрать подсказки или добавить пару слов своими словами.
+            </p>
+          ) : (
+            <p>{partIntroText[part.id] || "Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты."}</p>
+          )}
+        </div>
+
+        {visibleSteps.map((item) => (
+          <React.Fragment key={item.id}>
+            <div className={item.id === step?.id && !hasAnswerContent(currentAnswer) && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
+              <span>Специалист</span>
+              <p>{item.question}</p>
+            </div>
+            {hasAnswerContent(answerGroup[item.id]) ? (
+              <div className="chat-bubble user-bubble">
+                <span>Вы</span>
+                <p>{answerLabel(item, answerGroup[item.id])}</p>
+              </div>
+            ) : null}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {isPendingBaselineTransition ? (
+        <section className="intake-transition-panel" aria-label="Переход к Bach: ситуация">
+          <BaselineSummaryCard baseline={state.answers.baseline} />
+          <div className="transition-message">
+            <p>Спасибо. Базовая точка состояния сохранена.</p>
+            <p>Теперь мы перейдём ко второй части — Bach: ситуация.</p>
+            <p>
+              Здесь мы смотрим не на силу симптома, а на эмоциональные состояния,
+              которые могут быть связаны с текущей ситуацией.
+            </p>
+            <p>Отвечайте по тому, насколько фраза похожа на вас сейчас.</p>
+            <button className="primary-btn" onClick={continueToBachSituation} type="button">
+              Перейти к Bach: ситуация
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {!isPendingBaselineTransition ? (
+        <section className="answer-panel" aria-label="Ответ на текущий вопрос">
+          <div className="answer-panel-head">
+            <span>{step.label}</span>
+            <strong>
+              {part.kind === "bach"
+                ? "Насколько это похоже на вас сейчас?"
+                : step.type === "scale10"
+                  ? "Отметьте по ощущению от 0 до 10"
+                  : "Выберите 1–3 подсказки или добавьте своими словами"}
+            </strong>
+          </div>
+
+          {step.type === "scale10" ? (
+            <>
+              <div className="option-grid scale-grid">
+                {Array.from({ length: 11 }, (_, value) => (
+                  <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
+                    {value}
+                  </button>
+                ))}
+              </div>
+              <p className="scale-helper">{step.helper || "0 — совсем не ощущается, 10 — максимально выражено."}</p>
+            </>
+          ) : part.kind === "bach" ? (
+            <div className="option-grid bach-scale-grid">
+              {[0, 1, 2, 3].map((value) => (
+                <button className="answer-chip" key={value} onClick={() => setAnswer(value)} type="button">
+                  {answerLabel(step, value)}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="field compact-note inline-answer-field">
+              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваши слова"}</span>
+              {step.tagOptions ? (
+                <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
+                  {step.tagOptions.map((tag) => (
+                    <button
+                      aria-pressed={draftTags.includes(tag)}
+                      className={draftTags.includes(tag) ? "answer-chip tag-chip active" : "answer-chip tag-chip"}
+                      key={tag}
+                      onClick={() => toggleDraftTag(tag)}
+                      type="button"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              <textarea
+                id={`first-intake-${step.id}`}
+                name={`first-intake-${step.id}`}
+                onChange={(event) => setDraftValue(event.target.value)}
+                placeholder={step.placeholder}
+                value={draftValue}
+              />
+              <button className="primary-btn" onClick={submitDraft} type="button">
+                Сохранить ответ
+              </button>
+              {answerNotice ? <p className="answer-notice" role="status">{answerNotice}</p> : null}
+            </div>
+          )}
+        </section>
+      ) : null}
+
+      <footer className="chat-actions">
+        {hasAnyAnswer ? (
+          <button className="secondary-btn" onClick={goBack} type="button">
+            Назад
+          </button>
+        ) : null}
+        {hasAnyAnswer ? (
+          <div className="intake-navigation-actions" aria-label="Навигация первого приёма">
+            <button className="secondary-btn" onClick={saveAndExit} type="button">
+              Сохранить и выйти
+            </button>
+            <button className="ghost-btn" onClick={goToMainMenu} type="button">
+              Перейти в главное меню
+            </button>
+            <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+              Начать заново
+            </button>
+          </div>
+        ) : null}
+      </footer>
+      {restartChoiceSheet}
+    </article>
+  );
+}
+
 export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }) {
   const chatWindowRef = useRef(null);
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
@@ -519,8 +768,18 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
 
   if (restoreChoiceVisible) {
     return (
-      <div className="first-intake-page first-intake-dialog">
-        <article className="card intake-chat-card restore-intake-card">
+      <section className="first-intake-page first-intake-dialog intake-split-shell restore-intake-shell">
+        <IntakeContextPanel
+          baseline={state.answers.baseline}
+          currentStepIndex={state.currentStepIndex}
+          part={part}
+          partIndex={state.currentPartIndex}
+          partLabel={partLabel}
+          parts={parts}
+          stepLabel={stepLabel}
+          steps={steps}
+        />
+        <article className="intake-question-panel intake-chat-card restore-intake-card">
           <header className="chat-card-header">
             <div>
               <p className="card-kicker">Первый приём</p>
@@ -551,167 +810,47 @@ export default function SelfAnalysis({ onComplete, onModeChange, onSaveAndExit }
           </footer>
           {restartChoiceSheet}
         </article>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="first-intake-page first-intake-dialog">
-      <article className="card intake-chat-card">
-        <header className="chat-card-header">
-          <div>
-            <p className="card-kicker">{partLabel}</p>
-            <h2>{part.title}</h2>
-            <p className="part-intro-copy">{partIntroText[part.id]}</p>
-          </div>
-          <span className="chat-progress">{stepLabel}</span>
-        </header>
-
-        {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
-          <div className="baseline-strip-wrap">
-            <CompactBaselineStrip baseline={state.answers.baseline} />
-            <details className="baseline-details-drawer">
-              <summary>Показать базовую точку</summary>
-              <BaselineSummaryCard baseline={state.answers.baseline} />
-            </details>
-          </div>
-        ) : null}
-
-        <div className="chat-window" aria-live="polite" ref={chatWindowRef}>
-          <div className="chat-bubble therapist-bubble intro-bubble">
-            <span>Специалист</span>
-            {part.kind === "baseline" ? (
-              <p>
-                Давайте начнём спокойно. Я задам несколько коротких вопросов, чтобы увидеть главную точку текущего состояния.
-                Можно выбрать подсказки или добавить пару слов своими словами.
-              </p>
-            ) : (
-              <p>{partIntroText[part.id] || "Идём по одному вопросу. Ответ сохраняется сразу и станет частью рабочей карты."}</p>
-            )}
-          </div>
-
-          {visibleSteps.map((item) => (
-            <React.Fragment key={item.id}>
-              <div className={item.id === step?.id && !hasAnswerContent(currentAnswer) && !isComplete ? "chat-bubble therapist-bubble current-question-bubble" : "chat-bubble therapist-bubble"}>
-                <span>Специалист</span>
-                <p>{item.question}</p>
-              </div>
-              {hasAnswerContent(answerGroup[item.id]) ? (
-                <div className="chat-bubble user-bubble">
-                  <span>Вы</span>
-                  <p>{answerLabel(item, answerGroup[item.id])}</p>
-                </div>
-              ) : null}
-            </React.Fragment>
-          ))}
-        </div>
-
-        {isPendingBaselineTransition ? (
-          <section className="intake-transition-panel" aria-label="Переход к Bach: ситуация">
-            <BaselineSummaryCard baseline={state.answers.baseline} />
-            <div className="transition-message">
-              <p>Спасибо. Базовая точка состояния сохранена.</p>
-              <p>Теперь мы перейдём ко второй части — Bach: ситуация.</p>
-              <p>
-                Здесь мы смотрим не на силу симптома, а на эмоциональные состояния,
-                которые могут быть связаны с текущей ситуацией.
-              </p>
-              <p>Отвечайте по тому, насколько фраза похожа на вас сейчас.</p>
-              <button className="primary-btn" onClick={continueToBachSituation} type="button">
-                Перейти к Bach: ситуация
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        {!isPendingBaselineTransition ? (
-        <section className="answer-panel" aria-label="Ответ на текущий вопрос">
-          <div className="answer-panel-head">
-            <span>{step.label}</span>
-            <strong>
-              {part.kind === "bach"
-                ? "Насколько это похоже на вас сейчас?"
-                : step.type === "scale10"
-                  ? "Отметьте по ощущению от 0 до 10"
-                  : "Выберите 1–3 подсказки или добавьте своими словами"}
-            </strong>
-          </div>
-
-          {step.type === "scale10" ? (
-            <>
-              <div className="option-grid scale-grid">
-                {Array.from({ length: 11 }, (_, value) => (
-                  <button className="answer-chip scale-chip" key={value} onClick={() => setAnswer(value)} type="button">
-                    {value}
-                  </button>
-                ))}
-              </div>
-              <p className="scale-helper">{step.helper || "0 — совсем не ощущается, 10 — максимально выражено."}</p>
-            </>
-          ) : part.kind === "bach" ? (
-            <div className="option-grid bach-scale-grid">
-              {[0, 1, 2, 3].map((value) => (
-                <button className="answer-chip" key={value} onClick={() => setAnswer(value)} type="button">
-                  {answerLabel(step, value)}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="field compact-note inline-answer-field">
-              <span>{step.type === "comment" ? "Добавить своими словами" : "Ваши слова"}</span>
-              {step.tagOptions ? (
-                <div className="option-grid tag-chip-grid" aria-label="Подсказки для ответа">
-                  {step.tagOptions.map((tag) => (
-                    <button
-                      aria-pressed={draftTags.includes(tag)}
-                      className={draftTags.includes(tag) ? "answer-chip tag-chip active" : "answer-chip tag-chip"}
-                      key={tag}
-                      onClick={() => toggleDraftTag(tag)}
-                      type="button"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-              <textarea
-                id={`first-intake-${step.id}`}
-                name={`first-intake-${step.id}`}
-                onChange={(event) => setDraftValue(event.target.value)}
-                placeholder={step.placeholder}
-                value={draftValue}
-              />
-              <button className="primary-btn" onClick={submitDraft} type="button">
-                Сохранить ответ
-              </button>
-              {answerNotice ? <p className="answer-notice" role="status">{answerNotice}</p> : null}
-            </div>
-          )}
-        </section>
-        ) : null}
-
-        <footer className="chat-actions">
-          {hasAnyAnswer ? (
-            <button className="secondary-btn" onClick={goBack} type="button">
-              Назад
-            </button>
-          ) : null}
-          {hasAnyAnswer ? (
-            <div className="intake-navigation-actions" aria-label="Навигация первого приёма">
-              <button className="secondary-btn" onClick={saveAndExit} type="button">
-                Сохранить и выйти
-              </button>
-              <button className="ghost-btn" onClick={goToMainMenu} type="button">
-                Перейти в главное меню
-              </button>
-              <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-                Начать заново
-              </button>
-            </div>
-          ) : null}
-        </footer>
-        {restartChoiceSheet}
-      </article>
-    </div>
+    <section className="first-intake-page first-intake-dialog intake-split-shell">
+      <IntakeContextPanel
+        baseline={state.answers.baseline}
+        currentStepIndex={state.currentStepIndex}
+        part={part}
+        partIndex={state.currentPartIndex}
+        partLabel={partLabel}
+        parts={parts}
+        stepLabel={stepLabel}
+        steps={steps}
+      />
+      <IntakeQuestionPanel
+        answerGroup={answerGroup}
+        answerNotice={answerNotice}
+        chatWindowRef={chatWindowRef}
+        continueToBachSituation={continueToBachSituation}
+        currentAnswer={currentAnswer}
+        draftTags={draftTags}
+        draftValue={draftValue}
+        goBack={goBack}
+        goToMainMenu={goToMainMenu}
+        hasAnyAnswer={hasAnyAnswer}
+        isComplete={isComplete}
+        isPendingBaselineTransition={isPendingBaselineTransition}
+        part={part}
+        restartChoiceSheet={restartChoiceSheet}
+        saveAndExit={saveAndExit}
+        setAnswer={setAnswer}
+        setDraftValue={setDraftValue}
+        setRestartConfirmVisible={setRestartConfirmVisible}
+        state={state}
+        step={step}
+        submitDraft={submitDraft}
+        toggleDraftTag={toggleDraftTag}
+        visibleSteps={visibleSteps}
+      />
+    </section>
   );
 }
