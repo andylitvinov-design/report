@@ -43,6 +43,7 @@ export default function Layout({
   focusMode = false,
   hasCompletedResults = true,
   hideSpecialistPanel = false,
+  workbookMode = false,
   onPrimaryAction,
   onTabChange,
   onOpenSettings,
@@ -66,6 +67,7 @@ export default function Layout({
   const shellClassName = [
     "app-shell",
     focusMode ? "focus-mode" : "",
+    workbookMode ? "workbook-mode" : "",
     isNewUser ? "new-user-shell" : "",
   ]
     .filter(Boolean)
@@ -73,6 +75,7 @@ export default function Layout({
   const mainShellClassName = [
     "main-shell",
     hideSpecialistPanel ? "no-specialist-panel" : "",
+    workbookMode ? "workbook-main-shell" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -110,7 +113,7 @@ export default function Layout({
 
   return (
     <div className={shellClassName}>
-      <header className="global-topbar" aria-label="Основные разделы сайта">
+      {!workbookMode && <header className="global-topbar" aria-label="Основные разделы сайта">
         <div className="brand">
           <strong>PsiTherapy</strong>
           <span>Личный кабинет</span>
@@ -140,9 +143,9 @@ export default function Layout({
             );
           })}
         </nav>
-      </header>
+      </header>}
 
-      <aside className="sidebar context-sidebar" aria-label="Контекстный навигатор раздела">
+      {!workbookMode && <aside className="sidebar context-sidebar" aria-label="Контекстный навигатор раздела">
         {showTherapeuticNavigator ? (
           <>
             <article className="therapy-hint-card">
@@ -202,10 +205,10 @@ export default function Layout({
           )}
           {userAction}
         </div>
-      </aside>
+      </aside>}
 
       <main className={mainShellClassName}>
-        {!focusMode && (
+        {!focusMode && !workbookMode && (
           <section className="topbar">
             <div>
               <p className="eyebrow">{currentLabel}</p>
@@ -220,7 +223,7 @@ export default function Layout({
           </section>
         )}
 
-        {!focusMode && (
+        {!focusMode && !workbookMode && (
           <div className="mobile-menu" aria-label="Мобильная навигация">
             <button
               className="mobile-menu-toggle"
@@ -306,7 +309,7 @@ export default function Layout({
           </div>
         )}
 
-        {!focusMode && !isNewUser && pageTabs?.length > 0 && (
+        {!focusMode && !workbookMode && !isNewUser && pageTabs?.length > 0 && (
           <div className="tabs" aria-label="Разделы страницы">
             {pageTabs.map((tab) => (
               <button
@@ -323,7 +326,7 @@ export default function Layout({
 
         <section className="workspace">{children}</section>
 
-        {hasCompletedResults && !hideSpecialistPanel && <aside className="specialist-panel">
+        {hasCompletedResults && !workbookMode && !hideSpecialistPanel && <aside className="specialist-panel">
           {activePage === "self" || activePage === "advanced" ? (
             <>
               <article className="card">

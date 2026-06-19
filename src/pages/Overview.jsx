@@ -1,139 +1,178 @@
 import React from "react";
-import { DynamicsChart, ThemeBars } from "../components/Charts.jsx";
-import { FormulaList, MetricCard } from "../components/Cards.jsx";
+import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
+import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
+import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
+import WorkbookShell from "../components/workbook/WorkbookShell.jsx";
 import { overview } from "../data/mockData.js";
 
-function CurrentDashboard() {
+function WorkbookActionButton({ children, description, onClick, variant = "secondary" }) {
   return (
-    <section className="cabinet-page-shell overview-page-shell" aria-labelledby="overview-current-title">
-      <article className="cabinet-story-panel overview-story-panel">
-        <div className="cabinet-hero-surface">
-          <p className="eyebrow">Личная тетрадь</p>
-          <h2 id="overview-current-title">Текущая карта состояния</h2>
-          <p>
-            Здесь собраны последние срезы: что забирает ресурс, где состояние уже меняется
-            и какие темы требуют мягкого наблюдения.
-          </p>
-        </div>
-
-        <div className="metrics-grid overview-metrics-grid">
-          {overview.metrics.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
-          ))}
-        </div>
-
-        <article className="cabinet-notebook-block">
-          <div className="section-head">
-            <div>
-              <h3>Динамика</h3>
-              <p>Снижение напряжения и восстановление ресурса по последним срезам.</p>
-            </div>
-          </div>
-          <DynamicsChart points={overview.dynamics} />
-        </article>
-      </article>
-
-      <aside className="cabinet-action-panel overview-action-panel" aria-label="Рабочие действия">
-        <article className="cabinet-action-card">
-          <p className="card-kicker">Следующий шаг</p>
-          <h3>Формула поддержки</h3>
-          <p>Повторная проверка через 7 дней.</p>
-          <FormulaList items={overview.formula} />
-        </article>
-        <article className="cabinet-action-card soft">
-          <h3>Ведущие темы</h3>
-          <ThemeBars items={overview.themes} />
-        </article>
-        <p className="safety-note">
-          Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
-        </p>
-      </aside>
-    </section>
+    <button className={`workbook-overview-action ${variant}`} onClick={onClick} type="button">
+      <span>{children}</span>
+      {description ? <small>{description}</small> : null}
+    </button>
   );
 }
 
 function AfterFirstStepList() {
   return (
-    <div className="cabinet-step-list" aria-label="Что появится после первого шага">
-      {["Самоотчёт", "Результаты", "Рекомендации", "История"].map((item) => (
+    <div className="workbook-overview-list" aria-label="Что появится после первого шага">
+      {["результаты", "поддержка", "динамика"].map((item) => (
         <span key={item}>{item}</span>
       ))}
     </div>
   );
 }
 
-function NewUserDashboard({
+function NewUserWorkbook({
   bookingNoticeVisible,
+  onContinueIntake,
   onSpecialistRequest,
   onStartSelfAnalysis,
 }) {
   return (
-    <section className="cabinet-page-shell new-user-page-shell" aria-labelledby="new-user-title">
-      <article className="cabinet-story-panel new-user-story-panel">
-        <div className="cabinet-hero-surface">
-          <p className="eyebrow">Первый шаг</p>
-          <h2 id="new-user-title">Добро пожаловать в кабинет</h2>
-          <p>
-            Сначала мы создадим базовую точку состояния: что сейчас беспокоит, где
-            теряется ресурс и какие темы требуют внимания.
-          </p>
-        </div>
-
-        <div className="cabinet-notebook-block">
-          <h3>Что создаст первый приём</h3>
-          <p>
-            После короткого самоанализа здесь появится личная тетрадь: самоотчёт,
-            результаты, рекомендации и история наблюдений.
-          </p>
-          <AfterFirstStepList />
-        </div>
-
-        <p className="safety-note">
-          Самоанализ не заменяет медицинскую или психотерапевтическую помощь.
+    <WorkbookBook className="workbook-overview-book">
+      <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+        <p className="workbook-kicker">Обзор</p>
+        <h1 className="workbook-title">Журнал самонаблюдений</h1>
+        <span className="workbook-title-rule" aria-hidden="true" />
+        <p className="workbook-body workbook-lead">
+          Сегодня важно просто начать: заметить, что происходит, и создать первую карту состояния.
         </p>
-      </article>
 
-      <aside className="cabinet-action-panel new-user-action-panel" aria-label="Первое действие">
-        <article className="cabinet-action-card primary-action-card">
-          <p className="card-kicker">Главный следующий шаг</p>
-          <h3>Пройти первый приём — самоанализ</h3>
-          <p>
-            Ответьте на вопросы по одному. Система сохранит первичную карту состояния и
-            откроет первый самоотчёт.
-          </p>
-          <button className="primary-btn full" onClick={onStartSelfAnalysis} type="button">
+        <section className="workbook-overview-note" aria-labelledby="after-first-step-title">
+          <span aria-hidden="true">✦</span>
+          <div>
+            <h2 id="after-first-step-title">Что появится после первого шага</h2>
+            <AfterFirstStepList />
+          </div>
+        </section>
+
+        <WorkbookSafetyNote>
+          Самонаблюдение помогает увидеть состояние мягче, но не заменяет медицинскую или
+          психотерапевтическую помощь.
+        </WorkbookSafetyNote>
+      </WorkbookPage>
+
+      <WorkbookPage side="right" variant="response">
+        <p className="workbook-kicker">Сейчас</p>
+        <h2 className="workbook-question">Что делаем сейчас?</h2>
+        <div className="workbook-overview-actions" aria-label="Действия на сейчас">
+          <WorkbookActionButton
+            description="Создать первую карту состояния"
+            onClick={onStartSelfAnalysis}
+            variant="primary"
+          >
             Пройти первый приём
-          </button>
-        </article>
-
-        <article className="cabinet-action-card">
-          <h3>Заказать встречу со специалистом</h3>
-          <p>Подходит, если хочется живого сопровождения и персонального разбора.</p>
-          <button className="secondary-btn full" onClick={onSpecialistRequest} type="button">
+          </WorkbookActionButton>
+          <WorkbookActionButton
+            description="Оставить запрос на живое сопровождение"
+            onClick={onSpecialistRequest}
+          >
             Заказать встречу
-          </button>
-        </article>
-
+          </WorkbookActionButton>
+          <WorkbookActionButton
+            description="Вернуться к сохранённым ответам"
+            onClick={onContinueIntake}
+          >
+            Продолжить, если есть незавершённый приём
+          </WorkbookActionButton>
+        </div>
         {bookingNoticeVisible && (
-          <p className="placeholder-notice" role="status">
+          <p className="placeholder-notice workbook-overview-status" role="status">
             Раздел записи к специалисту ещё подключается. Запрос сохранён как следующий шаг.
           </p>
         )}
-
-        <article className="cabinet-action-card compact-status-card">
-          <span>Статус</span>
-          <strong>Базовая точка ещё не создана</strong>
-          <p>После первого приёма откроются результаты, рекомендации и история.</p>
-        </article>
-      </aside>
-    </section>
+      </WorkbookPage>
+    </WorkbookBook>
   );
 }
 
-export default function Overview(props) {
-  if (!props.hasCompletedResults) {
-    return <NewUserDashboard {...props} />;
-  }
+function CurrentUserWorkbook({
+  onAskAssistant,
+  onOpenResults,
+  onRepeatAiIntake,
+}) {
+  const [firstTheme, secondTheme] = overview.themes;
+  const [firstFormula] = overview.formula;
 
-  return <CurrentDashboard />;
+  return (
+    <WorkbookBook className="workbook-overview-book">
+      <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+        <p className="workbook-kicker">Обзор</p>
+        <h1 className="workbook-title">Сообщение для вас</h1>
+        <span className="workbook-title-rule" aria-hidden="true" />
+        <p className="workbook-body workbook-lead">
+          Сейчас главное - бережно восстановить ресурс и не расширять нагрузку быстрее,
+          чем состояние успевает стабилизироваться.
+        </p>
+
+        <section className="workbook-overview-note" aria-labelledby="current-state-title">
+          <span aria-hidden="true">✦</span>
+          <div>
+            <h2 id="current-state-title">Что меняется</h2>
+            <p>
+              Напряжение постепенно снижается; в работе остаются {firstTheme.label.toLowerCase()}
+              {secondTheme ? ` и ${secondTheme.label.toLowerCase()}` : ""}.
+            </p>
+            <p>Мягкая опора сейчас: {firstFormula} и короткий повторный срез через несколько дней.</p>
+          </div>
+        </section>
+
+        <p className="workbook-overview-suggestion">
+          Сегодня достаточно выбрать один следующий шаг и не превращать наблюдение в список задач.
+        </p>
+      </WorkbookPage>
+
+      <WorkbookPage side="right" variant="response">
+        <p className="workbook-kicker">Сейчас</p>
+        <h2 className="workbook-question">Что делаем сейчас?</h2>
+        <div className="workbook-overview-actions" aria-label="Действия на сейчас">
+          <WorkbookActionButton description="Перейти к сохранённому отчёту" onClick={onOpenResults} variant="primary">
+            Открыть результаты
+          </WorkbookActionButton>
+          <WorkbookActionButton description="Создать новую точку наблюдения" onClick={onRepeatAiIntake}>
+            Пройти повторный ИИ-приём
+          </WorkbookActionButton>
+          <WorkbookActionButton description="Перейти к поддержке и вопросу" onClick={onAskAssistant}>
+            Задать вопрос ассистенту
+          </WorkbookActionButton>
+        </div>
+      </WorkbookPage>
+    </WorkbookBook>
+  );
+}
+
+export default function Overview({
+  bookingNoticeVisible,
+  clientName,
+  hasCompletedResults,
+  onAskAssistant,
+  onContinueIntake,
+  onNavigate,
+  onOpenResults,
+  onRepeatAiIntake,
+  onSpecialistRequest,
+  onStartSelfAnalysis,
+}) {
+  return (
+    <WorkbookShell activeGroup="overview" onNavigate={onNavigate} userName={clientName}>
+      <section className="workbook-overview-page" aria-label="Обзор журнала самонаблюдений">
+        {hasCompletedResults ? (
+          <CurrentUserWorkbook
+            onAskAssistant={onAskAssistant}
+            onOpenResults={onOpenResults}
+            onRepeatAiIntake={onRepeatAiIntake}
+          />
+        ) : (
+          <NewUserWorkbook
+            bookingNoticeVisible={bookingNoticeVisible}
+            onContinueIntake={onContinueIntake}
+            onSpecialistRequest={onSpecialistRequest}
+            onStartSelfAnalysis={onStartSelfAnalysis}
+          />
+        )}
+      </section>
+    </WorkbookShell>
+  );
 }

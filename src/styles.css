@@ -81,6 +81,12 @@ h2 {
     linear-gradient(135deg, #fffaf3, var(--psi-bg));
 }
 
+.app-shell.workbook-mode {
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+}
+
 .global-topbar {
   grid-column: 1 / -1;
   position: sticky;
@@ -403,6 +409,14 @@ h2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 18px 22px;
+}
+
+.main-shell.workbook-main-shell {
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 
 .topbar,
@@ -968,6 +982,10 @@ h3 {
   display: grid;
   align-content: start;
   gap: 18px;
+}
+
+.workbook-main-shell .workspace {
+  display: block;
 }
 
 .new-user-shell .workspace {
@@ -1976,117 +1994,250 @@ h3 {
   min-height: calc(100dvh - 34px);
   padding: 0 0 18px;
   background:
-    radial-gradient(circle at 15% 10%, rgba(45, 108, 79, 0.1), transparent 20rem),
-    linear-gradient(135deg, #f8efdf, var(--workbook-bg));
+    radial-gradient(circle at 50% 0, rgba(255, 253, 248, 0.92), transparent 34rem),
+    linear-gradient(135deg, #fbf4e8, #efe0c7 58%, #d7c29d);
 }
 
 .workbook-shell {
-  width: min(100% - 32px, 1280px);
+  width: min(100% - 28px, 1360px);
   margin: 0 auto;
 }
 
 .workbook-header {
-  min-height: 74px;
-  display: flex;
+  min-height: 84px;
+  display: grid;
+  grid-template-columns: minmax(210px, auto) minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 14px 0;
+  gap: 22px;
+  padding: 16px 8px 18px;
 }
 
 .workbook-brand {
-  display: grid;
-  gap: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   color: var(--workbook-green);
+}
+
+.workbook-brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(232, 240, 223, 0.9), rgba(232, 240, 223, 0.2)),
+    linear-gradient(135deg, #f7f2e5, #e6edd9);
+  color: #67895d;
+  font-size: 22px;
+  box-shadow: inset 0 0 0 1px rgba(18, 63, 49, 0.08);
 }
 
 .workbook-brand strong {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
-}
-
-.workbook-brand span {
-  color: rgba(18, 63, 49, 0.66);
-  font-size: 13px;
-  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .workbook-top-nav {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 7px;
+  justify-content: center;
+  gap: 26px;
 }
 
 .workbook-nav-item {
-  min-height: 38px;
-  padding: 8px 12px;
-  border: 1px solid rgba(18, 63, 49, 0.12);
+  position: relative;
+  min-height: 42px;
+  padding: 8px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #1f2725;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 500;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.workbook-nav-item::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
   border-radius: 999px;
-  background: rgba(255, 247, 233, 0.72);
-  color: var(--workbook-green);
-  font-size: 13px;
-  font-weight: 850;
-  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  background: transparent;
 }
 
 .workbook-nav-item:hover,
 .workbook-nav-item:focus-visible,
 .workbook-nav-item.active {
-  border-color: rgba(18, 63, 49, 0.3);
-  background: var(--workbook-sage);
+  color: var(--workbook-green);
   transform: translateY(-1px);
 }
 
+.workbook-nav-item.active::after {
+  background: var(--workbook-green);
+}
+
+.workbook-account {
+  min-height: 50px;
+  padding: 5px 12px 5px 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.62);
+  color: #1f2725;
+}
+
+.workbook-account span {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #e8ecd9;
+  color: var(--workbook-green);
+  font-weight: 900;
+}
+
+.workbook-account strong {
+  font-size: 14px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.workbook-account small {
+  color: var(--workbook-green);
+  font-size: 18px;
+}
+
 .workbook-book {
-  min-height: clamp(680px, calc(100dvh - 128px), 860px);
+  position: relative;
+  min-height: clamp(720px, calc(100dvh - 126px), 900px);
+  height: clamp(720px, calc(100dvh - 126px), 900px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow: hidden;
-  border: 1px solid rgba(194, 160, 93, 0.24);
-  border-radius: 32px;
-  background: var(--workbook-paper);
-  box-shadow: var(--workbook-shadow);
-}
-
-.workbook-page {
-  min-width: 0;
-  padding: clamp(28px, 4vw, 52px);
-  display: grid;
-  align-content: start;
-  gap: 18px;
-}
-
-.workbook-page-left {
-  position: relative;
-  overflow: hidden;
-  border-right: 1px solid rgba(194, 160, 93, 0.24);
+  border: 10px solid #7a5530;
+  border-radius: 38px;
   background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.92), rgba(255, 247, 233, 0.78)),
-    radial-gradient(circle at 20% 16%, rgba(232, 240, 223, 0.95), transparent 16rem),
-    radial-gradient(circle at 82% 86%, rgba(45, 108, 79, 0.14), transparent 18rem),
-    var(--workbook-paper-soft);
+    linear-gradient(90deg, #6a4625 0 1.2%, transparent 1.2% 98.8%, #6a4625 98.8%),
+    var(--workbook-paper);
+  box-shadow:
+    0 28px 72px rgba(47, 34, 20, 0.26),
+    inset 0 0 0 2px rgba(255, 246, 228, 0.58),
+    inset 0 0 0 7px rgba(54, 36, 20, 0.24);
 }
 
-.workbook-page-left::after {
+.workbook-book::before {
   content: "";
   position: absolute;
-  right: -60px;
-  bottom: -70px;
-  width: 260px;
-  height: 260px;
-  border: 1px solid rgba(194, 160, 93, 0.26);
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(194, 160, 93, 0.14), transparent 62%);
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 3;
+  width: 34px;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, rgba(80, 54, 28, 0.25), transparent 24%, rgba(255, 255, 255, 0.62) 49%, rgba(80, 54, 28, 0.18) 73%, transparent);
   pointer-events: none;
 }
 
-.workbook-page-right {
+.workbook-book::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: calc(50% + 40px);
+  z-index: 4;
+  width: 34px;
+  height: 88px;
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(180deg, #1b6a4e, #0f4a35);
+  box-shadow: 0 10px 18px rgba(18, 63, 49, 0.22);
+  pointer-events: none;
+}
+
+.workbook-page {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(34px, 4vw, 58px);
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(194, 160, 93, 0.1) 1px, transparent 1px) 0 0 / 44px 44px,
-    linear-gradient(180deg, rgba(194, 160, 93, 0.08) 1px, transparent 1px) 0 0 / 44px 44px,
-    var(--workbook-paper);
+    radial-gradient(circle at 50% 4%, rgba(255, 255, 255, 0.7), transparent 24rem),
+    linear-gradient(90deg, rgba(200, 164, 99, 0.035) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(180deg, rgba(200, 164, 99, 0.03) 1px, transparent 1px) 0 0 / 28px 28px,
+    #fff9ee;
+}
+
+.workbook-page::before,
+.workbook-page::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.workbook-page-left {
+  border-right: 1px solid rgba(137, 99, 55, 0.22);
+  border-radius: 26px 0 0 26px;
+  box-shadow: inset -20px 0 30px rgba(88, 61, 33, 0.08);
+}
+
+.workbook-page-left::before {
+  inset: auto 0 0 0;
+  height: 34%;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.45), transparent 52%),
+    linear-gradient(180deg, transparent 0%, rgba(255, 249, 238, 0.4) 18%, rgba(255, 249, 238, 0.84) 66%),
+    radial-gradient(ellipse at 22% 84%, rgba(75, 121, 87, 0.5), transparent 18%),
+    radial-gradient(ellipse at 72% 78%, rgba(67, 111, 91, 0.38), transparent 22%),
+    linear-gradient(165deg, transparent 0 34%, rgba(119, 151, 135, 0.22) 35% 46%, transparent 47%),
+    linear-gradient(25deg, transparent 0 30%, rgba(109, 144, 115, 0.2) 31% 42%, transparent 43%),
+    linear-gradient(180deg, rgba(219, 225, 201, 0.2), rgba(108, 136, 112, 0.42));
+  opacity: 0.92;
+}
+
+.workbook-page-left::after {
+  right: 28px;
+  bottom: 30%;
+  width: 150px;
+  height: 340px;
+  background:
+    radial-gradient(ellipse at 50% 12%, rgba(150, 169, 113, 0.55) 0 10%, transparent 11%),
+    radial-gradient(ellipse at 30% 30%, rgba(150, 169, 113, 0.48) 0 8%, transparent 9%),
+    radial-gradient(ellipse at 70% 42%, rgba(181, 158, 86, 0.42) 0 8%, transparent 9%),
+    linear-gradient(105deg, transparent 48%, rgba(102, 126, 78, 0.5) 49% 51%, transparent 52%);
+  opacity: 0.65;
+  transform: rotate(5deg);
+}
+
+.workbook-page-right {
+  border-radius: 0 26px 26px 0;
+  box-shadow: inset 20px 0 30px rgba(88, 61, 33, 0.08);
+}
+
+.workbook-page-right::after {
+  right: -5px;
+  top: 18%;
+  width: 140px;
+  height: 430px;
+  background:
+    radial-gradient(ellipse at 48% 12%, rgba(181, 158, 86, 0.52) 0 8%, transparent 9%),
+    radial-gradient(ellipse at 26% 30%, rgba(150, 169, 113, 0.5) 0 7%, transparent 8%),
+    radial-gradient(ellipse at 70% 42%, rgba(150, 169, 113, 0.42) 0 8%, transparent 9%),
+    radial-gradient(ellipse at 30% 62%, rgba(181, 158, 86, 0.42) 0 6%, transparent 7%),
+    linear-gradient(100deg, transparent 48%, rgba(102, 126, 78, 0.44) 49% 51%, transparent 52%);
+  opacity: 0.62;
+  transform: rotate(9deg);
 }
 
 .workbook-kicker {
@@ -2098,18 +2249,28 @@ h3 {
 }
 
 .workbook-title {
-  max-width: 620px;
+  max-width: 570px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(42px, 5vw, 72px);
-  line-height: 0.98;
+  font-size: clamp(52px, 4.8vw, 72px);
+  line-height: 0.94;
   letter-spacing: 0;
   color: var(--workbook-green);
 }
 
+.workbook-title-rule {
+  width: 238px;
+  height: 15px;
+  display: block;
+  background:
+    radial-gradient(circle at 8px 7px, var(--workbook-gold) 0 3px, transparent 4px),
+    linear-gradient(90deg, var(--workbook-gold), transparent);
+  opacity: 0.9;
+}
+
 .workbook-question {
-  max-width: 700px;
+  max-width: 620px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(30px, 3.2vw, 48px);
+  font-size: clamp(30px, 2.5vw, 40px);
   line-height: 1.08;
   letter-spacing: 0;
   color: var(--workbook-green);
@@ -2117,9 +2278,68 @@ h3 {
 
 .workbook-body {
   max-width: 580px;
-  color: rgba(31, 31, 31, 0.74);
-  font-size: clamp(17px, 1.35vw, 21px);
-  line-height: 1.55;
+  color: #1f2725;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2.2vw, 34px);
+  line-height: 1.22;
+}
+
+.workbook-lead {
+  max-width: 520px;
+}
+
+.workbook-news-card,
+.workbook-topic-card {
+  width: min(100%, 520px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  border: 1px solid rgba(137, 99, 55, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.58);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.workbook-news-card {
+  padding: 15px 18px;
+}
+
+.workbook-topic-card {
+  margin-top: auto;
+  padding: 18px;
+  align-items: center;
+}
+
+.workbook-news-card > span,
+.workbook-topic-card > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #e8ecd9;
+  color: #6a8d58;
+  font-size: 22px;
+}
+
+.workbook-news-card strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--workbook-green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.workbook-news-card p,
+.workbook-topic-card p {
+  color: #1f2725;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.workbook-progress-compact {
+  display: none;
 }
 
 .workbook-helper,
@@ -2129,6 +2349,136 @@ h3 {
   font-size: 14px;
   font-weight: 700;
   line-height: 1.45;
+}
+
+.workbook-overview-page {
+  width: 100%;
+}
+
+.workbook-overview-book .workbook-page {
+  align-content: center;
+}
+
+.workbook-overview-note {
+  width: min(100%, 540px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(137, 99, 55, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.62);
+}
+
+.workbook-overview-note > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #e8ecd9;
+  color: #6a8d58;
+  font-size: 22px;
+}
+
+.workbook-overview-note h2 {
+  margin-bottom: 10px;
+  color: var(--workbook-green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.workbook-overview-note p,
+.workbook-overview-suggestion {
+  color: #1f2725;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.42;
+}
+
+.workbook-overview-note p + p {
+  margin-top: 8px;
+}
+
+.workbook-overview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workbook-overview-list span {
+  padding: 8px 12px;
+  border: 1px solid rgba(18, 63, 49, 0.12);
+  border-radius: 999px;
+  background: rgba(232, 240, 223, 0.76);
+  color: var(--workbook-green);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.workbook-overview-suggestion {
+  width: min(100%, 520px);
+  color: rgba(31, 39, 37, 0.78);
+}
+
+.workbook-overview-actions {
+  width: min(100%, 560px);
+  display: grid;
+  gap: 14px;
+}
+
+.workbook-overview-action {
+  min-height: 92px;
+  padding: 18px 20px;
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  border: 1px solid rgba(18, 63, 49, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 253, 248, 0.68);
+  color: var(--workbook-green);
+  text-align: left;
+  box-shadow: 0 12px 28px rgba(43, 32, 18, 0.07);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.workbook-overview-action.primary {
+  background: linear-gradient(135deg, #174c39, #2d6c4f);
+  color: #fffaf0;
+}
+
+.workbook-overview-action:hover,
+.workbook-overview-action:focus-visible {
+  border-color: rgba(18, 63, 49, 0.34);
+  background: rgba(232, 240, 223, 0.78);
+  transform: translateY(-1px);
+}
+
+.workbook-overview-action.primary:hover,
+.workbook-overview-action.primary:focus-visible {
+  background: linear-gradient(135deg, #123f31, #245c43);
+}
+
+.workbook-overview-action span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.08;
+}
+
+.workbook-overview-action small {
+  color: rgba(31, 39, 37, 0.62);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.workbook-overview-action.primary small {
+  color: rgba(255, 250, 240, 0.78);
+}
+
+.workbook-overview-status {
+  width: min(100%, 560px);
 }
 
 .workbook-theme-badge,
@@ -2142,10 +2492,26 @@ h3 {
 }
 
 .workbook-theme-badge {
-  padding: 8px 12px;
+  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 13px;
+  background: rgba(232, 240, 223, 0.78);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.workbook-theme-badge::before {
+  content: "☘";
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 900;
+  background: #dfe8ce;
+  color: #638956;
 }
 
 .workbook-progress-card,
@@ -2177,11 +2543,17 @@ h3 {
 }
 
 .workbook-response-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  justify-items: start;
   gap: 12px;
+}
+
+.workbook-response-head .workbook-kicker {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 4.4vw, 72px);
+  font-weight: 700;
+  line-height: 0.98;
+  text-transform: none;
 }
 
 .workbook-answer-panel,
@@ -2192,62 +2564,103 @@ h3 {
 
 .workbook-choice-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
+  padding: 22px 24px;
+  border: 1px solid rgba(137, 99, 55, 0.2);
+  border-radius: 26px;
+  background: rgba(255, 251, 243, 0.7);
 }
 
 .workbook-choice {
-  min-height: 104px;
-  padding: 16px;
+  min-height: 78px;
+  padding: 14px 20px;
   display: grid;
-  align-content: center;
-  gap: 6px;
-  border: 1px solid rgba(18, 63, 49, 0.2);
-  border-radius: 18px;
-  background: rgba(255, 253, 248, 0.9);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  border: 1px solid rgba(93, 132, 74, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, 0.86);
   color: var(--workbook-green);
   text-align: left;
-  box-shadow: 0 10px 28px rgba(47, 34, 20, 0.08);
+  box-shadow: none;
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.workbook-choice-icon {
+  width: 42px;
+  height: 42px;
+  color: #66865d;
 }
 
 .workbook-choice span {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(20px, 2vw, 30px);
+  font-size: clamp(24px, 2vw, 32px);
   line-height: 1.2;
 }
 
 .workbook-choice small {
+  grid-column: 2;
+  margin-top: -8px;
   color: rgba(31, 31, 31, 0.58);
   font-weight: 800;
+}
+
+.workbook-choice b {
+  color: #789365;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+  font-weight: 400;
 }
 
 .workbook-choice:hover,
 .workbook-choice:focus-visible,
 .workbook-choice.active {
   border-color: rgba(18, 63, 49, 0.42);
-  background: var(--workbook-sage);
-  box-shadow: 0 15px 34px rgba(18, 63, 49, 0.13);
+  background: rgba(232, 240, 223, 0.7);
+  box-shadow: 0 12px 24px rgba(18, 63, 49, 0.1);
   transform: translateY(-1px);
 }
 
 .workbook-assistant-input {
   display: grid;
-  gap: 9px;
+  gap: 16px;
+}
+
+.workbook-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px;
+  gap: 12px;
 }
 
 .workbook-assistant-input textarea {
-  min-height: 118px;
-  padding: 14px 15px;
+  min-height: 66px;
+  padding: 20px 24px;
   border: 1px solid var(--workbook-border);
-  border-radius: 18px;
+  border-radius: 15px;
   background: rgba(255, 253, 248, 0.86);
   color: var(--text);
   resize: vertical;
 }
 
-.workbook-assistant-input .primary-btn {
-  justify-self: start;
+.workbook-send-btn {
+  min-height: 66px;
+  border: 0;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #1b6a4e, #0f4a35);
+  color: #fff;
+  box-shadow: 0 14px 26px rgba(18, 63, 49, 0.18);
+}
+
+.workbook-send-btn svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
 }
 
 .workbook-actions,
@@ -3116,6 +3529,12 @@ h3 {
 
   .workbook-book {
     min-height: auto;
+    height: auto;
+  }
+
+  .workbook-book::before,
+  .workbook-book::after {
+    display: none;
   }
 
   .workbook-page-left {
@@ -3174,6 +3593,10 @@ h3 {
   .main-shell {
     padding: 16px;
     display: block;
+  }
+
+  .app-shell.focus-mode .main-shell {
+    padding: 0;
   }
 
   .topbar,
@@ -3269,11 +3692,15 @@ h3 {
 
   .workbook-app {
     min-height: 100dvh;
-    padding-bottom: 10px;
+    padding: 0 0 10px;
+    overflow-x: hidden;
   }
 
   .workbook-shell {
-    width: min(100% - 18px, 560px);
+    width: 100%;
+    max-width: 560px;
+    padding: 0 9px;
+    overflow-x: hidden;
   }
 
   .workbook-header {
@@ -3293,20 +3720,41 @@ h3 {
     flex: 0 0 auto;
   }
 
+  .workbook-account {
+    justify-self: end;
+    padding: 5px;
+  }
+
+  .workbook-account strong,
+  .workbook-account small {
+    display: none;
+  }
+
   .workbook-book {
+    width: 100%;
+    max-width: calc(100vw - 18px);
+    border-width: 8px;
     border-radius: 22px;
   }
 
   .workbook-page {
     padding: 24px 18px;
+    overflow: hidden;
   }
 
   .workbook-title {
-    font-size: clamp(36px, 12vw, 46px);
+    max-width: 100%;
+    font-size: clamp(40px, 13vw, 54px);
+    line-height: 1;
+    overflow-wrap: anywhere;
   }
 
   .workbook-question {
-    font-size: clamp(30px, 10vw, 38px);
+    font-size: clamp(29px, 8vw, 36px);
+  }
+
+  .workbook-response-head .workbook-kicker {
+    font-size: clamp(38px, 11vw, 46px);
   }
 
   .workbook-body {
@@ -3314,8 +3762,27 @@ h3 {
   }
 
   .workbook-choice {
+    grid-template-columns: 28px minmax(0, 1fr) 24px;
     min-height: 82px;
-    padding: 14px;
+    padding: 14px 10px;
+    gap: 8px;
+  }
+
+  .workbook-choice-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .workbook-choice span {
+    font-size: clamp(21px, 6vw, 24px);
+  }
+
+  .workbook-choice b {
+    font-size: 28px;
+  }
+
+  .workbook-input-row {
+    grid-template-columns: minmax(0, 1fr) 68px;
   }
 
   .workbook-actions,
@@ -3331,6 +3798,27 @@ h3 {
   .workbook-action-row .soft-warning-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .workbook-overview-book .workbook-page {
+    align-content: start;
+  }
+
+  .workbook-overview-note {
+    grid-template-columns: 1fr;
+  }
+
+  .workbook-overview-actions {
+    gap: 10px;
+  }
+
+  .workbook-overview-action {
+    min-height: 82px;
+    padding: 15px;
+  }
+
+  .workbook-overview-action span {
+    font-size: 22px;
   }
 
   .mobile-menu {
@@ -3682,6 +4170,10 @@ h3 {
 
   .app-shell.focus-mode h1 {
     font-size: clamp(30px, 10vw, 38px);
+  }
+
+  .app-shell.focus-mode .workbook-title {
+    font-size: 20px;
   }
 
   .chart {
