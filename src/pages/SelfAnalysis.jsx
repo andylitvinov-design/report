@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { AnalysisResultPanel } from "../components/Cards.jsx";
 import WorkbookAssistantInput from "../components/workbook/WorkbookAssistantInput.jsx";
 import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
 import WorkbookChoiceList from "../components/workbook/WorkbookChoiceList.jsx";
@@ -388,7 +389,73 @@ function IntakeContextPanel({ part, state, stepLabel, partLabel }) {
   );
 }
 
-export default function SelfAnalysis({ onComplete, onModeChange, onNavigate, onSaveAndExit }) {
+function AnalysisNavigatorWorkspace({
+  activeAnalysis,
+  onSelectAnalysis,
+  onSpecialistRequest,
+  onStartAnalysis,
+}) {
+  return (
+    <section className="analysis-navigator-workspace" aria-labelledby="analysis-navigator-title">
+      <div className="analysis-navigator-header">
+        <div>
+          <p className="eyebrow">Профиль / Самоанализ</p>
+          <h2 id="analysis-navigator-title">Результаты выбранного анализа</h2>
+        </div>
+        <p>
+          Центральная область показывает текущий выбранный тест: краткое резюме, динамику,
+          основные шкалы и следующие действия.
+        </p>
+      </div>
+      <AnalysisResultPanel
+        analysis={activeAnalysis}
+        onSelectAnalysis={onSelectAnalysis}
+        onSpecialistRequest={onSpecialistRequest}
+        onStartAnalysis={onStartAnalysis}
+      />
+    </section>
+  );
+}
+
+export default function SelfAnalysis({
+  activeAnalysis,
+  mode = "form",
+  onComplete,
+  onModeChange,
+  onNavigate,
+  onSaveAndExit,
+  onSelectAnalysis,
+  onSpecialistRequest,
+  onStartAnalysis,
+}) {
+  useEffect(() => {
+    if (mode === "navigator") {
+      onModeChange?.("overview");
+    }
+  }, [mode, onModeChange]);
+
+  if (mode === "navigator") {
+    return (
+      <AnalysisNavigatorWorkspace
+        activeAnalysis={activeAnalysis}
+        onSelectAnalysis={onSelectAnalysis}
+        onSpecialistRequest={onSpecialistRequest}
+        onStartAnalysis={onStartAnalysis}
+      />
+    );
+  }
+
+  return (
+    <SelfAnalysisForm
+      onComplete={onComplete}
+      onModeChange={onModeChange}
+      onNavigate={onNavigate}
+      onSaveAndExit={onSaveAndExit}
+    />
+  );
+}
+
+function SelfAnalysisForm({ onComplete, onModeChange, onNavigate, onSaveAndExit }) {
   const [state, setState] = useState(() => readJsonStorage(FIRST_INTAKE_PROGRESS_KEY) || makeInitialState());
   const [restoreChoiceVisible, setRestoreChoiceVisible] = useState(() => {
     const saved = readJsonStorage(FIRST_INTAKE_PROGRESS_KEY);

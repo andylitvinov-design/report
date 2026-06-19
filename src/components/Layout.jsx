@@ -1,28 +1,43 @@
 import React, { useState } from "react";
-import { client, navigation, specialistComments } from "../data/mockData.js";
+import { AnalysisMenuCard } from "./Cards.jsx";
+import {
+  client,
+  navigation,
+  specialistComments,
+  therapeuticNavigatorHint,
+  topNavigation,
+} from "../data/mockData.js";
 
 const clientNavigation = {
-  overview: "Профиль / Обзор",
+  overview: "Главная",
+  profile: "Профиль",
   expert: "Результаты (Отчёт)",
   recommendations: "Назначение",
   self: "Первый приём (Анализ)",
   advanced: "Расширенный ИИ-анализ",
   history: "Рекомендации",
+  consultations: "Консультации",
+  settings: "Настройки",
 };
 
 const actionLabels = {
   overview: "+ Новая оценка",
+  profile: "Пройти анализ",
   expert: "Открыть результаты",
   recommendations: "Обновить назначение",
   settings: "Сохранить настройки",
   advanced: "Выбрать анализ",
   history: "Открыть динамику",
+  consultations: "Заказать встречу",
 };
 
 const lockedForNewUser = new Set(["expert", "recommendations", "history"]);
+const therapeuticSections = new Set(["profile", "self"]);
 
 export default function Layout({
   activePage,
+  activeAnalysisId,
+  analysisGroups = [],
   pageTabs,
   activeTab,
   focusMode = false,
@@ -31,7 +46,9 @@ export default function Layout({
   onPrimaryAction,
   onTabChange,
   onOpenSettings,
+  onSelectAnalysis,
   onSignOut,
+  onStartAnalysis,
   children,
   clientOverride = null,
   userAction = null,
@@ -73,14 +90,8 @@ export default function Layout({
         : `${cabinetClient.name} · Фокус: ${cabinetClient.focus} · Последний срез: ${cabinetClient.lastSlice}`;
   const accountStatus = cabinetClient.nextSession || (isNewUser ? "первый срез не пройден" : "первичный анализ");
   const accountId = cabinetClient.id ? `ID ${cabinetClient.id}` : null;
-  const mobileMenuItems = [
-    { id: "overview", label: clientNavigation.overview, page: "overview" },
-    { id: "self", label: clientNavigation.self, page: "self" },
-    { id: "advanced", label: clientNavigation.advanced, page: "advanced" },
-    { id: "expert", label: clientNavigation.expert, page: "expert" },
-    { id: "recommendations", label: clientNavigation.recommendations, page: "recommendations" },
-    { id: "history", label: clientNavigation.history, page: "history" },
-  ];
+  const mobileMenuItems = topNavigation.map((item) => ({ ...item, page: item.id }));
+  const showTherapeuticNavigator = therapeuticSections.has(activePage);
 
   const handleMobileNavigation = (item) => {
     onTabChange(item.page, item.tab);
@@ -99,17 +110,17 @@ export default function Layout({
 
   return (
     <div className={shellClassName}>
-      <aside className="sidebar" aria-label="Основная навигация">
+      <header className="global-topbar" aria-label="Основные разделы сайта">
         <div className="brand">
           <strong>PsiTherapy</strong>
           <span>Личный кабинет</span>
         </div>
-        <nav className="nav-list">
-          {navigation.map((item) => {
+        <nav className="top-nav-list">
+          {topNavigation.map((item) => {
             const locked = isNewUser && lockedForNewUser.has(item.id);
             const nextStep = isNewUser && item.id === "self";
             const className = [
-              "nav-item",
+              "top-nav-item",
               item.id === activePage ? "active" : "",
               locked ? "locked" : "",
               nextStep ? "next-step" : "",
@@ -124,13 +135,61 @@ export default function Layout({
                 onClick={() => onTabChange(item.id)}
                 type="button"
               >
-                <span>{clientNavigation[item.id] || item.label}</span>
-                {nextStep && <small>главный следующий шаг</small>}
-                {locked && <small>после первого среза</small>}
+                {item.label}
               </button>
             );
           })}
         </nav>
+      </header>
+
+      <aside className="sidebar context-sidebar" aria-label="Контекстный навигатор раздела">
+        {showTherapeuticNavigator ? (
+          <>
+            <article className="therapy-hint-card">
+              <span>Навигатор</span>
+              <p>{therapeuticNavigatorHint}</p>
+            </article>
+            <nav className="therapeutic-context-menu" aria-label="Тесты и анализы">
+              {analysisGroups.map((group) => (
+                <AnalysisMenuCard
+                  activeId={activeAnalysisId}
+                  group={group}
+                  key={group.group}
+                  onSelectAnalysis={onSelectAnalysis}
+                  onStartAnalysis={onStartAnalysis}
+                />
+              ))}
+            </nav>
+          </>
+        ) : (
+          <nav className="nav-list" aria-label="Контекст раздела">
+            {navigation.map((item) => {
+              const locked = isNewUser && lockedForNewUser.has(item.id);
+              const nextStep = isNewUser && item.id === "self";
+              const className = [
+                "nav-item",
+                item.id === activePage ? "active" : "",
+                locked ? "locked" : "",
+                nextStep ? "next-step" : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              return (
+                <button
+                  className={className}
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  type="button"
+                >
+                  <span>{clientNavigation[item.id] || item.label}</span>
+                  {nextStep && <small>главный следующий шаг</small>}
+                  {locked && <small>после первого среза</small>}
+                </button>
+              );
+            })}
+          </nav>
+        )}
         <div className="client-mini">
           <strong>{cabinetClient.name}</strong>
           <span>{cabinetClient.email || accountId}</span>
@@ -153,7 +212,7 @@ export default function Layout({
               <h1>{currentLabel}</h1>
               <p className="subtitle">{subtitle}</p>
             </div>
-            {activePage !== "self" && activePage !== "settings" ? (
+            {onPrimaryAction && activePage !== "self" && activePage !== "settings" ? (
               <button className="primary-btn" onClick={onPrimaryAction} type="button">
                 {topbarActionLabel}
               </button>
