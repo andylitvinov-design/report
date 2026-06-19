@@ -81,6 +81,12 @@ h2 {
     linear-gradient(135deg, #fffaf3, var(--psi-bg));
 }
 
+.app-shell.workbook-mode {
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+}
+
 .global-topbar {
   grid-column: 1 / -1;
   position: sticky;
@@ -403,6 +409,14 @@ h2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 18px 22px;
+}
+
+.main-shell.workbook-main-shell {
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 
 .topbar,
@@ -968,6 +982,10 @@ h3 {
   display: grid;
   align-content: start;
   gap: 18px;
+}
+
+.workbook-main-shell .workspace {
+  display: block;
 }
 
 .new-user-shell .workspace {
@@ -2333,6 +2351,136 @@ h3 {
   line-height: 1.45;
 }
 
+.workbook-overview-page {
+  width: 100%;
+}
+
+.workbook-overview-book .workbook-page {
+  align-content: center;
+}
+
+.workbook-overview-note {
+  width: min(100%, 540px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(137, 99, 55, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.62);
+}
+
+.workbook-overview-note > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #e8ecd9;
+  color: #6a8d58;
+  font-size: 22px;
+}
+
+.workbook-overview-note h2 {
+  margin-bottom: 10px;
+  color: var(--workbook-green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.workbook-overview-note p,
+.workbook-overview-suggestion {
+  color: #1f2725;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.42;
+}
+
+.workbook-overview-note p + p {
+  margin-top: 8px;
+}
+
+.workbook-overview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workbook-overview-list span {
+  padding: 8px 12px;
+  border: 1px solid rgba(18, 63, 49, 0.12);
+  border-radius: 999px;
+  background: rgba(232, 240, 223, 0.76);
+  color: var(--workbook-green);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.workbook-overview-suggestion {
+  width: min(100%, 520px);
+  color: rgba(31, 39, 37, 0.78);
+}
+
+.workbook-overview-actions {
+  width: min(100%, 560px);
+  display: grid;
+  gap: 14px;
+}
+
+.workbook-overview-action {
+  min-height: 92px;
+  padding: 18px 20px;
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  border: 1px solid rgba(18, 63, 49, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 253, 248, 0.68);
+  color: var(--workbook-green);
+  text-align: left;
+  box-shadow: 0 12px 28px rgba(43, 32, 18, 0.07);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.workbook-overview-action.primary {
+  background: linear-gradient(135deg, #174c39, #2d6c4f);
+  color: #fffaf0;
+}
+
+.workbook-overview-action:hover,
+.workbook-overview-action:focus-visible {
+  border-color: rgba(18, 63, 49, 0.34);
+  background: rgba(232, 240, 223, 0.78);
+  transform: translateY(-1px);
+}
+
+.workbook-overview-action.primary:hover,
+.workbook-overview-action.primary:focus-visible {
+  background: linear-gradient(135deg, #123f31, #245c43);
+}
+
+.workbook-overview-action span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.08;
+}
+
+.workbook-overview-action small {
+  color: rgba(31, 39, 37, 0.62);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.workbook-overview-action.primary small {
+  color: rgba(255, 250, 240, 0.78);
+}
+
+.workbook-overview-status {
+  width: min(100%, 560px);
+}
+
 .workbook-theme-badge,
 .workbook-progress-card,
 .workbook-current-answer {
@@ -3596,9 +3744,9 @@ h3 {
 
   .workbook-title {
     max-width: 100%;
-    font-size: 20px;
+    font-size: clamp(40px, 13vw, 54px);
     line-height: 1;
-    overflow-wrap: normal;
+    overflow-wrap: anywhere;
   }
 
   .workbook-question {
@@ -3650,6 +3798,27 @@ h3 {
   .workbook-action-row .soft-warning-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .workbook-overview-book .workbook-page {
+    align-content: start;
+  }
+
+  .workbook-overview-note {
+    grid-template-columns: 1fr;
+  }
+
+  .workbook-overview-actions {
+    gap: 10px;
+  }
+
+  .workbook-overview-action {
+    min-height: 82px;
+    padding: 15px;
+  }
+
+  .workbook-overview-action span {
+    font-size: 22px;
   }
 
   .mobile-menu {

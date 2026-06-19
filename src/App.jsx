@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
-import { analysisCatalog, clientProgress, selfAnalysis } from "./data/mockData.js";
+import { analysisCatalog, client, clientProgress, selfAnalysis } from "./data/mockData.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
@@ -509,7 +509,13 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     return (
       <Overview
         bookingNoticeVisible={bookingNoticeVisible}
+        clientName={clientOverride?.name || client.name}
         hasCompletedResults={hasCompletedResults}
+        onAskAssistant={() => handleNavigation("recommendations")}
+        onContinueIntake={openFirstIntake}
+        onNavigate={handleNavigation}
+        onOpenResults={() => openResultReport(pageTabs.expert[0])}
+        onRepeatAiIntake={() => handleNavigation("advanced")}
         onSpecialistRequest={handleSpecialistRequest}
         onStartSelfAnalysis={openFirstIntake}
       />
@@ -537,6 +543,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
       userAction={userAction}
+      workbookMode={activePage === "overview"}
     >
       {renderPage()}
     </Layout>
