@@ -543,7 +543,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       onTabChange={handleNavigation}
       pageTabs={pageTabs[activePage]}
       userAction={userAction}
-      workbookMode={activePage === "overview"}
+      workbookMode
     >
       {renderPage()}
     </Layout>

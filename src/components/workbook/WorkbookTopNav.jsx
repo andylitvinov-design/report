@@ -1,23 +1,36 @@
-import React, { useId, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
+import {
+  findActiveWorkbookSubnav,
+  findWorkbookCategoryById,
+  findWorkbookCategoryByPage,
+  workbookNavigation,
+} from "../../data/workbookNavigation.js";
 
-export const workbookNavGroups = [
-  { id: "overview", label: "Обзор", page: "overview" },
-  { id: "intakes", label: "Приёмы", page: "self" },
-  { id: "ai", label: "ИИ-анализ", page: "advanced" },
-  { id: "results", label: "Результаты", page: "expert" },
-  { id: "support", label: "Поддержка", page: "recommendations" },
-  { id: "more", label: "Ещё", page: "history" },
-];
-
-export default function WorkbookTopNav({ activeGroup = "overview", onNavigate }) {
+export default function WorkbookTopNav({ activeGroup, activePage = "overview", activeTab = "", onNavigate }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuId = useId();
-  const activeItem = workbookNavGroups.find((item) => item.id === activeGroup) || workbookNavGroups[0];
+  const activeCategory = activeGroup
+    ? findWorkbookCategoryById(activeGroup)
+    : findWorkbookCategoryByPage(activePage);
+  const activeSubnav = findActiveWorkbookSubnav(activeCategory, activePage, activeTab);
 
   const handleNavigate = (item) => {
-    onNavigate?.(item.page);
+    onNavigate?.(item.page, item.tab);
     setIsMobileMenuOpen(false);
   };
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMobileMenuOpen]);
 
   return (
     <div className="workbook-nav-wrap">
@@ -29,32 +42,62 @@ export default function WorkbookTopNav({ activeGroup = "overview", onNavigate })
         onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
         type="button"
       >
-        <span>{activeItem.label}</span>
+        <span>{activeCategory.label}</span>
         <span aria-hidden="true">▾</span>
       </button>
 
       {isMobileMenuOpen && (
         <div className="workbook-mobile-nav-menu" id={menuId} role="menu">
-          {workbookNavGroups.map((item) => (
-            <button
-              aria-current={item.id === activeGroup ? "page" : undefined}
-              className={item.id === activeGroup ? "workbook-mobile-nav-item active" : "workbook-mobile-nav-item"}
-              key={item.id}
-              onClick={() => handleNavigate(item)}
-              role="menuitem"
-              type="button"
-            >
-              {item.label}
-            </button>
-          ))}
+          <div className="workbook-mobile-nav-section" aria-label="Категории">
+            {workbookNavigation.map((item) => (
+              <button
+                aria-current={item.id === activeCategory.id ? "page" : undefined}
+                className={item.id === activeCategory.id ? "workbook-mobile-nav-item active" : "workbook-mobile-nav-item"}
+                key={item.id}
+                onClick={() => handleNavigate(item)}
+                role="menuitem"
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <div className="workbook-mobile-subnav-section" aria-label={`Подкатегории: ${activeCategory.label}`}>
+            {activeCategory.subnav.map((item) => (
+              <button
+                aria-current={item.id === activeSubnav.id ? "page" : undefined}
+                className={item.id === activeSubnav.id ? "workbook-mobile-subnav-item active" : "workbook-mobile-subnav-item"}
+                key={item.id}
+                onClick={() => handleNavigate(item)}
+                role="menuitem"
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      <nav className="workbook-top-nav" aria-label="Разделы журнала">
-        {workbookNavGroups.map((item) => (
+      <nav className="workbook-top-nav" aria-label="Категории личного кабинета">
+        {workbookNavigation.map((item) => (
           <button
-            aria-current={item.id === activeGroup ? "page" : undefined}
-            className={item.id === activeGroup ? "workbook-nav-item active" : "workbook-nav-item"}
+            aria-current={item.id === activeCategory.id ? "page" : undefined}
+            className={item.id === activeCategory.id ? "workbook-nav-item active" : "workbook-nav-item"}
+            key={item.id}
+            onClick={() => handleNavigate(item)}
+            type="button"
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      <nav className="workbook-subnav" aria-label={`Подкатегории: ${activeCategory.label}`}>
+        {activeCategory.subnav.map((item) => (
+          <button
+            aria-current={item.id === activeSubnav.id ? "page" : undefined}
+            className={item.id === activeSubnav.id ? "workbook-subnav-item active" : "workbook-subnav-item"}
             key={item.id}
             onClick={() => handleNavigate(item)}
             type="button"

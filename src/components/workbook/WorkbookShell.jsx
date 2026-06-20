@@ -11,7 +11,14 @@ function initialsForName(name) {
     .toUpperCase() || "AL";
 }
 
-export default function WorkbookShell({ activeGroup = "overview", children, onNavigate, userName = "Andrey Litvinov" }) {
+export default function WorkbookShell({
+  activeGroup,
+  activePage = "overview",
+  activeTab = "",
+  children,
+  onNavigate,
+  userName = "Andrey Litvinov",
+}) {
   return (
     <section className="workbook-app">
       <div className="workbook-shell">
@@ -20,7 +27,12 @@ export default function WorkbookShell({ activeGroup = "overview", children, onNa
             <span className="workbook-brand-mark" aria-hidden="true">✦</span>
             <strong>PsiTherapy</strong>
           </div>
-          <WorkbookTopNav activeGroup={activeGroup} onNavigate={onNavigate} />
+          <WorkbookTopNav
+            activeGroup={activeGroup}
+            activePage={activePage}
+            activeTab={activeTab}
+            onNavigate={onNavigate}
+          />
           <button className="workbook-account" type="button">
             <span aria-hidden="true">{initialsForName(userName)}</span>
             <strong>{userName}</strong>

@@ -5,7 +5,6 @@ import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
 import WorkbookChoiceList from "../components/workbook/WorkbookChoiceList.jsx";
 import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
 import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
-import WorkbookShell from "../components/workbook/WorkbookShell.jsx";
 import WorkbookThemeBadge from "../components/workbook/WorkbookThemeBadge.jsx";
 import { selfAnalysis } from "../data/mockData.js";
 import { calculateRemedyResults } from "../lib/bachScoring.js";
@@ -692,81 +691,78 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
 
   if (restoreChoiceVisible) {
     return (
-      <WorkbookShell activeGroup="intakes" onNavigate={onNavigate} userName={clientName}>
-        <section className="first-intake-page first-intake-dialog restore-intake-shell">
-          <WorkbookBook>
-            <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-              <p className="workbook-kicker">Первый приём</p>
-              <h1 className="workbook-title">Вы уже начали журнал.</h1>
-              <p className="workbook-body">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
-              <div className="workbook-progress-card">
-                <span>Текущая часть</span>
-                <strong>{partLabel}</strong>
-                <small>Обновлено: {formatDateTime(state.updatedAt)}</small>
-              </div>
-              <WorkbookSafetyNote>
-                Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
-              </WorkbookSafetyNote>
-            </WorkbookPage>
-            <WorkbookPage side="right" variant="response">
-              <p className="workbook-kicker">Продолжить</p>
-              <h2 className="workbook-question">У вас есть незавершённый первый приём.</h2>
-              <p className="workbook-body">Выберите, что сделать сейчас.</p>
-              <div className="workbook-action-row">
-                <button className="secondary-btn" onClick={goToMainMenu} type="button">
-                  В главное меню
-                </button>
-                <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
-                  Продолжить
-                </button>
-                <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-                  Начать заново
-                </button>
-              </div>
-              {restartChoiceSheet}
-            </WorkbookPage>
-          </WorkbookBook>
-        </section>
-      </WorkbookShell>
+      <section className="first-intake-page first-intake-dialog restore-intake-shell">
+        <WorkbookBook>
+          <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+            <p className="workbook-kicker">Первый приём</p>
+            <h1 className="workbook-title">Вы уже начали журнал.</h1>
+            <p className="workbook-body">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
+            <div className="workbook-progress-card">
+              <span>Текущая часть</span>
+              <strong>{partLabel}</strong>
+              <small>Обновлено: {formatDateTime(state.updatedAt)}</small>
+            </div>
+            <WorkbookSafetyNote>
+              Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
+            </WorkbookSafetyNote>
+          </WorkbookPage>
+          <WorkbookPage side="right" variant="response">
+            <p className="workbook-kicker">Продолжить</p>
+            <h2 className="workbook-question">У вас есть незавершённый первый приём.</h2>
+            <p className="workbook-body">Выберите, что сделать сейчас.</p>
+            <div className="workbook-action-row">
+              <button className="secondary-btn" onClick={goToMainMenu} type="button">
+                В главное меню
+              </button>
+              <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
+                Продолжить
+              </button>
+              <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+                Начать заново
+              </button>
+            </div>
+            {restartChoiceSheet}
+          </WorkbookPage>
+        </WorkbookBook>
+      </section>
     );
   }
 
   return (
-    <WorkbookShell activeGroup="intakes" onNavigate={onNavigate} userName={clientName}>
-      <section className="first-intake-page first-intake-dialog">
-        <WorkbookBook>
-          <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-            <h1 className="workbook-title">Журнал самонаблюдений</h1>
-            <span className="workbook-title-rule" aria-hidden="true" />
-            <p className="workbook-body workbook-lead">Сейчас главное — двигаться мягко и замечать, что меняется.</p>
-            <div className="workbook-news-card">
-              <span aria-hidden="true">☘</span>
-              <div>
-                <strong>Что нового</strong>
-                <p>Ресурс немного вырос</p>
-                <p>Напряжение стало мягче</p>
-              </div>
+    <section className="first-intake-page first-intake-dialog">
+      <WorkbookBook>
+        <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+          <h1 className="workbook-title">Журнал самонаблюдений</h1>
+          <span className="workbook-title-rule" aria-hidden="true" />
+          <p className="workbook-body workbook-lead">Сейчас главное — двигаться мягко и замечать, что меняется.</p>
+          <div className="workbook-news-card">
+            <span aria-hidden="true">☘</span>
+            <div>
+              <strong>Что нового</strong>
+              <p>Ресурс немного вырос</p>
+              <p>Напряжение стало мягче</p>
             </div>
-            <div className="workbook-topic-card">
-              <span aria-hidden="true">☘</span>
-              <p>Работаем с темой:<br />{currentTheme}</p>
-            </div>
-            <div className="workbook-progress-card">
-              <span>{partLabel}</span>
-              <strong>{stepLabel}</strong>
-            </div>
-            <div className="workbook-progress-compact">
-              <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
-            </div>
-            {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
-              <CompactBaselineStrip baseline={state.answers.baseline} />
-            ) : null}
-            <WorkbookSafetyNote>
-              Отвечайте как есть сегодня. Здесь нет правильных или неправильных ответов.
-            </WorkbookSafetyNote>
-          </WorkbookPage>
+          </div>
+          <div className="workbook-topic-card">
+            <span aria-hidden="true">☘</span>
+            <p>Работаем с темой:<br />{currentTheme}</p>
+          </div>
+          <div className="workbook-progress-card">
+            <span>{partLabel}</span>
+            <strong>{stepLabel}</strong>
+          </div>
+          <div className="workbook-progress-compact">
+            <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
+          </div>
+          {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
+            <CompactBaselineStrip baseline={state.answers.baseline} />
+          ) : null}
+          <WorkbookSafetyNote>
+            Отвечайте как есть сегодня. Здесь нет правильных или неправильных ответов.
+          </WorkbookSafetyNote>
+        </WorkbookPage>
 
-          <WorkbookPage side="right" variant="response">
+        <WorkbookPage side="right" variant="response">
             <div className="workbook-response-head">
               <p className="workbook-kicker">Ваш ответ</p>
               <WorkbookThemeBadge>{currentTheme}</WorkbookThemeBadge>
@@ -835,9 +831,8 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
               ) : null}
             </footer>
             {restartChoiceSheet}
-          </WorkbookPage>
-        </WorkbookBook>
-      </section>
-    </WorkbookShell>
+        </WorkbookPage>
+      </WorkbookBook>
+    </section>
   );
 }

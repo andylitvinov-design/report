@@ -2042,14 +2042,18 @@ h3 {
 
 .workbook-top-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 26px;
+  gap: 14px;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .workbook-nav-wrap {
   position: relative;
   min-width: 0;
+  display: grid;
+  gap: 10px;
 }
 
 .workbook-mobile-nav-trigger,
@@ -2060,15 +2064,17 @@ h3 {
 .workbook-nav-item {
   position: relative;
   min-height: 42px;
-  padding: 8px 2px;
+  flex: 0 0 auto;
+  padding: 8px 4px;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: #1f2725;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 500;
   transition: color 160ms ease, transform 160ms ease;
+  white-space: nowrap;
 }
 
 .workbook-nav-item::after {
@@ -2091,6 +2097,41 @@ h3 {
 
 .workbook-nav-item.active::after {
   background: var(--workbook-green);
+}
+
+.workbook-subnav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 2px 3px;
+  scrollbar-width: thin;
+}
+
+.workbook-subnav-item,
+.workbook-mobile-subnav-item {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid rgba(18, 63, 49, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.58);
+  color: rgba(31, 39, 37, 0.74);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.workbook-subnav-item:hover,
+.workbook-subnav-item:focus-visible,
+.workbook-subnav-item.active,
+.workbook-mobile-subnav-item:hover,
+.workbook-mobile-subnav-item:focus-visible,
+.workbook-mobile-subnav-item.active {
+  border-color: rgba(18, 63, 49, 0.28);
+  background: var(--workbook-sage);
+  color: var(--workbook-green);
 }
 
 .workbook-account {
@@ -3719,7 +3760,7 @@ h3 {
 
   .workbook-header {
     min-height: 64px;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 8px;
     padding: 8px 0;
   }
@@ -3739,16 +3780,26 @@ h3 {
   }
 
   .workbook-nav-wrap {
-    justify-self: end;
+    display: contents;
   }
 
   .workbook-top-nav {
     display: none;
   }
 
+  .workbook-subnav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    order: 3;
+    max-width: calc(100vw - 28px);
+    padding: 2px 0 4px;
+  }
+
   .workbook-mobile-nav-trigger {
+    grid-column: 2;
+    justify-self: center;
     min-height: 42px;
-    max-width: 130px;
+    max-width: 140px;
     padding: 8px 11px;
     display: inline-flex;
     align-items: center;
@@ -3770,18 +3821,34 @@ h3 {
   }
 
   .workbook-mobile-nav-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
+    position: fixed;
+    top: 74px;
+    right: 14px;
+    left: 14px;
     z-index: 40;
-    width: min(240px, calc(100vw - 28px));
-    padding: 8px;
+    width: auto;
+    max-height: calc(100dvh - 92px);
+    padding: 12px;
     display: grid;
-    gap: 4px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    overflow: auto;
     border: 1px solid rgba(18, 63, 49, 0.14);
     border-radius: 18px;
     background: rgba(255, 253, 248, 0.98);
     box-shadow: 0 18px 48px rgba(43, 32, 18, 0.18);
+  }
+
+  .workbook-mobile-nav-section,
+  .workbook-mobile-subnav-section {
+    display: grid;
+    gap: 5px;
+  }
+
+  .workbook-mobile-subnav-section {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    padding-top: 10px;
+    border-top: 1px solid rgba(18, 63, 49, 0.1);
   }
 
   .workbook-mobile-nav-item {
@@ -3794,6 +3861,13 @@ h3 {
     color: #1f2725;
     font-weight: 800;
     text-align: left;
+  }
+
+  .workbook-mobile-subnav-item {
+    width: 100%;
+    justify-content: center;
+    border-radius: 14px;
+    text-align: center;
   }
 
   .workbook-mobile-nav-item:hover,
