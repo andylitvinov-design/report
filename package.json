@@ -1,9 +1,12 @@
 {
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/write-build-info.mjs",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm test",
     "delivery:check": "bash scripts/delivery-checks.sh",
     "delivery:status": "bash scripts/delivery-status.sh"
   },

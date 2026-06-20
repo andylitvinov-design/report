@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AnalysisMenuCard } from "./Cards.jsx";
+import WorkbookShell from "./workbook/WorkbookShell.jsx";
 import {
   client,
   navigation,
@@ -110,6 +111,21 @@ export default function Layout({
     setIsMobileMenuOpen(false);
     onSignOut?.();
   };
+
+  if (workbookMode) {
+    return (
+      <WorkbookShell
+        activePage={activePage}
+        activeTab={activeTab}
+        onNavigate={onTabChange}
+        userName={cabinetClient.name}
+      >
+        <main className={mainShellClassName}>
+          <section className="workspace">{children}</section>
+        </main>
+      </WorkbookShell>
+    );
+  }
 
   return (
     <div className={shellClassName}>

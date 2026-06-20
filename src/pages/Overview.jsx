@@ -2,7 +2,6 @@ import React from "react";
 import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
 import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
 import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
-import WorkbookShell from "../components/workbook/WorkbookShell.jsx";
 import { overview } from "../data/mockData.js";
 
 function WorkbookActionButton({ children, description, onClick, variant = "secondary" }) {
@@ -226,23 +225,21 @@ export default function Overview({
   onStartSelfAnalysis,
 }) {
   return (
-    <WorkbookShell activeGroup="overview" onNavigate={onNavigate} userName={clientName}>
-      <section className="workbook-overview-page" aria-label="Обзор мягкого AI-приёма">
-        {hasCompletedResults ? (
-          <CurrentUserWorkbook
-            onAskAssistant={onAskAssistant}
-            onOpenResults={onOpenResults}
-            onRepeatAiIntake={onRepeatAiIntake}
-          />
-        ) : (
-          <NewUserWorkbook
-            bookingNoticeVisible={bookingNoticeVisible}
-            onContinueIntake={onContinueIntake}
-            onSpecialistRequest={onSpecialistRequest}
-            onStartSelfAnalysis={onStartSelfAnalysis}
-          />
-        )}
-      </section>
-    </WorkbookShell>
+    <section className="workbook-overview-page" aria-label="Обзор мягкого AI-приёма">
+      {hasCompletedResults ? (
+        <CurrentUserWorkbook
+          onAskAssistant={onAskAssistant}
+          onOpenResults={onOpenResults}
+          onRepeatAiIntake={onRepeatAiIntake}
+        />
+      ) : (
+        <NewUserWorkbook
+          bookingNoticeVisible={bookingNoticeVisible}
+          onContinueIntake={onContinueIntake}
+          onSpecialistRequest={onSpecialistRequest}
+          onStartSelfAnalysis={onStartSelfAnalysis}
+        />
+      )}
+    </section>
   );
 }
