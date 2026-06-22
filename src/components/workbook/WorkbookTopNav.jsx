@@ -72,20 +72,6 @@ export default function WorkbookTopNav({ activeGroup, activePage = "overview", a
       </nav>
 
       <WorkbookSubNav activeSubnav={activeSubnav} category={activeCategory} onNavigate={handleNavigate} />
-
-      <nav className="workbook-mobile-bottom-nav" aria-label="Основные разделы">
-        {workbookNavigation.map((item) => (
-          <button
-            aria-current={item.id === activeCategory.id ? "page" : undefined}
-            className={item.id === activeCategory.id ? "workbook-mobile-bottom-item active" : "workbook-mobile-bottom-item"}
-            key={item.id}
-            onClick={() => handleNavigate(item)}
-            type="button"
-          >
-            {item.shortLabel || item.label}
-          </button>
-        ))}
-      </nav>
     </div>
   );
 }
