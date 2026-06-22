@@ -86,11 +86,8 @@ function AiIntakeDashboard({
     <section className="compact-section-page" aria-labelledby="ai-intake-title">
       <article className="card compact-route-hero">
         <p className="eyebrow">ИИ-приём</p>
-        <h2 id="ai-intake-title">Краткий срез запроса и состояния</h2>
-        <p>
-          Краткий ИИ-приём собирает текущий запрос и мягкий анализ Баха. Первый и повторный
-          приём остаются состояниями одной страницы, а новые срезы сохраняются в историю.
-        </p>
+        <h2 id="ai-intake-title">Краткий срез</h2>
+        <p>Быстро понять запрос, состояние и первые опоры.</p>
         <div className="compact-route-actions">
           {completedToday ? (
             <>
@@ -107,11 +104,11 @@ function AiIntakeDashboard({
           ) : (
             <>
               <button className="primary-btn" type="button" onClick={onStartBrief}>
-                {hasBriefIntake ? "Пройти повторный ИИ-приём" : "Пройти краткий ИИ-приём"}
+                Пройти короткий ИИ-приём
               </button>
               {hasBriefIntake && (
                 <button className="secondary-btn" type="button" onClick={onStartAdvanced}>
-                  Пройти расширенный ИИ-приём
+                  Расширенный срез
                 </button>
               )}
             </>
@@ -121,27 +118,40 @@ function AiIntakeDashboard({
           {completedToday
             ? "Следующая проверка будет доступна завтра."
             : hasBriefIntake
-              ? "Новый срез сохранится в историю и обновит динамику."
-              : "Краткий ИИ-приём создаст первую карту состояния."}
+              ? "Новый срез сохранится в историю."
+              : "3–5 минут. После появится первая карта состояния."}
         </p>
       </article>
 
       <div className="compact-route-grid">
         <article className="card compact-route-card">
-          <span>Краткий</span>
-          <h3>Запрос и анализ Баха</h3>
-          <p>Одна короткая рабочая линия: что сейчас беспокоит, что может поддержать и что требует проверки.</p>
+          <span>ИИ-приём</span>
+          <h3>Краткий срез</h3>
+          <p>Запрос, состояние и первая опора.</p>
+          <button className="secondary-btn" type="button" onClick={onStartBrief}>
+            Пройти короткий ИИ-приём
+          </button>
+          <small className="compact-route-hint">3–5 минут</small>
         </article>
         <article className="card compact-route-card">
           <span>Расширенный</span>
-          <h3>Тесты и шкалы</h3>
-          <p>Общее состояние, эмоциональные шкалы, ресурс, телесные маркеры, отношения и дополнительные тесты.</p>
-          <strong>{advancedAiResult ? "Последний расширенный срез сохранён" : "Доступен после краткого приёма"}</strong>
+          <h3>Глубже по шкалам</h3>
+          <p>Больше деталей, когда краткого среза мало.</p>
+          <button className="secondary-btn" disabled={!hasBriefIntake} type="button" onClick={onStartAdvanced}>
+            Открыть расширенный
+          </button>
+          <small className="compact-route-hint">
+            {advancedAiResult ? "Последний срез сохранён" : "После краткого приёма"}
+          </small>
         </article>
         <article className="card compact-route-card">
-          <span>История ИИ-приёмов</span>
-          <h3>Даты, отчёты, сравнение</h3>
-          <p>Все повторные срезы живут в архиве, где можно открыть отчёт и сравнить изменения.</p>
+          <span>История</span>
+          <h3>Срезы и динамика</h3>
+          <p>Открыть прошлые даты и сравнение.</p>
+          <button className="secondary-btn" type="button" onClick={onOpenDynamics}>
+            Открыть историю
+          </button>
+          <small className="compact-route-hint">После первого среза</small>
         </article>
       </div>
     </section>
@@ -161,9 +171,9 @@ function ConsultationPlaceholder({
         <p className="eyebrow">Личная сессия</p>
         <h2 id="consultations-title">Разбор отчёта со специалистом</h2>
         {hasCompletedResults ? (
-          <p>Последний ИИ-отчёт можно взять как основу для личной сессии и уточнения следующего шага.</p>
+          <p>Взять последний отчёт в работу.</p>
         ) : (
-          <p>Можно записаться сразу, но лучше сначала пройти краткий ИИ-приём — тогда сессия будет точнее.</p>
+          <p>Сначала можно пройти короткий срез.</p>
         )}
         <div className="compact-route-actions">
           {hasCompletedResults ? (
@@ -197,12 +207,12 @@ function ConsultationPlaceholder({
         <article className="card compact-route-card">
           <span>Последний отчёт</span>
           <h3>{hasCompletedResults ? "Готов для разбора" : "Появится после ИИ-приёма"}</h3>
-          <p>{hasCompletedResults ? "Отчёт можно открыть перед записью и взять как материал для встречи." : "Первый отчёт поможет точнее сформулировать запрос."}</p>
+          <p>{hasCompletedResults ? "Открыть перед встречей." : "Поможет сформулировать запрос."}</p>
         </article>
         <article className="card compact-route-card">
           <span>История сессий</span>
           <h3>Прошедшие и будущие встречи</h3>
-          <p>После сессии здесь будут ссылки на отчёт, заметку или назначение, если они есть.</p>
+          <p>Даты, заметки и назначения.</p>
         </article>
       </div>
     </section>
@@ -211,30 +221,27 @@ function ConsultationPlaceholder({
 
 function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, onStartSelfAnalysis }) {
   const reportText = hasCompletedResults
-    ? "Последний ИИ-отчёт доступен, повторные срезы будут добавляться в историю."
+    ? "Последний ИИ-отчёт доступен."
     : "ИИ-отчёты появятся после первого ИИ-приёма.";
 
   return (
     <section className="compact-section-page" aria-labelledby="profile-reports-title">
       <article className="card compact-route-hero">
         <p className="eyebrow">Профиль / Отчёты</p>
-        <h2 id="profile-reports-title">Архив, личный кабинет и динамика</h2>
-        <p>
-          Здесь собраны личные отчёты, ИИ-отчёты, тесты, измерения, история назначений и настройки доступа.
-          Рабочий маршрут вынесен в остальные разделы.
-        </p>
+        <h2 id="profile-reports-title">Отчёты и динамика</h2>
+        <p>Личный архив, последние результаты и настройки доступа.</p>
       </article>
 
       <div className="compact-archive-grid">
         <article className="card compact-route-card">
           <span>Личный анализ</span>
-          <h3>Экспертные отчёты и назначения</h3>
-          <p>Личные отчёты появятся после сессии со специалистом.</p>
+          <h3>Отчёты специалиста</h3>
+          <p>Появятся после личной сессии.</p>
           <button className="secondary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
         </article>
         <article className="card compact-route-card">
           <span>ИИ-анализ</span>
-          <h3>Последний отчёт и сравнение</h3>
+          <h3>Последний ИИ-отчёт</h3>
           <p>{reportText}</p>
           <button className="secondary-btn" type="button" onClick={hasCompletedResults ? onOpenReport : onStartSelfAnalysis}>
             {hasCompletedResults ? "Открыть последний отчёт" : "Пройти ИИ-приём"}
@@ -242,14 +249,14 @@ function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, 
         </article>
         <article className="card compact-route-card">
           <span>Данные и динамика</span>
-          <h3>Тесты, шкалы, измерения</h3>
-          <p>Динамика появится после двух и более ИИ-приёмов.</p>
+          <h3>Сравнение срезов</h3>
+          <p>После двух и более ИИ-приёмов.</p>
           <button className="secondary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти повторный ИИ-приём</button>
         </article>
         <article className="card compact-route-card">
           <span>Доступ и настройки</span>
-          <h3>Мои данные, оплата, приватность</h3>
-          <p>Аккаунт и настройки остаются внутри кабинета, без отдельного пункта первого уровня.</p>
+          <h3>Аккаунт</h3>
+          <p>Данные, вход и приватность.</p>
         </article>
       </div>
     </section>
@@ -262,8 +269,8 @@ function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRep
       <section className="compact-section-page" aria-labelledby="next-empty-title">
         <article className="card compact-route-hero">
           <p className="eyebrow">Что дальше</p>
-          <h2 id="next-empty-title">Назначение появится после ИИ-отчёта или личной сессии</h2>
-          <p>Сначала нужен краткий срез или встреча, чтобы план был связан с текущим состоянием.</p>
+          <h2 id="next-empty-title">Сначала короткий срез</h2>
+          <p>После него появится первый план действий.</p>
           <div className="compact-route-actions">
             <button className="primary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти ИИ-приём</button>
             <button className="secondary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
@@ -278,11 +285,7 @@ function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRep
       <article className="card compact-route-hero">
         <p className="eyebrow">Что дальше</p>
         <h2 id="next-title">Текущее направление поддержки</h2>
-        <p>
-          Сейчас важно бережно поддержать ресурс, не перегружать план и повторить проверку после
-          нескольких дней наблюдения. Это не заменяет медицинскую помощь; при серьёзных симптомах
-          лучше держать связь с врачом.
-        </p>
+        <p>Один фокус, мягкая поддержка и повторная проверка.</p>
         <div className="compact-route-actions">
           <button className="primary-btn" type="button" onClick={onOpenReport}>Открыть отчёт</button>
           <button className="secondary-btn" type="button" onClick={onBookSession}>Записаться на сессию</button>
@@ -293,11 +296,11 @@ function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRep
       <div className="compact-archive-grid next-plan-grid">
         {[
           ["Главный фокус", "Снизить расход ресурса и оставить один понятный шаг на ближайшие дни."],
-          ["Что поддерживать", "Сон, паузы, мягкие практики и наблюдение за тем, что может поддержать."],
-          ["Что не перегружать", "Не расширять список задач, если ресурс остаётся нестабильным."],
+          ["Что поддерживать", "Сон, паузы и мягкие практики."],
+          ["Что не перегружать", "Не расширять список задач."],
           ["Что делать мягко", "Отмечать изменения коротко, без жёсткой оценки и давления на результат."],
-          ["Что принимать / использовать", "Только то, что назначено специалистом; новые средства требуют проверки."],
-          ["Что отслеживать", "Ресурс, напряжение, телесные маркеры и повторяющиеся эмоциональные темы."],
+          ["Что принимать / использовать", "Только назначенное специалистом."],
+          ["Что отслеживать", "Ресурс, напряжение и телесные маркеры."],
         ].map(([title, text]) => (
           <article className="card compact-route-card" key={title}>
             <span>Текущее назначение</span>

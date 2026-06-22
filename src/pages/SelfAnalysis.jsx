@@ -408,10 +408,7 @@ function AnalysisNavigatorWorkspace({
           <p className="eyebrow">Профиль / Самоанализ</p>
           <h2 id="analysis-navigator-title">Результаты выбранного анализа</h2>
         </div>
-        <p>
-          Центральная область показывает текущий выбранный тест: краткое резюме, динамику,
-          основные шкалы и следующие действия.
-        </p>
+        <p>Краткое резюме, динамика и следующий шаг.</p>
       </div>
       <AnalysisResultPanel
         analysis={activeAnalysis}

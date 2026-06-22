@@ -12,18 +12,6 @@ export const workbookNavigation = [
     ],
   },
   {
-    id: "personal-session",
-    label: "Личная сессия",
-    shortLabel: "Сессия",
-    page: "consultations",
-    pages: ["consultations"],
-    subnav: [
-      { id: "last-report", label: "Последний отчёт", page: "consultations", tab: "last-report" },
-      { id: "order", label: "Заказать сессию", page: "consultations", tab: "order" },
-      { id: "history", label: "История сессий", page: "consultations", tab: "session-history" },
-    ],
-  },
-  {
     id: "profile-reports",
     label: "Профиль / Отчёты",
     shortLabel: "Отчёты",
@@ -41,10 +29,11 @@ export const workbookNavigation = [
     label: "Что дальше",
     shortLabel: "Дальше",
     page: "recommendations",
-    pages: ["recommendations"],
+    pages: ["recommendations", "consultations"],
     subnav: [
       { id: "current-assignment", label: "Текущее назначение", page: "recommendations", tab: "current-assignment" },
       { id: "support-plan", label: "План сопровождения", page: "recommendations", tab: "support-plan" },
+      { id: "personal-session", label: "Личная сессия", page: "consultations", tab: "order" },
       { id: "next-action", label: "Следующий шаг", page: "recommendations", tab: "next-action" },
       { id: "next-check", label: "Следующая проверка", page: "recommendations", tab: "next-check" },
     ],
