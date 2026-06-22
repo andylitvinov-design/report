@@ -62,20 +62,6 @@ export default function WorkbookTopNav({ activeGroup, activePage = "overview", a
               </button>
             ))}
           </div>
-          <div className="workbook-mobile-subnav-section" aria-label={`Подкатегории: ${activeCategory.label}`}>
-            {activeCategory.subnav.map((item) => (
-              <button
-                aria-current={item.id === activeSubnav.id ? "page" : undefined}
-                className={item.id === activeSubnav.id ? "workbook-mobile-subnav-item active" : "workbook-mobile-subnav-item"}
-                key={item.id}
-                onClick={() => handleNavigate(item)}
-                role="menuitem"
-                type="button"
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
         </div>
       )}
 
@@ -103,6 +89,20 @@ export default function WorkbookTopNav({ activeGroup, activePage = "overview", a
             type="button"
           >
             {item.label}
+          </button>
+        ))}
+      </nav>
+
+      <nav className="workbook-mobile-bottom-nav" aria-label="Основные разделы">
+        {workbookNavigation.map((item) => (
+          <button
+            aria-current={item.id === activeCategory.id ? "page" : undefined}
+            className={item.id === activeCategory.id ? "workbook-mobile-bottom-item active" : "workbook-mobile-bottom-item"}
+            key={item.id}
+            onClick={() => handleNavigate(item)}
+            type="button"
+          >
+            {item.shortLabel || item.label}
           </button>
         ))}
       </nav>
