@@ -695,7 +695,7 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
         <WorkbookBook>
           <WorkbookPage side="left" variant="message" backgroundVariant="lake">
             <p className="workbook-kicker">Первый приём</p>
-            <h1 className="workbook-title">Вы уже начали журнал.</h1>
+            <h1 className="workbook-title">Вы уже начали AI-приём.</h1>
             <p className="workbook-body">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
             <div className="workbook-progress-card">
               <span>Текущая часть</span>
@@ -732,7 +732,7 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
     <section className="first-intake-page first-intake-dialog">
       <WorkbookBook>
         <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-          <h1 className="workbook-title">Журнал самонаблюдений</h1>
+          <h1 className="workbook-title">AI-приём самонаблюдения</h1>
           <span className="workbook-title-rule" aria-hidden="true" />
           <p className="workbook-body workbook-lead">Сейчас главное — двигаться мягко и замечать, что меняется.</p>
           <div className="workbook-news-card">
