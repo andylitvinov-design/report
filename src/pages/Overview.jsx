@@ -1,5 +1,6 @@
 import React from "react";
 import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
+import WorkbookMobileHero from "../components/workbook/WorkbookMobileHero.jsx";
 import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
 import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
 import { overview } from "../data/mockData.js";
@@ -166,8 +167,40 @@ function CurrentUserWorkbook({
   const [firstFormula] = overview.formula;
 
   return (
-    <WorkbookBook className="workbook-overview-book">
-      <WorkbookPage side="left" variant="message" backgroundVariant="lake">
+    <>
+      <div className="workbook-mobile-overview" aria-label="Текущий мягкий AI-сеанс">
+        <WorkbookMobileHero>
+          <p className="workbook-kicker">Рабочая карта</p>
+          <h1 className="workbook-title">Сообщение для вас</h1>
+          <p className="workbook-mobile-promise">
+            AI отражает текущую карту состояния и предлагает один следующий шаг.
+          </p>
+          <div className="workbook-mobile-primary">
+            <button className="workbook-overview-action primary" onClick={onOpenResults} type="button">
+              <span>Открыть результаты</span>
+              <small>Посмотреть сохранённую рабочую карту</small>
+            </button>
+          </div>
+        </WorkbookMobileHero>
+
+        <section className="workbook-mobile-secondary" aria-label="Другие варианты">
+          <p className="workbook-kicker">Другие варианты</p>
+          <div className="workbook-overview-actions">
+            <WorkbookActionButton description="Создать новую точку наблюдения" onClick={onRepeatAiIntake}>
+              Пройти повторный ИИ-приём
+            </WorkbookActionButton>
+            <WorkbookActionButton description="Перейти к поддержке и вопросу" onClick={onAskAssistant}>
+              Задать вопрос ассистенту
+            </WorkbookActionButton>
+          </div>
+          <p className="workbook-overview-suggestion">
+            Сегодня достаточно выбрать один следующий шаг и не превращать наблюдение в список задач.
+          </p>
+        </section>
+      </div>
+
+      <WorkbookBook className="workbook-overview-book workbook-overview-book-desktop">
+        <WorkbookPage side="left" variant="message" backgroundVariant="lake">
         <p className="workbook-kicker">Обзор</p>
         <h1 className="workbook-title">Сообщение для вас</h1>
         <span className="workbook-title-rule" aria-hidden="true" />
@@ -208,7 +241,8 @@ function CurrentUserWorkbook({
           </WorkbookActionButton>
         </div>
       </WorkbookPage>
-    </WorkbookBook>
+      </WorkbookBook>
+    </>
   );
 }
 
