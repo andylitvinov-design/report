@@ -537,6 +537,8 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     }
     if (tab) {
       setActiveTabs((current) => ({ ...current, [page]: tab }));
+      setActivePage(page);
+      setBookingNoticeVisible(false);
       return;
     }
     setActivePage(page);

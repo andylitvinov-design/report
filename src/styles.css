@@ -2146,8 +2146,7 @@ h3 {
 }
 
 .workbook-mobile-nav-trigger,
-.workbook-mobile-nav-menu,
-.workbook-mobile-bottom-nav {
+.workbook-mobile-nav-menu {
   display: none;
 }
 
@@ -2220,25 +2219,6 @@ h3 {
 .workbook-mobile-subnav-item:focus-visible,
 .workbook-mobile-subnav-item.active {
   border-color: rgba(18, 63, 49, 0.28);
-  background: var(--workbook-sage);
-  color: var(--workbook-green);
-}
-
-.workbook-mobile-bottom-item {
-  min-width: 0;
-  min-height: 48px;
-  padding: 6px 4px;
-  border: 0;
-  border-radius: 14px;
-  background: transparent;
-  color: rgba(31, 39, 37, 0.72);
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.05;
-  text-align: center;
-}
-
-.workbook-mobile-bottom-item.active {
   background: var(--workbook-sage);
   color: var(--workbook-green);
 }
@@ -3908,7 +3888,7 @@ h3 {
     grid-column: 2;
     justify-self: center;
     min-height: 42px;
-    max-width: 140px;
+    max-width: min(190px, 44vw);
     padding: 8px 11px;
     display: inline-flex;
     align-items: center;
@@ -3948,44 +3928,21 @@ h3 {
     box-shadow: 0 18px 48px rgba(43, 32, 18, 0.18);
   }
 
-  .workbook-mobile-bottom-nav {
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    left: 10px;
-    z-index: 35;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
-    padding: 5px;
-    border: 1px solid rgba(18, 63, 49, 0.14);
-    border-radius: 18px;
-    background: rgba(255, 253, 248, 0.96);
-    box-shadow: 0 16px 42px rgba(43, 32, 18, 0.16);
-  }
-
   .main-shell.workbook-main-shell {
     min-height: 0;
     height: calc(100dvh - 188px);
     max-height: calc(100dvh - 188px);
     overflow-y: auto;
-    padding-bottom: 88px;
+    padding-bottom: 18px;
   }
 
   .compact-section-page {
-    padding-bottom: 88px;
+    padding-bottom: 18px;
   }
 
-  .workbook-mobile-nav-section,
-  .workbook-mobile-subnav-section {
+  .workbook-mobile-nav-section {
     display: grid;
     gap: 5px;
-  }
-
-  .workbook-mobile-subnav-section {
-    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-    padding-top: 10px;
-    border-top: 1px solid rgba(18, 63, 49, 0.1);
   }
 
   .workbook-mobile-nav-item {
