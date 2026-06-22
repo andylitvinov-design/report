@@ -7,18 +7,18 @@ import {
 } from "../src/data/workbookNavigation.js";
 
 describe("workbookNavigation", () => {
-  it("exposes the four-section first-level menu without legacy categories", () => {
+  it("exposes the compact three-section first-level menu without legacy categories", () => {
     assert.deepEqual(
       workbookNavigation.map((item) => item.label),
       [
         "ИИ-приём",
-        "Личная сессия",
         "Профиль / Отчёты",
         "Что дальше",
       ],
     );
 
     assert.equal(workbookNavigation.some((item) => item.label === "Ещё"), false);
+    assert.equal(workbookNavigation.some((item) => item.label === "Личная сессия"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Самоанализ"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Первый приём"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Повторный AI-приём"), false);
@@ -28,7 +28,7 @@ describe("workbookNavigation", () => {
     assert.equal(findWorkbookCategoryByPage("overview").id, "ai-session");
     assert.equal(findWorkbookCategoryByPage("self").id, "ai-session");
     assert.equal(findWorkbookCategoryByPage("advanced").id, "ai-session");
-    assert.equal(findWorkbookCategoryByPage("consultations").id, "personal-session");
+    assert.equal(findWorkbookCategoryByPage("consultations").id, "next-step");
     assert.equal(findWorkbookCategoryByPage("profile").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("expert").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("history").id, "profile-reports");
