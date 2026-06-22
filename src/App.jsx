@@ -21,7 +21,7 @@ import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js
 import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
 export const pageTabs = {
-  overview: ["Состояние", "Динамика", "Психологический портрет", "Карта личности"],
+  overview: [],
   profile: [],
   expert: ["Меню отчётов", "Самоотчёт", "Расширенный ИИ-анализ", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
   recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
@@ -30,6 +30,14 @@ export const pageTabs = {
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
   consultations: [],
 };
+
+function isToday(dateString) {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return false;
+  const today = new Date();
+  return date.toDateString() === today.toDateString();
+}
 
 function LockedReportState({
   bookingNoticeVisible,
@@ -63,24 +71,241 @@ function LockedReportState({
   );
 }
 
-function ConsultationPlaceholder({ bookingNoticeVisible, onSpecialistRequest }) {
+function AiIntakeDashboard({
+  advancedAiResult,
+  firstIntakeResult,
+  onOpenDynamics,
+  onOpenReport,
+  onStartAdvanced,
+  onStartBrief,
+}) {
+  const hasBriefIntake = Boolean(firstIntakeResult);
+  const completedToday = isToday(firstIntakeResult?.completedAt);
+
   return (
-    <section className="locked-empty-state" aria-labelledby="consultations-title">
-      <article className="card locked-empty-card">
-        <p className="eyebrow">Консультации</p>
-        <h2 id="consultations-title">Запись к специалисту</h2>
+    <section className="compact-section-page" aria-labelledby="ai-intake-title">
+      <article className="card compact-route-hero">
+        <p className="eyebrow">ИИ-приём</p>
+        <h2 id="ai-intake-title">Краткий срез запроса и состояния</h2>
         <p>
-          Здесь будет запись на персональную консультацию. Пока можно оставить запрос как следующий шаг.
+          Краткий ИИ-приём собирает текущий запрос и мягкий анализ Баха. Первый и повторный
+          приём остаются состояниями одной страницы, а новые срезы сохраняются в историю.
         </p>
-        <button className="primary-btn" onClick={onSpecialistRequest} type="button">
-          Пройти консультацию у специалиста
-        </button>
+        <div className="compact-route-actions">
+          {completedToday ? (
+            <>
+              <button className="primary-btn" type="button" disabled>
+                Сегодня ИИ-приём уже пройден
+              </button>
+              <button className="secondary-btn" type="button" onClick={onOpenReport}>
+                Открыть последний отчёт
+              </button>
+              <button className="secondary-btn" type="button" onClick={onOpenDynamics}>
+                Посмотреть динамику
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="primary-btn" type="button" onClick={onStartBrief}>
+                {hasBriefIntake ? "Пройти повторный ИИ-приём" : "Пройти краткий ИИ-приём"}
+              </button>
+              {hasBriefIntake && (
+                <button className="secondary-btn" type="button" onClick={onStartAdvanced}>
+                  Пройти расширенный ИИ-приём
+                </button>
+              )}
+            </>
+          )}
+        </div>
+        <p className="compact-route-note">
+          {completedToday
+            ? "Следующая проверка будет доступна завтра."
+            : hasBriefIntake
+              ? "Новый срез сохранится в историю и обновит динамику."
+              : "Краткий ИИ-приём создаст первую карту состояния."}
+        </p>
+      </article>
+
+      <div className="compact-route-grid">
+        <article className="card compact-route-card">
+          <span>Краткий</span>
+          <h3>Запрос и анализ Баха</h3>
+          <p>Одна короткая рабочая линия: что сейчас беспокоит, что может поддержать и что требует проверки.</p>
+        </article>
+        <article className="card compact-route-card">
+          <span>Расширенный</span>
+          <h3>Тесты и шкалы</h3>
+          <p>Общее состояние, эмоциональные шкалы, ресурс, телесные маркеры, отношения и дополнительные тесты.</p>
+          <strong>{advancedAiResult ? "Последний расширенный срез сохранён" : "Доступен после краткого приёма"}</strong>
+        </article>
+        <article className="card compact-route-card">
+          <span>История ИИ-приёмов</span>
+          <h3>Даты, отчёты, сравнение</h3>
+          <p>Все повторные срезы живут в архиве, где можно открыть отчёт и сравнить изменения.</p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function ConsultationPlaceholder({
+  bookingNoticeVisible,
+  hasCompletedResults,
+  onOpenReport,
+  onSpecialistRequest,
+  onStartSelfAnalysis,
+}) {
+  return (
+    <section className="compact-section-page" aria-labelledby="consultations-title">
+      <article className="card compact-route-hero">
+        <p className="eyebrow">Личная сессия</p>
+        <h2 id="consultations-title">Разбор отчёта со специалистом</h2>
+        {hasCompletedResults ? (
+          <p>Последний ИИ-отчёт можно взять как основу для личной сессии и уточнения следующего шага.</p>
+        ) : (
+          <p>Можно записаться сразу, но лучше сначала пройти краткий ИИ-приём — тогда сессия будет точнее.</p>
+        )}
+        <div className="compact-route-actions">
+          {hasCompletedResults ? (
+            <>
+              <button className="primary-btn" onClick={onOpenReport} type="button">
+                Разобрать этот отчёт на личной сессии
+              </button>
+              <button className="secondary-btn" onClick={onSpecialistRequest} type="button">
+                Заказать сессию
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="primary-btn" onClick={onStartSelfAnalysis} type="button">
+                Пройти ИИ-приём
+              </button>
+              <button className="secondary-btn" onClick={onSpecialistRequest} type="button">
+                Заказать сессию сразу
+              </button>
+            </>
+          )}
+        </div>
         {bookingNoticeVisible && (
           <p className="placeholder-notice" role="status">
             Раздел записи ещё подключается. Запрос сохранён как следующий шаг.
           </p>
         )}
       </article>
+
+      <div className="compact-route-grid">
+        <article className="card compact-route-card">
+          <span>Последний отчёт</span>
+          <h3>{hasCompletedResults ? "Готов для разбора" : "Появится после ИИ-приёма"}</h3>
+          <p>{hasCompletedResults ? "Отчёт можно открыть перед записью и взять как материал для встречи." : "Первый отчёт поможет точнее сформулировать запрос."}</p>
+        </article>
+        <article className="card compact-route-card">
+          <span>История сессий</span>
+          <h3>Прошедшие и будущие встречи</h3>
+          <p>После сессии здесь будут ссылки на отчёт, заметку или назначение, если они есть.</p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, onStartSelfAnalysis }) {
+  const reportText = hasCompletedResults
+    ? "Последний ИИ-отчёт доступен, повторные срезы будут добавляться в историю."
+    : "ИИ-отчёты появятся после первого ИИ-приёма.";
+
+  return (
+    <section className="compact-section-page" aria-labelledby="profile-reports-title">
+      <article className="card compact-route-hero">
+        <p className="eyebrow">Профиль / Отчёты</p>
+        <h2 id="profile-reports-title">Архив, личный кабинет и динамика</h2>
+        <p>
+          Здесь собраны личные отчёты, ИИ-отчёты, тесты, измерения, история назначений и настройки доступа.
+          Рабочий маршрут вынесен в остальные разделы.
+        </p>
+      </article>
+
+      <div className="compact-archive-grid">
+        <article className="card compact-route-card">
+          <span>Личный анализ</span>
+          <h3>Экспертные отчёты и назначения</h3>
+          <p>Личные отчёты появятся после сессии со специалистом.</p>
+          <button className="secondary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
+        </article>
+        <article className="card compact-route-card">
+          <span>ИИ-анализ</span>
+          <h3>Последний отчёт и сравнение</h3>
+          <p>{reportText}</p>
+          <button className="secondary-btn" type="button" onClick={hasCompletedResults ? onOpenReport : onStartSelfAnalysis}>
+            {hasCompletedResults ? "Открыть последний отчёт" : "Пройти ИИ-приём"}
+          </button>
+        </article>
+        <article className="card compact-route-card">
+          <span>Данные и динамика</span>
+          <h3>Тесты, шкалы, измерения</h3>
+          <p>Динамика появится после двух и более ИИ-приёмов.</p>
+          <button className="secondary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти повторный ИИ-приём</button>
+        </article>
+        <article className="card compact-route-card">
+          <span>Доступ и настройки</span>
+          <h3>Мои данные, оплата, приватность</h3>
+          <p>Аккаунт и настройки остаются внутри кабинета, без отдельного пункта первого уровня.</p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRepeatAiIntake, onStartSelfAnalysis }) {
+  if (!hasCompletedResults) {
+    return (
+      <section className="compact-section-page" aria-labelledby="next-empty-title">
+        <article className="card compact-route-hero">
+          <p className="eyebrow">Что дальше</p>
+          <h2 id="next-empty-title">Назначение появится после ИИ-отчёта или личной сессии</h2>
+          <p>Сначала нужен краткий срез или встреча, чтобы план был связан с текущим состоянием.</p>
+          <div className="compact-route-actions">
+            <button className="primary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти ИИ-приём</button>
+            <button className="secondary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
+          </div>
+        </article>
+      </section>
+    );
+  }
+
+  return (
+    <section className="compact-section-page" aria-labelledby="next-title">
+      <article className="card compact-route-hero">
+        <p className="eyebrow">Что дальше</p>
+        <h2 id="next-title">Текущее направление поддержки</h2>
+        <p>
+          Сейчас важно бережно поддержать ресурс, не перегружать план и повторить проверку после
+          нескольких дней наблюдения. Это не заменяет медицинскую помощь; при серьёзных симптомах
+          лучше держать связь с врачом.
+        </p>
+        <div className="compact-route-actions">
+          <button className="primary-btn" type="button" onClick={onOpenReport}>Открыть отчёт</button>
+          <button className="secondary-btn" type="button" onClick={onBookSession}>Записаться на сессию</button>
+          <button className="secondary-btn" type="button" onClick={onRepeatAiIntake}>Пройти повторную проверку</button>
+        </div>
+      </article>
+
+      <div className="compact-archive-grid next-plan-grid">
+        {[
+          ["Главный фокус", "Снизить расход ресурса и оставить один понятный шаг на ближайшие дни."],
+          ["Что поддерживать", "Сон, паузы, мягкие практики и наблюдение за тем, что может поддержать."],
+          ["Что не перегружать", "Не расширять список задач, если ресурс остаётся нестабильным."],
+          ["Что делать мягко", "Отмечать изменения коротко, без жёсткой оценки и давления на результат."],
+          ["Что принимать / использовать", "Только то, что назначено специалистом; новые средства требуют проверки."],
+          ["Что отслеживать", "Ресурс, напряжение, телесные маркеры и повторяющиеся эмоциональные темы."],
+        ].map(([title, text]) => (
+          <article className="card compact-route-card" key={title}>
+            <span>Текущее назначение</span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
@@ -228,7 +453,7 @@ function RoutedApp() {
 }
 
 export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut = null, userAction = null }) {
-  const [activePage, setActivePage] = useState("overview");
+  const [activePage, setActivePage] = useState("self");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
@@ -306,12 +531,8 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       return;
     }
     if (!hasCompletedResults && page === "expert") {
-      setActivePage("expert");
+      setActivePage("profile");
       setBookingNoticeVisible(false);
-      return;
-    }
-    if (!hasCompletedResults && ["recommendations", "history"].includes(page)) {
-      openFirstIntake();
       return;
     }
     if (tab) {
@@ -384,12 +605,12 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   };
 
   const handleFirstIntakeSaveAndExit = () => {
-    setActivePage("overview");
+    setActivePage("self");
     setSelfAnalysisMode("overview");
   };
 
   const handleAdvancedAiSaveAndExit = () => {
-    setActivePage("overview");
+    setActivePage("self");
     setAdvancedAnalysisMode("overview");
   };
 
@@ -439,22 +660,36 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       return (
         <ConsultationPlaceholder
           bookingNoticeVisible={bookingNoticeVisible}
+          hasCompletedResults={hasCompletedResults}
+          onOpenReport={() => openResultReport(pageTabs.expert[0])}
           onSpecialistRequest={handleSpecialistRequest}
+          onStartSelfAnalysis={openFirstIntake}
         />
       );
     }
     if (activePage === "profile") {
       return (
-        <SelfAnalysis
-          activeAnalysis={selectedAnalysis}
-          mode="navigator"
-          onSelectAnalysis={handleSelectAnalysis}
-          onSpecialistRequest={handleSpecialistRequest}
-          onStartAnalysis={handleStartAnalysis}
+        <ProfileReportsPage
+          hasCompletedResults={hasCompletedResults}
+          onBookSession={() => handleNavigation("consultations")}
+          onOpenReport={() => openResultReport(pageTabs.expert[0])}
+          onStartSelfAnalysis={openFirstIntake}
         />
       );
     }
     if (activePage === "self") {
+      if (selfAnalysisMode !== "form") {
+        return (
+          <AiIntakeDashboard
+            advancedAiResult={advancedAiResult}
+            firstIntakeResult={firstIntakeResult}
+            onOpenDynamics={() => handleNavigation("profile")}
+            onOpenReport={() => openResultReport(pageTabs.expert[0])}
+            onStartAdvanced={() => handleNavigation("advanced")}
+            onStartBrief={openFirstIntake}
+          />
+        );
+      }
       return (
         <SelfAnalysis
           activeAnalysis={selectedAnalysis}
@@ -501,7 +736,15 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       );
     }
     if (activePage === "recommendations") {
-      return <Recommendations />;
+      return (
+        <NextStepsPage
+          hasCompletedResults={hasCompletedResults}
+          onBookSession={() => handleNavigation("consultations")}
+          onOpenReport={() => openResultReport(pageTabs.expert[0])}
+          onRepeatAiIntake={() => handleNavigation("advanced")}
+          onStartSelfAnalysis={openFirstIntake}
+        />
+      );
     }
     if (activePage === "history") {
       return <DynamicsHistory />;
