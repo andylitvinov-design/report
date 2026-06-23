@@ -19,7 +19,8 @@ Follow all source-of-truth docs in order:
 3. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
 4. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
 5. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
-6. `AGENTS.md` — project adapter and command registry
+6. `docs/delivery-design-quality-gate.md` — required UI/mobile/visual quality gate and `make-interfaces-feel-better` pass
+7. `AGENTS.md` — project adapter and command registry
 
 These docs are the local source of truth. Do not browse or fetch external loop repos. If a local doc is missing, first run the Local Checkout Recovery Gate below. If the file is still missing after that gate, report `needs verification` and do not invent replacement rules.
 
@@ -50,6 +51,7 @@ Required shared docs for this repo:
 docs/delivery-loop-program.md
 docs/delivery-loop-technical-details.md
 docs/delivery-loop-source-patterns-and-live-proof.md
+docs/delivery-design-quality-gate.md
 ```
 
 Task-specific docs such as `docs/first-intake-analysis-dialog-plan.md` should be read when relevant, but absence of a task-specific doc is not a reason to disable `/delivery` globally.
@@ -104,48 +106,35 @@ Do not use completion language if any required item is `PARTIAL`, `FAIL`, or `NO
 
 After implementation, reread the original task and compare it with the diff, local checks, PR state, deployment state, and live proof. If a gap is found, repair and rerun the gate. After 2 failed gate repair attempts, stop with `STATUS: BLOCKED` and report the remaining gap, why it was not fixed, the next file/function to inspect, and any required user action.
 
-Required final status:
+## Design Quality Gate for UI tasks
 
-- `STATUS: SUCCESS` — task implemented, PR merged or direct-to-main confirmed, deployed, and verified live.
-- `STATUS: BLOCKED` — exact external blocker, evidence, and required user action.
+For UI, mobile, desktop, screenshot, layout, hero, first-screen, landing, profile/cabinet, navigation, tabs, chips, cards, forms, or visual-polish tasks, run `docs/delivery-design-quality-gate.md` before claiming success.
 
-Do not stop after code, PR, checks, merge, or deploy.
+Build/check/live proof is not enough for UI delivery.
 
-## Design Quality Gate
+The gate must include a `UI POLISH / FEEL-BETTER PASS`.
 
-This gate is mandatory for every task that includes or implies UI work: UI, mobile, screenshot, layout, UX, polish, visual, first screen, hero, landing, full-screen, profile/cabinet screen, card, menu, navigation, or CTA. Wording such as "первый экран", "на всю страницу", "как на скрине", "не так перегружено", "мягче", "красивее", or "понятнее" is a required visual acceptance criterion, not a suggestion.
+External skill:
 
-Before saying `STATUS: SUCCESS`, `/delivery` must verify design quality in addition to build, checks, PR state, deploy state, and live behavior.
+```txt
+jakubkrehel/make-interfaces-feel-better
+```
 
-### Screenshot/request contract check
+Install/use when supported:
 
-Extract the exact visual request from the user. If the user asked for a first screen, full-screen layout, reference screenshot match, lighter navigation, softer visual tone, clearer composition, or less clutter, do not mark success when the implemented screen visibly violates that requested visual structure.
+```bash
+npx skills add jakubkrehel/make-interfaces-feel-better
+```
 
-### Mobile first-screen gate
+Reference:
 
-For a mobile viewport around `390x844` / iPhone, verify:
+```txt
+https://jakub.kr/skills/make-interfaces-feel-better
+```
 
-- the first screen feels intentional and complete;
-- the primary hero/section does not look accidentally cut off;
-- when a full-screen first view is requested, the next major block is not visible at the bottom unless that reveal is intentionally designed;
-- the main CTA is visible, clear, centered in the flow, and not buried;
-- header, navigation, and hero fit without visual clutter;
-- there are no duplicated tab rows unless specifically required;
-- there is no horizontal overflow;
-- chips/buttons are not cramped;
-- safe-area and browser bars are considered.
+If the external skill is installed, apply it to the changed screen before final success. If it is not installed or cannot be verified, use the fallback checklist from `docs/delivery-design-quality-gate.md` and report that fallback was used.
 
-### Visual hierarchy gate
-
-Check that there is one clear primary action, secondary actions are visually quieter, the mobile title is sized appropriately, labels/chips do not compete with the hero, spacing is calm and consistent, and the screen feels like a designed product instead of only working components.
-
-### UI polish pass
-
-Use `docs/audit-ui-polish-skill.md` as the local reference. It mirrors the shared polish guidance from `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-ui-polish-skill.md`. If the external skill is installed, use `make-interfaces-feel-better`. If it is not installed, do not block on installation; use the fallback checklist: visual hierarchy, spacing / rhythm, text density, feedback / motion, perceived quality, mobile feel, and performance feel. Supported install command when the environment allows it: `npx skills add jakubkrehel/make-interfaces-feel-better`.
-
-### Visual proof required
-
-For UI tasks, the final report must include mobile screenshot/proof or a clear explanation why unavailable, plus a desktop check and this table:
+For UI tasks, final report must include:
 
 ```txt
 DESIGN QUALITY GATE:
@@ -158,11 +147,27 @@ DESIGN QUALITY GATE:
 | No duplicated/cluttered nav | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
 | Visual hierarchy calm | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
 | Desktop not regressed | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+
+UI POLISH / FEEL-BETTER PASS:
+| Check | Status | Evidence | Fix if failed |
+|---|---|---|---|
+| External skill available or fallback used | PASS/PARTIAL/NOT VERIFIED | | |
+| Visual hierarchy improved | PASS/PARTIAL/FAIL | | |
+| Spacing and rhythm improved | PASS/PARTIAL/FAIL | | |
+| Text density reduced | PASS/PARTIAL/FAIL | | |
+| Mobile feel improved | PASS/PARTIAL/FAIL | | |
+| Perceived quality improved | PASS/PARTIAL/FAIL | | |
+| No raw/debug-looking UI remains | PASS/PARTIAL/FAIL | | |
 ```
 
-Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`. If any required design item is `FAIL` or `NOT VERIFIED`, do not say `STATUS: SUCCESS`; run another improvement loop. If auth or live access prevents visual proof, use `PARTIAL_AUTH_LIMITATION` for that item and state exactly what was not visually verified.
+If any required design item is `FAIL` or `NOT VERIFIED`, do not report `STATUS: SUCCESS`. Run another improvement loop or report an exact blocker/auth limitation.
 
-For UI tasks, the final report must also include exact visual gaps, if any, and whether the first screen matches the user requested composition.
+Required final status:
+
+- `STATUS: SUCCESS` — task implemented, PR merged or direct-to-main confirmed, deployed, and verified live.
+- `STATUS: BLOCKED` — exact external blocker, evidence, and required user action.
+
+Do not stop after code, PR, checks, merge, or deploy.
 
 ## Built-In Delegation
 
@@ -222,7 +227,7 @@ Allowed critic verdicts:
 - `SAFETY_STOP` — continuing is unsafe or externally blocked.
 - `NEEDS_HUMAN_DECISION` — owner/product judgment is required.
 
-Use `SAFETY_STOP` only for dangerous or externally impossible cases. Missing polish, weak evidence, or partial UI/API quality should normally become `IMPROVE`, `IMPROVE_MINOR`, or `READY_WITH_NOTES` with a concrete next action.
+Use `SAFETY_STOP` only for dangerous or externally impossible cases. Missing polish, weak evidence, partial UI/API quality, a cut-off first screen, duplicated/cluttered navigation, or missing visual proof should normally become `IMPROVE`, `IMPROVE_MINOR`, or `READY_WITH_NOTES` with a concrete next action.
 
 For UI tasks, the critic must also review design quality. It must output `IMPROVE` or `IMPROVE_MINOR` when the first screen is not full/complete after being requested, top navigation is cluttered, the next section is accidentally visible, CTA hierarchy is weak, duplicated navigation competes with the hero, or the design looks technically functional but visually unfinished.
 
