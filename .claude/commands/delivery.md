@@ -169,6 +169,59 @@ Required final status:
 
 Do not stop after code, PR, checks, merge, or deploy.
 
+## Design Quality Gate
+
+This gate is mandatory for every task that includes or implies UI work: UI, mobile, screenshot, layout, UX, polish, visual, first screen, hero, landing, full-screen, profile/cabinet screen, card, menu, navigation, or CTA. Wording such as "первый экран", "на всю страницу", "как на скрине", "не так перегружено", "мягче", "красивее", or "понятнее" is a required visual acceptance criterion, not a suggestion.
+
+Before saying `STATUS: SUCCESS`, `/delivery` must verify design quality in addition to build, checks, PR state, deploy state, and live behavior.
+
+### Screenshot/request contract check
+
+Extract the exact visual request from the user. If the user asked for a first screen, full-screen layout, reference screenshot match, lighter navigation, softer visual tone, clearer composition, or less clutter, do not mark success when the implemented screen visibly violates that requested visual structure.
+
+### Mobile first-screen gate
+
+For a mobile viewport around `390x844` / iPhone, verify:
+
+- the first screen feels intentional and complete;
+- the primary hero/section does not look accidentally cut off;
+- when a full-screen first view is requested, the next major block is not visible at the bottom unless that reveal is intentionally designed;
+- the main CTA is visible, clear, centered in the flow, and not buried;
+- header, navigation, and hero fit without visual clutter;
+- there are no duplicated tab rows unless specifically required;
+- there is no horizontal overflow;
+- chips/buttons are not cramped;
+- safe-area and browser bars are considered.
+
+### Visual hierarchy gate
+
+Check that there is one clear primary action, secondary actions are visually quieter, the mobile title is sized appropriately, labels/chips do not compete with the hero, spacing is calm and consistent, and the screen feels like a designed product instead of only working components.
+
+### UI polish pass
+
+Use `docs/audit-ui-polish-skill.md` as the local reference. It mirrors the shared polish guidance from `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-ui-polish-skill.md`. If the external skill is installed, use `make-interfaces-feel-better`. If it is not installed, do not block on installation; use the fallback checklist: visual hierarchy, spacing / rhythm, text density, feedback / motion, perceived quality, mobile feel, and performance feel. Supported install command when the environment allows it: `npx skills add jakubkrehel/make-interfaces-feel-better`.
+
+### Visual proof required
+
+For UI tasks, the final report must include mobile screenshot/proof or a clear explanation why unavailable, plus a desktop check and this table:
+
+```txt
+DESIGN QUALITY GATE:
+| Check | Status | Evidence | Fix if failed |
+|---|---|---|---|
+| Original visual request matched | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Mobile first screen complete | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| No accidental next-section cut | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Primary CTA clear | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| No duplicated/cluttered nav | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Visual hierarchy calm | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Desktop not regressed | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+```
+
+Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`. If any required design item is `FAIL` or `NOT VERIFIED`, do not say `STATUS: SUCCESS`; run another improvement loop. If auth or live access prevents visual proof, use `PARTIAL_AUTH_LIMITATION` for that item and state exactly what was not visually verified.
+
+For UI tasks, the final report must also include exact visual gaps, if any, and whether the first screen matches the user requested composition.
+
 ## Built-In Delegation
 
 The `/delivery` command itself is the user's delegation to proceed through the full safe release path.
@@ -230,6 +283,8 @@ Allowed critic verdicts:
 - `NEEDS_HUMAN_DECISION` — owner/product judgment is required.
 
 Use `SAFETY_STOP` only for dangerous or externally impossible cases. Missing polish, weak evidence, partial UI/API quality, a cut-off first screen, duplicated/cluttered navigation, or missing visual proof should normally become `IMPROVE`, `IMPROVE_MINOR`, or `READY_WITH_NOTES` with a concrete next action.
+
+For UI tasks, the critic must also review design quality. It must output `IMPROVE` or `IMPROVE_MINOR` when the first screen is not full/complete after being requested, top navigation is cluttered, the next section is accidentally visible, CTA hierarchy is weak, duplicated navigation competes with the hero, or the design looks technically functional but visually unfinished.
 
 Record machine-readable critic output in optional top-level `.delivery/status.json` field `spiralValidatorCritic`. Do not put it inside `result_verification`.
 
