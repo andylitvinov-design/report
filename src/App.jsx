@@ -133,10 +133,9 @@ function AiIntakeDashboard({
   onStartBrief,
 }) {
   const hasBriefIntake = Boolean(firstIntakeResult);
-  const primaryCtaLabel = hasBriefIntake ? "Повторный ИИ-приём" : "Пройти краткий ИИ-приём";
 
   return (
-    <section className="compact-section-page" aria-labelledby="ai-intake-title">
+    <section className="compact-section-page ai-intake-onboarding" aria-labelledby="ai-intake-title">
       <div className="intake-option-row" aria-label="Варианты приёма">
         <button className="intake-option-pill active" type="button">
           ИИ-приём
@@ -145,46 +144,54 @@ function AiIntakeDashboard({
           Приём у Мастера
         </button>
       </div>
-      <article className="card compact-route-hero">
-        <h2 id="ai-intake-title">ИИ-приём</h2>
-        <p>Сначала AI поможет сделать краткий срез состояния. После него можно пройти расширенный приём.</p>
+      <article className="card compact-route-hero ai-intake-hero">
+        <span className="ai-intake-kicker">Мягкий AI-сеанс</span>
+        <h2 id="ai-intake-title">
+          {hasBriefIntake ? "Можно сделать новый мягкий срез" : "Начните с мягкого AI-приёма"}
+        </h2>
+        <p>
+          {hasBriefIntake
+            ? "AI задаст несколько бережных вопросов и обновит карту состояния."
+            : "AI задаст несколько бережных вопросов и создаст первую карту состояния."}
+        </p>
         <div className="compact-route-actions">
           <button className="primary-btn" type="button" onClick={onStartBrief}>
-            {primaryCtaLabel}
+            {hasBriefIntake ? "Пройти новый приём" : "Пройти первый приём"}
           </button>
         </div>
         <p className="compact-route-note">
-          {hasBriefIntake
-            ? "Новый срез сохранится в историю."
-            : "3-5 минут. После появится первая карта состояния."}
+          {hasBriefIntake ? "Новый срез сохранится в историю" : "Guided AI session для первого среза"}
         </p>
+        {hasBriefIntake && (
+          <button className="text-link ai-intake-advanced-link" type="button" onClick={onStartAdvanced}>
+            {advancedAiResult ? "Вернуться к расширенному AI-срезу" : "Открыть расширенный AI-срез"}
+          </button>
+        )}
       </article>
 
-      <div className="compact-route-grid">
-        <article className={hasBriefIntake ? "card compact-route-card" : "card compact-route-card soft-locked-card"}>
-          <span>Расширенный ИИ-приём</span>
-          <h3>Больше деталей</h3>
-          <p>Можно пройти после краткого ИИ-приёма.</p>
-          <button className="secondary-btn" disabled={!hasBriefIntake} type="button" onClick={onStartAdvanced}>
-            {hasBriefIntake ? "Открыть расширенный ИИ-приём" : "Откроется после краткого приёма"}
+      <div className="ai-intake-secondary" aria-label="Другие варианты">
+        <span className="ai-intake-secondary-title">Другие варианты</span>
+        <div className="compact-route-grid ai-intake-secondary-grid">
+          <article className="card compact-route-card ai-intake-option-card">
+            <h3>Заказать встречу</h3>
+            <p>Оставить запрос на живое сопровождение</p>
+            <button className="secondary-btn" type="button" onClick={onOpenPersonalIntake}>
+              Заказать встречу
+            </button>
+          </article>
+          <article className="card compact-route-card ai-intake-option-card">
+            <h3>Продолжить приём</h3>
+            <p>Вернуться к сохранённым ответам</p>
+            <button className="secondary-btn" type="button" onClick={onStartBrief}>
+              Продолжить приём
+            </button>
+          </article>
+        </div>
+        {!hasBriefIntake && (
+          <button className="text-link ai-intake-advanced-link" type="button" disabled onClick={onStartAdvanced}>
+            Расширенный AI-срез станет доступен после первого приёма
           </button>
-          <small className="compact-route-hint">
-            {hasBriefIntake
-              ? advancedAiResult
-                ? "Последний расширенный срез сохранён"
-                : "Доступен сейчас"
-              : "Откроется после краткого приёма"}
-          </small>
-        </article>
-        <article className="card compact-route-card">
-          <span>Приём у Мастера</span>
-          <h3>Живой разбор</h3>
-          <p>Заявка на сопровождение со специалистом.</p>
-          <button className="secondary-btn" type="button" onClick={onOpenPersonalIntake}>
-            Открыть личный приём
-          </button>
-          <small className="compact-route-hint">Отдельный вариант в разделе Приём</small>
-        </article>
+        )}
       </div>
     </section>
   );

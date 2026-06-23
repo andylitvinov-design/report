@@ -65,6 +65,26 @@ describe("workbookNavigation", () => {
 });
 
 describe("first intake baseline hints", () => {
+  it("keeps AI intake entry as a soft hero-led onboarding screen", () => {
+    const source = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+    const component = source.match(/function AiIntakeDashboard\([\s\S]*?\n}\n\nfunction ConsultationPlaceholder/);
+
+    assert.ok(component);
+    assert.match(component[0], /Мягкий AI-сеанс/);
+    assert.match(component[0], /Начните с мягкого AI-приёма/);
+    assert.match(component[0], /AI задаст несколько бережных вопросов и создаст первую карту состояния\./);
+    assert.match(component[0], /Пройти первый приём/);
+    assert.match(component[0], /Guided AI session для первого среза/);
+    assert.match(component[0], /Другие варианты/);
+    assert.match(component[0], /Заказать встречу/);
+    assert.match(component[0], /Оставить запрос на живое сопровождение/);
+    assert.match(component[0], /Продолжить приём/);
+    assert.match(component[0], /Вернуться к сохранённым ответам/);
+    assert.doesNotMatch(component[0], /Пройти краткий ИИ-приём/);
+    assert.doesNotMatch(component[0], /Расширенный ИИ-приём/);
+    assert.doesNotMatch(component[0], /Откроется после краткого приёма/);
+  });
+
   it("keeps the initial baseline answer hints to six visible choices", () => {
     const source = readFileSync(new URL("../src/pages/SelfAnalysis.jsx", import.meta.url), "utf8");
     const mainConcern = source.match(/id: "mainConcern"[\s\S]*?tagOptions: \[([\s\S]*?)\]/);
