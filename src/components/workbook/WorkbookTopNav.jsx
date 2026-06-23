@@ -1,16 +1,18 @@
-import React, { useEffect, useId, useState } from "react";
+import React from "react";
 import {
   findActiveWorkbookSubnav,
   findWorkbookCategoryById,
   findWorkbookCategoryByPage,
   workbookNavigation,
 } from "../../data/workbookNavigation.js";
-import WorkbookMobileCategorySheet from "./WorkbookMobileCategorySheet.jsx";
 import WorkbookSubNav from "./WorkbookSubNav.jsx";
 
+const mobileWorkbookNavigation = [
+  { id: "overview", label: "Обзор", page: "overview", pages: ["overview"] },
+  ...workbookNavigation,
+];
+
 export default function WorkbookTopNav({ activeGroup, activePage = "overview", activeTab = "", onNavigate }) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const menuId = useId();
   const activeCategory = activeGroup
     ? findWorkbookCategoryById(activeGroup)
     : findWorkbookCategoryByPage(activePage);
@@ -18,44 +20,29 @@ export default function WorkbookTopNav({ activeGroup, activePage = "overview", a
 
   const handleNavigate = (item) => {
     onNavigate?.(item.page, item.tab);
-    setIsMobileMenuOpen(false);
   };
-
-  useEffect(() => {
-    if (!isMobileMenuOpen) return undefined;
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isMobileMenuOpen]);
 
   return (
     <div className="workbook-nav-wrap">
-      <button
-        aria-controls={menuId}
-        aria-expanded={isMobileMenuOpen}
-        aria-haspopup="menu"
-        className="workbook-mobile-nav-trigger"
-        onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
-        type="button"
-      >
-        <span>{activeCategory.label}</span>
-        <span aria-hidden="true">▾</span>
-      </button>
+      <nav className="workbook-mobile-nav-row" aria-label="Основные разделы">
+        {mobileWorkbookNavigation.map((item) => {
+          const active = item.id === "overview"
+            ? activePage === "overview"
+            : item.pages.includes(activePage);
 
-      {isMobileMenuOpen && (
-        <WorkbookMobileCategorySheet
-          activeCategory={activeCategory}
-          activeSubnav={activeSubnav}
-          id={menuId}
-          onNavigate={handleNavigate}
-        />
-      )}
+          return (
+            <button
+              aria-current={active ? "page" : undefined}
+              className={active ? "workbook-mobile-nav-pill active" : "workbook-mobile-nav-pill"}
+              key={item.id}
+              onClick={() => handleNavigate(item)}
+              type="button"
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
 
       <nav className="workbook-top-nav" aria-label="Категории личного кабинета">
         {workbookNavigation.map((item) => (
