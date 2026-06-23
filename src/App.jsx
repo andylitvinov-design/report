@@ -125,15 +125,6 @@ function AiIntakeDashboard({
 
       <div className="compact-route-grid">
         <article className="card compact-route-card">
-          <span>ИИ-приём</span>
-          <h3>Краткий срез</h3>
-          <p>Запрос, состояние и первая опора.</p>
-          <button className="secondary-btn" type="button" onClick={onStartBrief}>
-            Пройти короткий ИИ-приём
-          </button>
-          <small className="compact-route-hint">3–5 минут</small>
-        </article>
-        <article className="card compact-route-card">
           <span>Расширенный</span>
           <h3>Глубже по шкалам</h3>
           <p>Больше деталей, когда краткого среза мало.</p>
@@ -456,7 +447,7 @@ function RoutedApp() {
 }
 
 export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut = null, userAction = null }) {
-  const [activePage, setActivePage] = useState("self");
+  const [activePage, setActivePage] = useState("overview");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());

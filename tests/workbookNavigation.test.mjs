@@ -7,10 +7,11 @@ import {
 } from "../src/data/workbookNavigation.js";
 
 describe("workbookNavigation", () => {
-  it("exposes the compact three-section first-level menu without legacy categories", () => {
+  it("keeps the approved overview entry before the compact workbook sections", () => {
     assert.deepEqual(
       workbookNavigation.map((item) => item.label),
       [
+        "Обзор",
         "ИИ-приём",
         "Профиль / Отчёты",
         "Что дальше",
@@ -25,7 +26,7 @@ describe("workbookNavigation", () => {
   });
 
   it("resolves each app page to its active category and contextual subnav", () => {
-    assert.equal(findWorkbookCategoryByPage("overview").id, "ai-session");
+    assert.equal(findWorkbookCategoryByPage("overview").id, "overview");
     assert.equal(findWorkbookCategoryByPage("self").id, "ai-session");
     assert.equal(findWorkbookCategoryByPage("advanced").id, "ai-session");
     assert.equal(findWorkbookCategoryByPage("consultations").id, "next-step");
