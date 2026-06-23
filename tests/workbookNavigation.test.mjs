@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { readFileSync } from "node:fs";
 
 import {
   findWorkbookCategoryByPage,
@@ -26,6 +27,13 @@ describe("workbookNavigation", () => {
     assert.equal(workbookNavigation.some((item) => item.label === "Повторный AI-приём"), false);
   });
 
+  it("keeps compact mobile labels for the top mobile navigation", () => {
+    assert.deepEqual(
+      workbookNavigation.map((item) => item.shortLabel),
+      ["Приём", "Отчёты", "Дальше"],
+    );
+  });
+
   it("resolves each app page to its active category and contextual subnav", () => {
     assert.equal(findWorkbookCategoryByPage("overview").id, "intake");
     assert.equal(findWorkbookCategoryByPage("self").id, "intake");
@@ -41,5 +49,25 @@ describe("workbookNavigation", () => {
       findWorkbookCategoryByPage("self").subnav.map((item) => item.label),
       [],
     );
+  });
+});
+
+describe("first intake baseline hints", () => {
+  it("keeps the initial baseline answer hints to six visible choices", () => {
+    const source = readFileSync(new URL("../src/pages/SelfAnalysis.jsx", import.meta.url), "utf8");
+    const mainConcern = source.match(/id: "mainConcern"[\s\S]*?tagOptions: \[([\s\S]*?)\]/);
+
+    assert.ok(mainConcern);
+    const labels = [...mainConcern[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+
+    assert.deepEqual(labels, [
+      "Тревога / беспокойство",
+      "Усталость / нет сил",
+      "Напряжение в теле",
+      "Эмоциональная тяжесть",
+      "Отношения / одиночество",
+      "Работа / деньги / будущее",
+    ]);
+    assert.equal(labels.length <= 6, true);
   });
 });

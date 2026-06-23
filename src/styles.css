@@ -3995,6 +3995,7 @@ h3 {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 8px;
     padding: 8px 0;
+    min-width: 0;
   }
 
   .workbook-brand {
@@ -4015,8 +4016,10 @@ h3 {
     grid-column: 1 / -1;
     order: 3;
     min-width: 0;
+    max-width: 100%;
     display: grid;
     gap: 6px;
+    overflow: hidden;
   }
 
   .workbook-top-nav {
@@ -4034,10 +4037,15 @@ h3 {
   .workbook-mobile-nav-row {
     display: flex;
     align-items: center;
-    gap: 7px;
-    max-width: calc(100vw - 18px);
-    padding: 1px 0 3px;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 1px 2px 5px;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
 
@@ -4047,13 +4055,14 @@ h3 {
 
   .workbook-mobile-nav-pill {
     flex: 0 0 auto;
-    min-height: 36px;
-    padding: 8px 12px;
+    min-height: 32px;
+    padding: 7px 10px;
     border: 1px solid rgba(18, 63, 49, 0.13);
     border-radius: 999px;
     background: rgba(255, 253, 248, 0.7);
     color: #1f2725;
-    font-weight: 850;
+    font-size: 13px;
+    font-weight: 800;
     line-height: 1;
     white-space: nowrap;
   }
@@ -4115,6 +4124,7 @@ h3 {
 
   .workbook-account {
     justify-self: end;
+    min-width: 32px;
     padding: 5px;
   }
 
@@ -4670,6 +4680,26 @@ h3 {
 
   .chart {
     min-height: 190px;
+  }
+}
+
+@media (max-width: 380px) {
+  .workbook-shell {
+    padding: 0 8px;
+  }
+
+  .workbook-header {
+    gap: 7px;
+  }
+
+  .workbook-mobile-nav-row {
+    gap: 5px;
+  }
+
+  .workbook-mobile-nav-pill {
+    min-height: 31px;
+    padding: 6px 9px;
+    font-size: 13px;
   }
 }
 
