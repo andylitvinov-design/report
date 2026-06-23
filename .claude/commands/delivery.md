@@ -19,7 +19,8 @@ Follow all source-of-truth docs in order:
 3. `docs/delivery-loop-program.md` — full protocol, stop states, final report format
 4. `docs/delivery-loop-technical-details.md` — scripts, commands, CI/CD checks, agent decision table
 5. `docs/delivery-loop-source-patterns-and-live-proof.md` — embedded loop patterns and live proof contract
-6. `AGENTS.md` — project adapter and command registry
+6. `docs/delivery-design-quality-gate.md` — required UI/mobile/visual quality gate and `make-interfaces-feel-better` pass
+7. `AGENTS.md` — project adapter and command registry
 
 These docs are the local source of truth. Do not browse or fetch external loop repos. If a local doc is missing, first run the Local Checkout Recovery Gate below. If the file is still missing after that gate, report `needs verification` and do not invent replacement rules.
 
@@ -50,6 +51,7 @@ Required shared docs for this repo:
 docs/delivery-loop-program.md
 docs/delivery-loop-technical-details.md
 docs/delivery-loop-source-patterns-and-live-proof.md
+docs/delivery-design-quality-gate.md
 ```
 
 Task-specific docs such as `docs/first-intake-analysis-dialog-plan.md` should be read when relevant, but absence of a task-specific doc is not a reason to disable `/delivery` globally.
@@ -103,6 +105,62 @@ Allowed statuses: `PASS`, `PARTIAL`, `FAIL`, `NOT VERIFIED`.
 Do not use completion language if any required item is `PARTIAL`, `FAIL`, or `NOT VERIFIED`. Say `Implemented but not verified.` or `Cannot verify because ...` instead.
 
 After implementation, reread the original task and compare it with the diff, local checks, PR state, deployment state, and live proof. If a gap is found, repair and rerun the gate. After 2 failed gate repair attempts, stop with `STATUS: BLOCKED` and report the remaining gap, why it was not fixed, the next file/function to inspect, and any required user action.
+
+## Design Quality Gate for UI tasks
+
+For UI, mobile, desktop, screenshot, layout, hero, first-screen, landing, profile/cabinet, navigation, tabs, chips, cards, forms, or visual-polish tasks, run `docs/delivery-design-quality-gate.md` before claiming success.
+
+Build/check/live proof is not enough for UI delivery.
+
+The gate must include a `UI POLISH / FEEL-BETTER PASS`.
+
+External skill:
+
+```txt
+jakubkrehel/make-interfaces-feel-better
+```
+
+Install/use when supported:
+
+```bash
+npx skills add jakubkrehel/make-interfaces-feel-better
+```
+
+Reference:
+
+```txt
+https://jakub.kr/skills/make-interfaces-feel-better
+```
+
+If the external skill is installed, apply it to the changed screen before final success. If it is not installed or cannot be verified, use the fallback checklist from `docs/delivery-design-quality-gate.md` and report that fallback was used.
+
+For UI tasks, final report must include:
+
+```txt
+DESIGN QUALITY GATE:
+| Check | Status | Evidence | Fix if failed |
+|---|---|---|---|
+| Original visual request matched | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Mobile first screen complete | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| No accidental next-section cut | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Primary CTA clear | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| No duplicated/cluttered nav | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Visual hierarchy calm | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+| Desktop not regressed | PASS/PARTIAL/FAIL/NOT VERIFIED | | |
+
+UI POLISH / FEEL-BETTER PASS:
+| Check | Status | Evidence | Fix if failed |
+|---|---|---|---|
+| External skill available or fallback used | PASS/PARTIAL/NOT VERIFIED | | |
+| Visual hierarchy improved | PASS/PARTIAL/FAIL | | |
+| Spacing and rhythm improved | PASS/PARTIAL/FAIL | | |
+| Text density reduced | PASS/PARTIAL/FAIL | | |
+| Mobile feel improved | PASS/PARTIAL/FAIL | | |
+| Perceived quality improved | PASS/PARTIAL/FAIL | | |
+| No raw/debug-looking UI remains | PASS/PARTIAL/FAIL | | |
+```
+
+If any required design item is `FAIL` or `NOT VERIFIED`, do not report `STATUS: SUCCESS`. Run another improvement loop or report an exact blocker/auth limitation.
 
 Required final status:
 
@@ -160,6 +218,8 @@ implement -> critic review -> concrete improvement plan -> patch next loop -> cr
 
 The critic must validate the Original Request Contract requirement by requirement and output concrete next actions. It may run up to 3 loops.
 
+For UI tasks, the critic must also run `docs/delivery-design-quality-gate.md` and output `IMPROVE` or `IMPROVE_MINOR` when the design is technically functional but visually unfinished.
+
 Allowed critic verdicts:
 
 - `READY_FOR_MERGE` — all critic requirements are `PASS`.
@@ -169,7 +229,7 @@ Allowed critic verdicts:
 - `SAFETY_STOP` — continuing is unsafe or externally blocked.
 - `NEEDS_HUMAN_DECISION` — owner/product judgment is required.
 
-Use `SAFETY_STOP` only for dangerous or externally impossible cases. Missing polish, weak evidence, or partial UI/API quality should normally become `IMPROVE`, `IMPROVE_MINOR`, or `READY_WITH_NOTES` with a concrete next action.
+Use `SAFETY_STOP` only for dangerous or externally impossible cases. Missing polish, weak evidence, partial UI/API quality, a cut-off first screen, duplicated/cluttered navigation, or missing visual proof should normally become `IMPROVE`, `IMPROVE_MINOR`, or `READY_WITH_NOTES` with a concrete next action.
 
 Record machine-readable critic output in optional top-level `.delivery/status.json` field `spiralValidatorCritic`. Do not put it inside `result_verification`.
 
