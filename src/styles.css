@@ -1322,6 +1322,75 @@ h3 {
   font-weight: 800;
 }
 
+.client-cabinet {
+  display: grid;
+  gap: 16px;
+}
+
+.client-section-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.client-section-hero h2 {
+  font-size: 30px;
+}
+
+.client-section-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.client-section-list {
+  display: grid;
+  gap: 12px;
+}
+
+.client-section-card,
+.empty-state {
+  min-width: 0;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.client-section-card > div {
+  display: grid;
+  gap: 6px;
+}
+
+.client-section-card span {
+  color: var(--muted);
+}
+
+.empty-state {
+  grid-template-columns: 1fr;
+  border-style: dashed;
+  background: #fbf7ee;
+}
+
+.text-link {
+  color: var(--green);
+  font-weight: 850;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  text-decoration: underline;
+}
+
 .cabinet-page-shell {
   width: 100%;
   display: grid;
@@ -4488,6 +4557,23 @@ h3 {
 
   .advanced-program-card {
     min-height: 0;
+  }
+
+  .client-section-hero,
+  .client-section-card {
+    grid-template-columns: 1fr;
+  }
+
+  .client-section-switcher {
+    justify-content: stretch;
+  }
+
+  .client-section-switcher .tab,
+  .client-section-card .primary-btn,
+  .client-section-card .secondary-btn,
+  .client-section-card .text-link {
+    width: 100%;
+    text-align: center;
   }
 
   .app-shell.focus-mode h1 {

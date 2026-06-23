@@ -23,6 +23,57 @@ export const navigation = [
   { id: "history", label: "Динамика / История" },
 ];
 
+export const clientCabinet = {
+  sections: [
+    { id: "orders", label: "Мои заказы" },
+    { id: "courses", label: "Мои курсы" },
+    { id: "favorites", label: "Избранное" },
+    { id: "chat", label: "Чат" },
+  ],
+  orders: {
+    error: null,
+    items: [
+      {
+        id: "mandala-yggdrasil-step-1",
+        title: "Полученная мандала: Рейки Иггдрасиль — 1 ступень",
+        status: "Передано мастером",
+        description: "Материал доступен в личном кабинете после передачи мастером.",
+        href: "#orders",
+        action: "Открыть",
+      },
+    ],
+  },
+  courses: {
+    error: null,
+    items: [
+      {
+        id: "reiki-yggdrasil-level-1",
+        title: "Рейки Иггдрасиль — 1 ступень",
+        progress: "Доступ открыт",
+        description: "Базовый курс для первого уровня практики.",
+        href: "#courses",
+        action: "Перейти к курсу",
+      },
+    ],
+  },
+  favorites: {
+    error: null,
+    items: [],
+  },
+  chat: {
+    error: null,
+    items: [
+      {
+        id: "master-chat",
+        title: "Сообщения с мастером",
+        status: "Вход в чат",
+        description: "Здесь будет доступен диалог после подключения сообщений.",
+        action: "Открыть чат",
+      },
+    ],
+  },
+};
+
 export const topNavigation = [
   { id: "overview", label: "Главная" },
   { id: "profile", label: "Профиль" },
@@ -188,6 +239,8 @@ export const overview = {
 };
 
 export const specialistComments = {
+  profile:
+    "В личном кабинете оставлены только заказы, курсы, избранное и чат. Полученные мандалы находятся внутри раздела заказов.",
   overview:
     "Сейчас главное - не усиливать нагрузку, а восстановить базовую опору. По последнему срезу видно: напряжение снизилось, но ресурс еще нестабилен.",
   self:
