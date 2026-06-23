@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
 import { analysisCatalog, client, clientProgress, selfAnalysis } from "./data/mockData.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
+import ClientCabinet from "./pages/ClientCabinet.jsx";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -664,14 +665,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       );
     }
     if (activePage === "profile") {
-      return (
-        <ProfileReportsPage
-          hasCompletedResults={hasCompletedResults}
-          onBookSession={() => handleNavigation("consultations")}
-          onOpenReport={() => openResultReport(pageTabs.expert[0])}
-          onStartSelfAnalysis={openFirstIntake}
-        />
-      );
+      return <ClientCabinet />;
     }
     if (activePage === "self") {
       if (selfAnalysisMode !== "form") {
