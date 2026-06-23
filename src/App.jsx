@@ -24,12 +24,74 @@ export const pageTabs = {
   overview: [],
   profile: [],
   expert: ["Меню отчётов", "Самоотчёт", "Расширенный ИИ-анализ", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
-  recommendations: ["Рецепт Мастера", "ИИ-советы"],
+  recommendations: ["Отчёты Мастера", "ИИ-отчёты"],
   self: [],
   advanced: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
   consultations: [],
 };
+
+const packageFormats = [
+  {
+    id: "basic",
+    title: "Базовый",
+    price: "0€",
+    description: "Короткий ИИ-приём и базовые результаты.",
+  },
+  {
+    id: "expanded",
+    title: "Расширенный",
+    price: "5€",
+    description: "Доступ к расширенным диагностикам и ИИ-отчётам.",
+  },
+  {
+    id: "personal",
+    title: "Личный",
+    price: "50€",
+    description: "Расширенный формат плюс одна персональная сессия вне очереди.",
+  },
+  {
+    id: "support",
+    title: "Сопровождение",
+    price: "200€",
+    description: "Входит 4 сессии плюс 4 недели дистанционной энергетической коррекции и поддержки через препараты.",
+  },
+];
+
+const accessRank = {
+  basic: 0,
+  expanded: 1,
+  personal: 2,
+  support: 3,
+};
+
+const aiReportCards = [
+  {
+    id: "homeopathy",
+    title: "План-программа коррекции в гомеопатии",
+    source: "по результатам ИИ-приёма и текущего запроса",
+  },
+  {
+    id: "naturopathy",
+    title: "План-программа коррекции в натуропатии",
+    source: "по ресурсу, нагрузке и режиму восстановления",
+  },
+  {
+    id: "bach",
+    title: "План-программа коррекции в цветочной терапии Баха",
+    source: "по Bach-блоку и эмоциональным темам",
+  },
+  {
+    id: "body-therapy",
+    title: "Отчёт Рекомендации телесной терапии",
+    source: "по телесным маркерам и уровню напряжения",
+  },
+  {
+    id: "imaginal-therapy",
+    title: "Отчёт рекомендация Образной Терапии",
+    source: "по запросу и повторяющимся образам",
+  },
+];
 
 function LockedReportState({
   bookingNoticeVisible,
@@ -80,7 +142,7 @@ function AiIntakeDashboard({
           ИИ-приём
         </button>
         <button className="intake-option-pill" type="button" onClick={onOpenPersonalIntake}>
-          Личный приём
+          Приём у Мастера
         </button>
       </div>
       <article className="card compact-route-hero">
@@ -115,7 +177,7 @@ function AiIntakeDashboard({
           </small>
         </article>
         <article className="card compact-route-card">
-          <span>Личный приём</span>
+          <span>Приём у Мастера</span>
           <h3>Живой разбор</h3>
           <p>Заявка на сопровождение со специалистом.</p>
           <button className="secondary-btn" type="button" onClick={onOpenPersonalIntake}>
@@ -142,11 +204,11 @@ function ConsultationPlaceholder({
           ИИ-приём
         </button>
         <button className="intake-option-pill active" type="button">
-          Личный приём
+          Приём у Мастера
         </button>
       </div>
       <article className="card compact-route-hero">
-        <h2 id="consultations-title">Личный приём</h2>
+        <h2 id="consultations-title">Приём у Мастера</h2>
         <p>Можно оставить заявку на живое сопровождение, если хочется разобрать состояние вместе со специалистом.</p>
         <div className="compact-route-actions">
           <button className="primary-btn" onClick={onSpecialistRequest} type="button">
@@ -176,7 +238,7 @@ function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, 
   return (
     <section className="compact-section-page" aria-labelledby="profile-reports-title">
       <article className="card compact-route-hero">
-        <p className="eyebrow">Профиль / Отчёты</p>
+        <p className="eyebrow">Профиль</p>
         <h2 id="profile-reports-title">Отчёты и динамика</h2>
         <p>Личный архив, последние результаты и настройки доступа.</p>
       </article>
@@ -214,55 +276,56 @@ function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, 
 
 export function NextStepsPage({
   activeTab = pageTabs.recommendations[0],
+  accessLevel = "basic",
   hasCompletedResults,
-  masterPrescription = null,
   onBookSession,
   onOpenReport,
   onRepeatAiIntake,
   onStartSelfAnalysis,
 }) {
   const selectedTab = pageTabs.recommendations.includes(activeTab) ? activeTab : pageTabs.recommendations[0];
+  const hasPersonalAccess = accessRank[accessLevel] >= accessRank.personal;
+  const hasExpandedAccess = accessRank[accessLevel] >= accessRank.expanded;
 
-  if (selectedTab === "Рецепт Мастера") {
+  if (selectedTab === "Отчёты Мастера") {
     return (
-      <section className="compact-section-page" aria-labelledby="master-prescription-title">
+      <section className="compact-section-page" aria-labelledby="master-reports-title">
         <article className="card compact-route-hero">
-          <p className="eyebrow">Назначение</p>
-          <h2 id="master-prescription-title">
-            {masterPrescription?.title || "Рецепт Мастера пока не добавлен"}
+          <p className="eyebrow">Отчёты Мастера</p>
+          <h2 id="master-reports-title">
+            {hasPersonalAccess ? "Отчёты Мастера добавляются вручную" : "Для доступа перейти на Пакет Персональный"}
           </h2>
           <p>
-            {masterPrescription?.notes ||
-              "Рецепт Мастера добавляется специалистом вручную после личной сессии или проверки."}
+            {hasPersonalAccess
+              ? "В этом разделе будут только отчёты, которые специалист подготовил и передал вручную после проверки."
+              : "Мастер-отчёты не генерируются автоматически. Доступ открывается с пакета «Личный», после работы со специалистом."}
           </p>
           <div className="compact-route-actions">
-            <button className="primary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
+            <button className="primary-btn" type="button" onClick={onBookSession}>
+              {hasPersonalAccess ? "Запросить отчёт у Мастера" : "Перейти на Пакет Персональный"}
+            </button>
           </div>
         </article>
-        {masterPrescription?.items?.length > 0 && (
-          <div className="compact-archive-grid next-plan-grid">
-            {masterPrescription.items.map((item) => (
-              <article className="card compact-route-card" key={item.title}>
-                <span>{masterPrescription.authorLabel || "Добавлено специалистом"}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        )}
+        <article className="card soft-card master-report-safety">
+          <h3>Без автогенерации</h3>
+          <p>
+            Раздел не создаёт мастер-отчёты сам и не показывает фиктивно успешную покупку. После заявки формат
+            подтверждается отдельно.
+          </p>
+        </article>
       </section>
     );
   }
 
   if (!hasCompletedResults) {
     return (
-      <section className="compact-section-page" aria-labelledby="ai-advice-empty-title">
+      <section className="compact-section-page" aria-labelledby="ai-reports-empty-title">
         <article className="card compact-route-hero">
-          <p className="eyebrow">ИИ-советы</p>
-          <h2 id="ai-advice-empty-title">ИИ-советы появятся после тестов</h2>
+          <p className="eyebrow">ИИ-отчёты</p>
+          <h2 id="ai-reports-empty-title">ИИ-отчёты появятся после ИИ-приёма</h2>
           <p>
-            Сначала нужен короткий ИИ-приём, чтобы советы опирались на ответы, а не на пустой шаблон.
-            Рецепт Мастера добавляется специалистом вручную отдельно.
+            Сначала нужен короткий ИИ-приём, чтобы карточки опирались на ответы, а не на пустой шаблон.
+            Отчёты Мастера добавляются специалистом вручную отдельно.
           </p>
           <div className="compact-route-actions">
             <button className="primary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти ИИ-приём</button>
@@ -273,30 +336,36 @@ export function NextStepsPage({
   }
 
   return (
-    <section className="compact-section-page" aria-labelledby="ai-advice-title">
+    <section className="compact-section-page" aria-labelledby="ai-reports-title">
       <article className="card compact-route-hero">
-        <p className="eyebrow">ИИ-советы</p>
-        <h2 id="ai-advice-title">ИИ-советы по текущему срезу</h2>
+        <p className="eyebrow">ИИ-отчёты</p>
+        <h2 id="ai-reports-title">Пять направлений ИИ-отчётов</h2>
         <p>
-          Это не медицинское назначение и не замена работе со специалистом. Советы опираются на
-          результаты краткого ИИ-приёма и помогают выбрать мягкий следующий шаг.
+          Это предварительные рабочие программы поддержки, а не медицинское назначение. Финальная версия
+          требует проверки и не заменяет работу со специалистом.
         </p>
         <div className="compact-route-actions">
-          <button className="primary-btn" type="button" onClick={onOpenReport}>Открыть отчёт</button>
+          <button className="primary-btn" disabled={!hasExpandedAccess} type="button">
+            {hasExpandedAccess ? "Открыть ИИ-отчёты" : "Доступно в расширенном формате 5€"}
+          </button>
+          <button className="secondary-btn" type="button" onClick={onOpenReport}>Открыть текущие отчёты</button>
           <button className="secondary-btn" type="button" onClick={onRepeatAiIntake}>Пройти повторную проверку</button>
         </div>
       </article>
 
       <div className="compact-archive-grid next-plan-grid">
-        {[
-          ["Главный фокус", "Выберите один понятный шаг на ближайшие дни и не расширяйте список задач."],
-          ["Что поддерживать", "Сон, паузы, бережный режим и короткие практики восстановления."],
-          ["Как отслеживать", "Мягко отмечайте ресурс, напряжение и телесные маркеры без жёсткой оценки."],
-        ].map(([title, text]) => (
-          <article className="card compact-route-card" key={title}>
-            <span>По результатам ИИ-приёма</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
+        {aiReportCards.map((report) => (
+          <article
+            className={hasExpandedAccess ? "card compact-route-card" : "card compact-route-card soft-locked-card"}
+            key={report.id}
+          >
+            <span>{hasExpandedAccess ? report.source : "Расширенный формат 5€"}</span>
+            <h3>{report.title}</h3>
+            <p>
+              {hasExpandedAccess
+                ? "Каркас отчёта доступен по сохранённым результатам. Подробные рекомендации требуют проверки."
+                : "Карточка видна как направление, но полный ИИ-отчёт закрыт до расширенного формата."}
+            </p>
           </article>
         ))}
       </div>
@@ -474,6 +543,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
     completedFromProgress ||
     clientOverride?.hasCompletedFirstConsultation === true ||
     clientOverride?.hasCompletedResults === true;
+  const currentAccessLevel = clientOverride?.accessLevel || (forceDemo ? "expanded" : "basic");
 
   const analysisGroups = useMemo(() => {
     const completedAt = firstIntakeResult?.completedAt
@@ -651,6 +721,34 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
             </div>
             {userAction ? <div className="settings-actions">{userAction}</div> : null}
           </article>
+          <article className="card settings-card format-settings-card">
+            <p className="eyebrow">Форматы</p>
+            <h2>Пакеты доступа</h2>
+            <p className="settings-note">
+              Выбор формата здесь не запускает оплату и не подтверждает покупку. Доступ меняется только после
+              отдельного подтверждения.
+            </p>
+            <div className="format-card-grid">
+              {packageFormats.map((format) => {
+                const isCurrent = format.id === currentAccessLevel;
+                return (
+                  <section className={isCurrent ? "format-card active" : "format-card"} key={format.id}>
+                    <div>
+                      <span>{format.title}</span>
+                      <strong>{format.price}</strong>
+                    </div>
+                    <p>{format.description}</p>
+                    <button className={isCurrent ? "secondary-btn" : "primary-btn"} type="button">
+                      {isCurrent ? "Текущий формат" : "Запросить формат"}
+                    </button>
+                  </section>
+                );
+              })}
+            </div>
+            <p className="safety-note">
+              Рекомендации и поддержка через препараты не являются медицинским назначением и требуют проверки специалистом.
+            </p>
+          </article>
         </section>
       );
     }
@@ -728,6 +826,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
     if (activePage === "recommendations") {
       return (
         <NextStepsPage
+          accessLevel={currentAccessLevel}
           activeTab={activeTabs.recommendations}
           hasCompletedResults={hasCompletedResults}
           onBookSession={() => handleNavigation("consultations")}

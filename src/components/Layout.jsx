@@ -13,11 +13,11 @@ const clientNavigation = {
   overview: "Приём",
   profile: "Профиль",
   expert: "Результаты (Отчёт)",
-  recommendations: "Назначение",
-  self: "Первый приём (Анализ)",
+  recommendations: "Что делать",
+  self: "ИИ-приём",
   advanced: "Расширенный ИИ-анализ",
   history: "Рекомендации",
-  consultations: "Консультации",
+  consultations: "Приём у Мастера",
   settings: "Настройки",
 };
 
@@ -36,8 +36,8 @@ const lockedForNewUser = new Set(["expert", "recommendations", "history"]);
 const therapeuticSections = new Set(["profile", "self"]);
 const mobilePrimaryNavigation = [
   { id: "intake", label: "Приём", page: "self", pages: ["self", "advanced", "consultations"] },
-  { id: "profile-reports", label: "Профиль / Отчёты", page: "profile", pages: ["profile", "expert", "history", "settings"] },
-  { id: "prescription", label: "Назначение", page: "recommendations", pages: ["recommendations"] },
+  { id: "profile", label: "Профиль", page: "profile", pages: ["profile", "history", "settings"] },
+  { id: "next-actions", label: "Что делать", page: "recommendations", pages: ["recommendations", "expert"] },
 ];
 
 export default function Layout({

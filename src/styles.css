@@ -791,6 +791,66 @@ h3 {
   min-width: 180px;
 }
 
+.format-settings-card {
+  align-content: start;
+}
+
+.settings-note {
+  max-width: 760px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.format-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.format-card {
+  min-height: 210px;
+  padding: 16px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-lg);
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.format-card.active {
+  border-color: rgba(18, 63, 49, 0.26);
+  background: var(--workbook-sage);
+}
+
+.format-card div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.format-card span {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.format-card strong {
+  color: #26312d;
+  font-size: 22px;
+}
+
+.format-card p {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.format-card .primary-btn,
+.format-card .secondary-btn {
+  align-self: end;
+  width: 100%;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -1749,6 +1809,7 @@ h3 {
   font-size: 22px;
   line-height: 1.1;
   color: #26312d;
+  overflow-wrap: anywhere;
 }
 
 .compact-route-card p {
@@ -1774,7 +1835,11 @@ h3 {
 }
 
 .next-plan-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.master-report-safety {
+  max-width: 760px;
 }
 
 .onboarding-copy {
@@ -4218,8 +4283,13 @@ h3 {
 
   .compact-route-grid,
   .compact-archive-grid,
-  .next-plan-grid {
+  .next-plan-grid,
+  .format-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .format-card {
+    min-height: 0;
   }
 
   .compact-route-card {

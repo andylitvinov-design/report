@@ -15,12 +15,12 @@ export const clientProgress = {
 };
 
 export const navigation = [
-  { id: "overview", label: "Обзор" },
-  { id: "self", label: "Первый приём (Анализ)" },
-  { id: "advanced", label: "Расширенный ИИ-анализ" },
-  { id: "expert", label: "Экспертный анализ" },
-  { id: "recommendations", label: "Рекомендации" },
-  { id: "history", label: "Динамика / История" },
+  { id: "self", label: "ИИ-приём" },
+  { id: "consultations", label: "Приём у Мастера" },
+  { id: "profile", label: "Сейчас" },
+  { id: "history", label: "Динамика" },
+  { id: "settings", label: "Настройки" },
+  { id: "recommendations", label: "Что делать" },
 ];
 
 export const clientCabinet = {
@@ -75,12 +75,9 @@ export const clientCabinet = {
 };
 
 export const topNavigation = [
-  { id: "overview", label: "Главная" },
+  { id: "self", label: "Приём" },
   { id: "profile", label: "Профиль" },
-  { id: "self", label: "Самоанализ" },
-  { id: "expert", label: "Отчёты" },
-  { id: "consultations", label: "Консультации" },
-  { id: "settings", label: "Настройки" },
+  { id: "recommendations", label: "Что делать" },
 ];
 
 export const therapeuticNavigatorHint =
