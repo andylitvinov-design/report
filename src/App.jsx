@@ -346,7 +346,7 @@ function CabinetAuthError({ error }) {
   );
 }
 
-export function CabinetAuthGate() {
+export function CabinetAuthGate({ initialPage = "self" } = {}) {
   const [authStatus, setAuthStatus] = useState("loading");
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
@@ -419,7 +419,7 @@ export function CabinetAuthGate() {
     return <CabinetAuthError error={error} />;
   }
 
-  return <ReportApp clientOverride={clientOverride} onSignOut={handleSignOut} userAction={signOutAction} />;
+  return <ReportApp clientOverride={clientOverride} initialPage={initialPage} onSignOut={handleSignOut} userAction={signOutAction} />;
 }
 
 function RoutedApp() {
@@ -436,7 +436,7 @@ function RoutedApp() {
   }
 
   if (path === "/profile") {
-    return <CabinetAuthGate />;
+    return demoMode ? <ReportApp forceDemo initialPage="profile" /> : <CabinetAuthGate initialPage="profile" />;
   }
 
   if (path === "/demo") {
@@ -446,8 +446,8 @@ function RoutedApp() {
   return <LoginPage />;
 }
 
-export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut = null, userAction = null }) {
-  const [activePage, setActivePage] = useState("self");
+export function ReportApp({ clientOverride = null, forceDemo = false, initialPage = "self", onSignOut = null, userAction = null }) {
+  const [activePage, setActivePage] = useState(initialPage);
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
