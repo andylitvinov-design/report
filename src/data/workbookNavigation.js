@@ -1,10 +1,18 @@
 export const workbookNavigation = [
   {
+    id: "overview",
+    label: "Обзор",
+    shortLabel: "Обзор",
+    page: "overview",
+    pages: ["overview"],
+    subnav: [],
+  },
+  {
     id: "ai-session",
     label: "ИИ-приём",
     shortLabel: "Приём",
     page: "self",
-    pages: ["overview", "self", "advanced"],
+    pages: ["self", "advanced"],
     subnav: [
       { id: "short", label: "Краткий", page: "self", tab: "short" },
       { id: "extended", label: "Расширенный", page: "advanced", tab: "extended" },
@@ -52,6 +60,7 @@ export function findActiveWorkbookSubnav(category, activePage, activeTab) {
   return (
     category.subnav.find((item) => item.tab && item.tab === activeTab) ||
     category.subnav.find((item) => item.page === activePage) ||
-    category.subnav[0]
+    category.subnav[0] ||
+    null
   );
 }
