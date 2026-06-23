@@ -7,12 +7,7 @@ import {
 } from "../../data/workbookNavigation.js";
 import WorkbookSubNav from "./WorkbookSubNav.jsx";
 
-const mobileWorkbookNavigation = [
-  { id: "overview", label: "Обзор", page: "overview", pages: ["overview"] },
-  ...workbookNavigation,
-];
-
-export default function WorkbookTopNav({ activeGroup, activePage = "overview", activeTab = "", onNavigate }) {
+export default function WorkbookTopNav({ activeGroup, activePage = "self", activeTab = "", onNavigate }) {
   const activeCategory = activeGroup
     ? findWorkbookCategoryById(activeGroup)
     : findWorkbookCategoryByPage(activePage);
@@ -25,11 +20,8 @@ export default function WorkbookTopNav({ activeGroup, activePage = "overview", a
   return (
     <div className="workbook-nav-wrap">
       <nav className="workbook-mobile-nav-row" aria-label="Основные разделы">
-        {mobileWorkbookNavigation.map((item) => {
-          const active = item.id === "overview"
-            ? activePage === "overview"
-            : item.pages.includes(activePage);
-
+        {workbookNavigation.map((item) => {
+          const active = item.pages.includes(activePage);
           return (
             <button
               aria-current={active ? "page" : undefined}

@@ -10,7 +10,7 @@ import {
 } from "../data/mockData.js";
 
 const clientNavigation = {
-  overview: "Главная",
+  overview: "Приём",
   profile: "Профиль",
   expert: "Результаты (Отчёт)",
   recommendations: "Назначение",
@@ -22,7 +22,7 @@ const clientNavigation = {
 };
 
 const actionLabels = {
-  overview: "+ Новая оценка",
+  overview: "Пройти краткий ИИ-приём",
   profile: "Пройти анализ",
   expert: "Открыть результаты",
   recommendations: "Обновить назначение",
@@ -35,9 +35,9 @@ const actionLabels = {
 const lockedForNewUser = new Set(["expert", "recommendations", "history"]);
 const therapeuticSections = new Set(["profile", "self"]);
 const mobilePrimaryNavigation = [
-  { id: "ai-session", label: "ИИ-приём", page: "self", pages: ["overview", "self", "advanced"] },
+  { id: "intake", label: "Приём", page: "self", pages: ["self", "advanced", "consultations"] },
   { id: "profile-reports", label: "Профиль / Отчёты", page: "profile", pages: ["profile", "expert", "history", "settings"] },
-  { id: "next-step", label: "Что дальше", page: "recommendations", pages: ["recommendations", "consultations"] },
+  { id: "next-step", label: "Что дальше", page: "recommendations", pages: ["recommendations"] },
 ];
 
 export default function Layout({
