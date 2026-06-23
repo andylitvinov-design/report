@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AnalysisResultPanel } from "../components/Cards.jsx";
-import WorkbookAssistantInput from "../components/workbook/WorkbookAssistantInput.jsx";
-import WorkbookBook from "../components/workbook/WorkbookBook.jsx";
-import WorkbookChoiceList from "../components/workbook/WorkbookChoiceList.jsx";
-import WorkbookPage from "../components/workbook/WorkbookPage.jsx";
-import WorkbookSafetyNote from "../components/workbook/WorkbookSafetyNote.jsx";
-import WorkbookThemeBadge from "../components/workbook/WorkbookThemeBadge.jsx";
 import { selfAnalysis } from "../data/mockData.js";
 import { calculateRemedyResults } from "../lib/bachScoring.js";
 import {
@@ -673,144 +667,196 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
     { id: "bach-some", icon: "body", label: "Заметно", description: "2", value: 2 },
     { id: "bach-strong", icon: "heart", label: "Сильно", description: "3", value: 3 },
   ];
-  const tagChoices = (step.tagOptions || []).slice(0, 3).map((tag) => ({
+  const tagChoices = (step.tagOptions || []).map((tag) => ({
     id: tag,
     icon: choiceIconForLabel(tag),
     label: tag,
     isSelected: draftTags.includes(tag),
     onSelect: () => toggleDraftTag(tag),
   }));
-  const workbookChoiceItems = step.type === "scale10"
+  const answerChoices = step.type === "scale10"
     ? scaleChoices.map((item) => ({ ...item, isSelected: Number(currentAnswer) === item.value, onSelect: () => setAnswer(item.value) }))
     : part.kind === "bach"
       ? bachChoices.map((item) => ({ ...item, isSelected: Number(currentAnswer) === item.value, onSelect: () => setAnswer(item.value) }))
       : tagChoices;
+  const previousStepBubbles = steps
+    .slice(0, Math.max(state.currentStepIndex, 0))
+    .map((item) => ({ step: item, answer: answerGroup[item.id] }))
+    .filter((item) => hasAnswerContent(item.answer));
 
   if (restoreChoiceVisible) {
     return (
-      <section className="first-intake-page first-intake-dialog restore-intake-shell">
-        <WorkbookBook>
-          <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-            <p className="workbook-kicker">Первый приём</p>
-            <h1 className="workbook-title">Вы уже начали AI-приём.</h1>
-            <p className="workbook-body">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
-            <div className="workbook-progress-card">
+      <section className="first-intake-page first-intake-dialog first-intake-chat-mode restore-intake-shell">
+        <article className="card intake-chat-card restore-intake-card">
+          <header className="chat-card-header">
+            <div>
+              <p className="card-kicker">Первый приём</p>
+              <h2>Вы уже начали AI-приём.</h2>
+              <p className="part-intro-copy">Можно вернуться к тому же месту или начать заново, если состояние сегодня другое.</p>
+            </div>
+            <span className="chat-progress">{stepLabel}</span>
+          </header>
+          <div className="chat-window restore-intake-body" aria-live="polite">
+            <div className="chat-bubble therapist-bubble intro-bubble">
+              <span>Специалист</span>
+              <p>Я сохранил незавершённый диалог и могу продолжить с текущего вопроса.</p>
+            </div>
+            <div className="chat-bubble therapist-bubble current-question-bubble">
               <span>Текущая часть</span>
-              <strong>{partLabel}</strong>
+              <p>{partLabel}</p>
               <small>Обновлено: {formatDateTime(state.updatedAt)}</small>
             </div>
-            <WorkbookSafetyNote>
-              Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
-            </WorkbookSafetyNote>
-          </WorkbookPage>
-          <WorkbookPage side="right" variant="response">
-            <p className="workbook-kicker">Продолжить</p>
-            <h2 className="workbook-question">У вас есть незавершённый первый приём.</h2>
-            <p className="workbook-body">Выберите, что сделать сейчас.</p>
-            <div className="workbook-action-row">
-              <button className="secondary-btn" onClick={goToMainMenu} type="button">
-                В главное меню
-              </button>
-              <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
-                Продолжить
-              </button>
-              <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
-                Начать заново
-              </button>
-            </div>
-            {restartChoiceSheet}
-          </WorkbookPage>
-        </WorkbookBook>
+          </div>
+          <footer className="chat-actions">
+            <button className="secondary-btn" onClick={goToMainMenu} type="button">
+              В главное меню
+            </button>
+            <button className="primary-btn" onClick={() => setRestoreChoiceVisible(false)} type="button">
+              Продолжить
+            </button>
+            <button className="soft-warning-btn" onClick={() => setRestartConfirmVisible(true)} type="button">
+              Начать заново
+            </button>
+          </footer>
+          <p className="compact-safety-note">
+            Самоанализ и рекомендации не заменяют медицинскую или психотерапевтическую помощь.
+          </p>
+          {restartChoiceSheet}
+        </article>
       </section>
     );
   }
 
   return (
-    <section className="first-intake-page first-intake-dialog">
-      <WorkbookBook>
-        <WorkbookPage side="left" variant="message" backgroundVariant="lake">
-          <h1 className="workbook-title">AI-приём самонаблюдения</h1>
-          <span className="workbook-title-rule" aria-hidden="true" />
-          <p className="workbook-body workbook-lead">Сейчас главное — двигаться мягко и замечать, что меняется.</p>
-          <div className="workbook-news-card">
-            <span aria-hidden="true">☘</span>
+    <section className="first-intake-page first-intake-dialog first-intake-chat-mode">
+      <div className="intake-split-shell">
+        <IntakeContextPanel part={part} state={state} stepLabel={stepLabel} partLabel={partLabel} />
+
+        <article className="card intake-chat-card" aria-labelledby="first-intake-chat-title">
+          <header className="chat-card-header">
             <div>
-              <strong>Что нового</strong>
-              <p>Ресурс немного вырос</p>
-              <p>Напряжение стало мягче</p>
+              <p className="card-kicker">Краткий ИИ-приём</p>
+              <h2 id="first-intake-chat-title">{part.shortTitle}</h2>
+              <p className="part-intro-copy">{partIntroText[part.id]}</p>
             </div>
-          </div>
-          <div className="workbook-topic-card">
-            <span aria-hidden="true">☘</span>
-            <p>Работаем с темой:<br />{currentTheme}</p>
-          </div>
-          <div className="workbook-progress-card">
-            <span>{partLabel}</span>
-            <strong>{stepLabel}</strong>
-          </div>
-          <div className="workbook-progress-compact">
-            <IntakeProgressMap currentPartIndex={state.currentPartIndex} />
-          </div>
+            <span className="chat-progress">{stepLabel}</span>
+          </header>
+
           {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
-            <CompactBaselineStrip baseline={state.answers.baseline} />
-          ) : null}
-          <WorkbookSafetyNote>
-            Отвечайте как есть сегодня. Здесь нет правильных или неправильных ответов.
-          </WorkbookSafetyNote>
-        </WorkbookPage>
-
-        <WorkbookPage side="right" variant="response">
-            <div className="workbook-response-head">
-              <p className="workbook-kicker">Ваш ответ</p>
-              <WorkbookThemeBadge>{currentTheme}</WorkbookThemeBadge>
+            <div className="baseline-strip-wrap">
+              <CompactBaselineStrip baseline={state.answers.baseline} />
             </div>
-            <h2 className="workbook-question">{step.question}</h2>
-            {step.helper ? <p className="workbook-helper">{step.helper}</p> : null}
+          ) : null}
 
-            {isPendingBaselineTransition ? (
-              <section className="workbook-transition-panel" aria-label="Переход к Bach: ситуация">
-                <BaselineSummaryCard baseline={state.answers.baseline} />
+          <div className="chat-window" aria-live="polite">
+            <div className="chat-bubble therapist-bubble intro-bubble">
+              <span>Специалист</span>
+              <p>Идём по одному вопросу. Можно выбрать подсказки и добавить пару слов своими словами.</p>
+            </div>
+
+            {previousStepBubbles.map(({ step: item, answer }) => (
+              <React.Fragment key={item.id}>
+                <div className="chat-bubble therapist-bubble">
+                  <span>{item.label || part.shortTitle}</span>
+                  <p>{item.question}</p>
+                </div>
+                <div className="chat-bubble user-bubble">
+                  <span>Вы</span>
+                  <p>{answerLabel(item, answer)}</p>
+                </div>
+              </React.Fragment>
+            ))}
+
+            {!isPendingBaselineTransition ? (
+              <div className="chat-bubble therapist-bubble current-question-bubble">
+                <span>{currentTheme}</span>
+                <p>{step.question}</p>
+                {step.helper ? <small>{step.helper}</small> : null}
+              </div>
+            ) : null}
+
+            {hasAnswerContent(currentAnswer) ? (
+              <div className="chat-bubble user-bubble">
+                <span>Вы</span>
+                <p>{answerLabel(step, currentAnswer)}</p>
+              </div>
+            ) : null}
+          </div>
+
+          {isPendingBaselineTransition ? (
+            <section className="intake-transition-panel" aria-label="Переход к Bach: ситуация">
+              <div className="transition-message">
                 <p>Базовая точка сохранена. Теперь можно перейти к состояниям Bach, связанным с текущей ситуацией.</p>
                 <button className="primary-btn" onClick={continueToBachSituation} type="button">
                   Перейти к Bach: ситуация
                 </button>
-              </section>
-            ) : (
-              <section className="workbook-answer-panel" aria-label="Ответ на текущий вопрос">
-                {workbookChoiceItems.length > 0 ? (
-                  <WorkbookChoiceList
-                    choices={workbookChoiceItems}
-                    label={step.type === "scale10" || part.kind === "bach" ? "Шкала ответа" : "Подсказки для ответа"}
-                  />
-                ) : null}
+              </div>
+              <BaselineSummaryCard baseline={state.answers.baseline} />
+            </section>
+          ) : (
+            <section className="answer-panel" aria-label="Ответ на текущий вопрос">
+              <div className="answer-panel-head">
+                <span>{step.type === "scale10" || part.kind === "bach" ? "Шкала ответа" : "Подсказки для ответа"}</span>
+                <strong>{partLabel}</strong>
+              </div>
+              {answerChoices.length > 0 ? (
+                <div
+                  className={[
+                    "option-grid",
+                    step.type === "scale10" ? "scale-grid" : "",
+                    part.kind === "bach" ? "bach-scale-grid" : "",
+                    step.tagOptions ? "tag-chip-grid" : "",
+                  ].filter(Boolean).join(" ")}
+                  aria-label={step.type === "scale10" || part.kind === "bach" ? "Шкала ответа" : "Подсказки для ответа"}
+                >
+                  {answerChoices.map((item) => (
+                    <button
+                      aria-pressed={item.isSelected}
+                      className={[
+                        "answer-chip",
+                        step.tagOptions ? "tag-chip" : "",
+                        step.type === "scale10" ? "scale-chip" : "",
+                        item.isSelected ? "active" : "",
+                      ].filter(Boolean).join(" ")}
+                      key={item.id}
+                      onClick={item.onSelect}
+                      type="button"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
                 {step.type !== "scale10" && part.kind !== "bach" ? (
-                  <WorkbookAssistantInput
-                    id={`first-intake-${step.id}`}
-                    name={`first-intake-${step.id}`}
-                    notice={answerNotice}
-                    onChange={(event) => setDraftValue(event.target.value)}
-                    onSubmit={submitDraft}
-                    placeholder={step.placeholder || "Или напишите своими словами..."}
-                    value={draftValue}
-                  />
+                  <div className="compact-note inline-answer-field">
+                    <label htmlFor={`first-intake-${step.id}`}>Добавить своими словами</label>
+                    <div className="inline-answer-row">
+                      <textarea
+                        id={`first-intake-${step.id}`}
+                        name={`first-intake-${step.id}`}
+                        onChange={(event) => setDraftValue(event.target.value)}
+                        placeholder={step.placeholder || "Или напишите своими словами..."}
+                        value={draftValue}
+                      />
+                      <button className="primary-btn" onClick={submitDraft} type="button">
+                        Отправить
+                      </button>
+                    </div>
+                    {answerNotice ? <p className="answer-notice" role="status">{answerNotice}</p> : null}
+                  </div>
                 ) : null}
                 {step.type === "scale10" ? (
-                  <p className="workbook-helper">Число сохранится совместимо со старой шкалой: 2, 5 или 8 из 10.</p>
+                  <p className="scale-helper">Число сохранится совместимо со старой шкалой: 2, 5 или 8 из 10.</p>
                 ) : null}
                 {part.kind === "bach" ? (
-                  <p className="workbook-helper">Ответ сохраняется числом для прежнего Bach scoring.</p>
+                  <p className="scale-helper">Ответ сохраняется числом для прежнего Bach scoring.</p>
                 ) : null}
-              </section>
-            )}
+            </section>
+          )}
 
-            {hasAnswerContent(currentAnswer) ? (
-              <div className="workbook-current-answer" aria-live="polite">
-                <span>Сохранённый ответ</span>
-                <p>{answerLabel(step, currentAnswer)}</p>
-              </div>
-            ) : null}
-
-            <footer className="workbook-actions">
+          <footer className="chat-actions">
+            <div className="intake-navigation-actions">
               {hasAnyAnswer ? (
                 <button className="secondary-btn" onClick={goBack} type="button">
                   Назад
@@ -826,10 +872,14 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
                   Начать заново
                 </button>
               ) : null}
-            </footer>
-            {restartChoiceSheet}
-        </WorkbookPage>
-      </WorkbookBook>
+            </div>
+          </footer>
+          <p className="compact-safety-note">
+            Отвечайте как есть сегодня. Здесь нет правильных или неправильных ответов.
+          </p>
+          {restartChoiceSheet}
+        </article>
+      </div>
     </section>
   );
 }
