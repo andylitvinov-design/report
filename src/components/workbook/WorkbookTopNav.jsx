@@ -30,7 +30,7 @@ export default function WorkbookTopNav({ activeGroup, activePage = "self", activ
               onClick={() => handleNavigate(item)}
               type="button"
             >
-              {item.label}
+              {item.shortLabel || item.label}
             </button>
           );
         })}
