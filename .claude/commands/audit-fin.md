@@ -30,6 +30,12 @@ Required chain:
 understand numeric target -> extract numeric contract -> inspect visible numbers -> inspect code and data flow deeply -> run source-layer matrix before hypotheses -> compare expected vs actual -> list problems -> generate focused hypotheses only from failing/unverified layers -> evaluate hypotheses against evidence -> choose most likely root cause -> compare solution options -> create/update GitHub issue -> return short /delivery prompt with issue link
 ```
 
+Handoff prompt rule:
+
+The copy-pasteable prompt for the implementation agent must start with `/delivery` as the first non-empty line.
+
+Do not start the prompt block with `/audit-fin -> /delivery handoff`, `/audit-fin → /delivery handoff`, `/audit -> /delivery handoff`, or any other slash-prefixed audit label. If a label is useful, put it outside the prompt block as plain text only.
+
 Before hypotheses, always run the source-layer matrix:
 
 1. Visual/displayed value.
