@@ -37,7 +37,7 @@ const therapeuticSections = new Set(["profile", "self"]);
 const mobilePrimaryNavigation = [
   { id: "intake", label: "Приём", page: "self", pages: ["self", "advanced", "consultations"] },
   { id: "profile-reports", label: "Профиль / Отчёты", page: "profile", pages: ["profile", "expert", "history", "settings"] },
-  { id: "next-step", label: "Что дальше", page: "recommendations", pages: ["recommendations"] },
+  { id: "prescription", label: "Назначение", page: "recommendations", pages: ["recommendations"] },
 ];
 
 export default function Layout({
