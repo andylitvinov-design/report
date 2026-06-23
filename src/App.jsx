@@ -6,7 +6,6 @@ import ClientCabinet from "./pages/ClientCabinet.jsx";
 import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
-import Overview from "./pages/Overview.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
 import {
@@ -31,14 +30,6 @@ export const pageTabs = {
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
   consultations: [],
 };
-
-function isToday(dateString) {
-  if (!dateString) return false;
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return false;
-  const today = new Date();
-  return date.toDateString() === today.toDateString();
-}
 
 function LockedReportState({
   bookingNoticeVisible,
@@ -75,75 +66,62 @@ function LockedReportState({
 function AiIntakeDashboard({
   advancedAiResult,
   firstIntakeResult,
-  onOpenDynamics,
-  onOpenReport,
+  onOpenPersonalIntake,
   onStartAdvanced,
   onStartBrief,
 }) {
   const hasBriefIntake = Boolean(firstIntakeResult);
-  const completedToday = isToday(firstIntakeResult?.completedAt);
+  const primaryCtaLabel = hasBriefIntake ? "Повторный ИИ-приём" : "Пройти краткий ИИ-приём";
 
   return (
     <section className="compact-section-page" aria-labelledby="ai-intake-title">
+      <div className="intake-option-row" aria-label="Варианты приёма">
+        <button className="intake-option-pill active" type="button">
+          ИИ-приём
+        </button>
+        <button className="intake-option-pill" type="button" onClick={onOpenPersonalIntake}>
+          Личный приём
+        </button>
+      </div>
       <article className="card compact-route-hero">
-        <p className="eyebrow">ИИ-приём</p>
-        <h2 id="ai-intake-title">Краткий срез</h2>
-        <p>Быстро понять запрос, состояние и первые опоры.</p>
+        <h2 id="ai-intake-title">ИИ-приём</h2>
+        <p>Сначала AI поможет сделать краткий срез состояния. После него можно пройти расширенный приём.</p>
         <div className="compact-route-actions">
-          {completedToday ? (
-            <>
-              <button className="primary-btn" type="button" disabled>
-                Сегодня ИИ-приём уже пройден
-              </button>
-              <button className="secondary-btn" type="button" onClick={onOpenReport}>
-                Открыть последний отчёт
-              </button>
-              <button className="secondary-btn" type="button" onClick={onOpenDynamics}>
-                Посмотреть динамику
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="primary-btn" type="button" onClick={onStartBrief}>
-                Пройти короткий ИИ-приём
-              </button>
-              {hasBriefIntake && (
-                <button className="secondary-btn" type="button" onClick={onStartAdvanced}>
-                  Расширенный срез
-                </button>
-              )}
-            </>
-          )}
+          <button className="primary-btn" type="button" onClick={onStartBrief}>
+            {primaryCtaLabel}
+          </button>
         </div>
         <p className="compact-route-note">
-          {completedToday
-            ? "Следующая проверка будет доступна завтра."
-            : hasBriefIntake
-              ? "Новый срез сохранится в историю."
-              : "3–5 минут. После появится первая карта состояния."}
+          {hasBriefIntake
+            ? "Новый срез сохранится в историю."
+            : "3-5 минут. После появится первая карта состояния."}
         </p>
       </article>
 
       <div className="compact-route-grid">
-        <article className="card compact-route-card">
-          <span>Расширенный</span>
-          <h3>Глубже по шкалам</h3>
-          <p>Больше деталей, когда краткого среза мало.</p>
+        <article className={hasBriefIntake ? "card compact-route-card" : "card compact-route-card soft-locked-card"}>
+          <span>Расширенный ИИ-приём</span>
+          <h3>Больше деталей</h3>
+          <p>Можно пройти после краткого ИИ-приёма.</p>
           <button className="secondary-btn" disabled={!hasBriefIntake} type="button" onClick={onStartAdvanced}>
-            Открыть расширенный
+            {hasBriefIntake ? "Открыть расширенный ИИ-приём" : "Откроется после краткого приёма"}
           </button>
           <small className="compact-route-hint">
-            {advancedAiResult ? "Последний срез сохранён" : "После краткого приёма"}
+            {hasBriefIntake
+              ? advancedAiResult
+                ? "Последний расширенный срез сохранён"
+                : "Доступен сейчас"
+              : "Откроется после краткого приёма"}
           </small>
         </article>
         <article className="card compact-route-card">
-          <span>История</span>
-          <h3>Срезы и динамика</h3>
-          <p>Открыть прошлые даты и сравнение.</p>
-          <button className="secondary-btn" type="button" onClick={onOpenDynamics}>
-            Открыть историю
+          <span>Личный приём</span>
+          <h3>Живой разбор</h3>
+          <p>Заявка на сопровождение со специалистом.</p>
+          <button className="secondary-btn" type="button" onClick={onOpenPersonalIntake}>
+            Открыть личный приём
           </button>
-          <small className="compact-route-hint">После первого среза</small>
+          <small className="compact-route-hint">Отдельный вариант в разделе Приём</small>
         </article>
       </div>
     </section>
@@ -153,60 +131,39 @@ function AiIntakeDashboard({
 function ConsultationPlaceholder({
   bookingNoticeVisible,
   hasCompletedResults,
+  onOpenAiIntake,
   onOpenReport,
   onSpecialistRequest,
-  onStartSelfAnalysis,
 }) {
   return (
     <section className="compact-section-page" aria-labelledby="consultations-title">
+      <div className="intake-option-row" aria-label="Варианты приёма">
+        <button className="intake-option-pill" type="button" onClick={onOpenAiIntake}>
+          ИИ-приём
+        </button>
+        <button className="intake-option-pill active" type="button">
+          Личный приём
+        </button>
+      </div>
       <article className="card compact-route-hero">
-        <p className="eyebrow">Личная сессия</p>
-        <h2 id="consultations-title">Разбор отчёта со специалистом</h2>
-        {hasCompletedResults ? (
-          <p>Взять последний отчёт в работу.</p>
-        ) : (
-          <p>Сначала можно пройти короткий срез.</p>
-        )}
+        <h2 id="consultations-title">Личный приём</h2>
+        <p>Можно оставить заявку на живое сопровождение, если хочется разобрать состояние вместе со специалистом.</p>
         <div className="compact-route-actions">
-          {hasCompletedResults ? (
-            <>
-              <button className="primary-btn" onClick={onOpenReport} type="button">
-                Разобрать этот отчёт на личной сессии
-              </button>
-              <button className="secondary-btn" onClick={onSpecialistRequest} type="button">
-                Заказать сессию
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="primary-btn" onClick={onStartSelfAnalysis} type="button">
-                Пройти ИИ-приём
-              </button>
-              <button className="secondary-btn" onClick={onSpecialistRequest} type="button">
-                Заказать сессию сразу
-              </button>
-            </>
+          <button className="primary-btn" onClick={onSpecialistRequest} type="button">
+            Оставить заявку
+          </button>
+          {hasCompletedResults && (
+            <button className="secondary-btn" onClick={onOpenReport} type="button">
+              Открыть последний отчёт
+            </button>
           )}
         </div>
         {bookingNoticeVisible && (
           <p className="placeholder-notice" role="status">
-            Раздел записи ещё подключается. Запрос сохранён как следующий шаг.
+            Раздел записи к специалисту ещё подключается. Запрос сохранён как следующий шаг.
           </p>
         )}
       </article>
-
-      <div className="compact-route-grid">
-        <article className="card compact-route-card">
-          <span>Последний отчёт</span>
-          <h3>{hasCompletedResults ? "Готов для разбора" : "Появится после ИИ-приёма"}</h3>
-          <p>{hasCompletedResults ? "Открыть перед встречей." : "Поможет сформулировать запрос."}</p>
-        </article>
-        <article className="card compact-route-card">
-          <span>История сессий</span>
-          <h3>Прошедшие и будущие встречи</h3>
-          <p>Даты, заметки и назначения.</p>
-        </article>
-      </div>
     </section>
   );
 }
@@ -448,7 +405,7 @@ function RoutedApp() {
 }
 
 export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut = null, userAction = null }) {
-  const [activePage, setActivePage] = useState("overview");
+  const [activePage, setActivePage] = useState("self");
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
@@ -519,29 +476,31 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
   );
 
   const handleNavigation = (page, tab) => {
-    if (page === "settings") {
+    const targetPage = page === "overview" ? "self" : page;
+
+    if (targetPage === "settings") {
       setActivePage("settings");
       setBookingNoticeVisible(false);
       setSelfAnalysisMode("overview");
       return;
     }
-    if (!hasCompletedResults && page === "expert") {
+    if (!hasCompletedResults && targetPage === "expert") {
       setActivePage("profile");
       setBookingNoticeVisible(false);
       return;
     }
     if (tab) {
-      setActiveTabs((current) => ({ ...current, [page]: tab }));
-      setActivePage(page);
+      setActiveTabs((current) => ({ ...current, [targetPage]: tab }));
+      setActivePage(targetPage);
       setBookingNoticeVisible(false);
       return;
     }
-    setActivePage(page);
+    setActivePage(targetPage);
     setBookingNoticeVisible(false);
-    if (page !== "self") {
+    if (targetPage !== "self") {
       setSelfAnalysisMode("overview");
     }
-    if (page !== "advanced") {
+    if (targetPage !== "advanced") {
       setAdvancedAnalysisMode("overview");
     }
   };
@@ -658,9 +617,9 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
         <ConsultationPlaceholder
           bookingNoticeVisible={bookingNoticeVisible}
           hasCompletedResults={hasCompletedResults}
+          onOpenAiIntake={() => handleNavigation("self")}
           onOpenReport={() => openResultReport(pageTabs.expert[0])}
           onSpecialistRequest={handleSpecialistRequest}
-          onStartSelfAnalysis={openFirstIntake}
         />
       );
     }
@@ -673,8 +632,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
           <AiIntakeDashboard
             advancedAiResult={advancedAiResult}
             firstIntakeResult={firstIntakeResult}
-            onOpenDynamics={() => handleNavigation("profile")}
-            onOpenReport={() => openResultReport(pageTabs.expert[0])}
+            onOpenPersonalIntake={() => handleNavigation("consultations")}
             onStartAdvanced={() => handleNavigation("advanced")}
             onStartBrief={openFirstIntake}
           />
@@ -740,17 +698,12 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
       return <DynamicsHistory />;
     }
     return (
-      <Overview
-        bookingNoticeVisible={bookingNoticeVisible}
-        clientName={clientOverride?.name || client.name}
-        hasCompletedResults={hasCompletedResults}
-        onAskAssistant={() => handleNavigation("recommendations")}
-        onContinueIntake={openFirstIntake}
-        onNavigate={handleNavigation}
-        onOpenResults={() => openResultReport(pageTabs.expert[0])}
-        onRepeatAiIntake={() => handleNavigation("advanced")}
-        onSpecialistRequest={handleSpecialistRequest}
-        onStartSelfAnalysis={openFirstIntake}
+      <AiIntakeDashboard
+        advancedAiResult={advancedAiResult}
+        firstIntakeResult={firstIntakeResult}
+        onOpenPersonalIntake={() => handleNavigation("consultations")}
+        onStartAdvanced={() => handleNavigation("advanced")}
+        onStartBrief={openFirstIntake}
       />
     );
   };

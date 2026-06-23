@@ -13,7 +13,7 @@ function initialsForName(name) {
 
 export default function WorkbookShell({
   activeGroup,
-  activePage = "overview",
+  activePage = "self",
   activeTab = "",
   children,
   onNavigate,

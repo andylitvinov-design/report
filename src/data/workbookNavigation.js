@@ -1,23 +1,11 @@
 export const workbookNavigation = [
   {
-    id: "overview",
-    label: "Обзор",
-    shortLabel: "Обзор",
-    page: "overview",
-    pages: ["overview"],
-    subnav: [],
-  },
-  {
-    id: "ai-session",
-    label: "ИИ-приём",
+    id: "intake",
+    label: "Приём",
     shortLabel: "Приём",
     page: "self",
-    pages: ["self", "advanced"],
-    subnav: [
-      { id: "short", label: "Краткий", page: "self", tab: "short" },
-      { id: "extended", label: "Расширенный", page: "advanced", tab: "extended" },
-      { id: "history", label: "История", page: "self", tab: "ai-history" },
-    ],
+    pages: ["self", "advanced", "consultations"],
+    subnav: [],
   },
   {
     id: "profile-reports",
@@ -37,7 +25,7 @@ export const workbookNavigation = [
     label: "Что дальше",
     shortLabel: "Дальше",
     page: "recommendations",
-    pages: ["recommendations", "consultations"],
+    pages: ["recommendations"],
     subnav: [
       { id: "current-assignment", label: "Текущее назначение", page: "recommendations", tab: "current-assignment" },
       { id: "support-plan", label: "План сопровождения", page: "recommendations", tab: "support-plan" },

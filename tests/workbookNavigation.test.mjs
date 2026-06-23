@@ -7,17 +7,18 @@ import {
 } from "../src/data/workbookNavigation.js";
 
 describe("workbookNavigation", () => {
-  it("keeps the approved overview entry before the compact workbook sections", () => {
+  it("keeps intake as the first visible section and removes overview", () => {
     assert.deepEqual(
       workbookNavigation.map((item) => item.label),
       [
-        "Обзор",
-        "ИИ-приём",
+        "Приём",
         "Профиль / Отчёты",
         "Что дальше",
       ],
     );
 
+    assert.equal(workbookNavigation.some((item) => item.label === "Обзор"), false);
+    assert.equal(workbookNavigation.some((item) => item.id === "overview"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Ещё"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Личная сессия"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Самоанализ"), false);
@@ -26,10 +27,10 @@ describe("workbookNavigation", () => {
   });
 
   it("resolves each app page to its active category and contextual subnav", () => {
-    assert.equal(findWorkbookCategoryByPage("overview").id, "overview");
-    assert.equal(findWorkbookCategoryByPage("self").id, "ai-session");
-    assert.equal(findWorkbookCategoryByPage("advanced").id, "ai-session");
-    assert.equal(findWorkbookCategoryByPage("consultations").id, "next-step");
+    assert.equal(findWorkbookCategoryByPage("overview").id, "intake");
+    assert.equal(findWorkbookCategoryByPage("self").id, "intake");
+    assert.equal(findWorkbookCategoryByPage("advanced").id, "intake");
+    assert.equal(findWorkbookCategoryByPage("consultations").id, "intake");
     assert.equal(findWorkbookCategoryByPage("profile").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("expert").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("history").id, "profile-reports");
@@ -38,7 +39,7 @@ describe("workbookNavigation", () => {
 
     assert.deepEqual(
       findWorkbookCategoryByPage("self").subnav.map((item) => item.label),
-      ["Краткий", "Расширенный", "История"],
+      [],
     );
   });
 });
