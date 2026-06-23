@@ -2900,6 +2900,30 @@ h3 {
   min-height: 0;
 }
 
+.first-intake-chat-mode {
+  display: grid;
+  gap: 14px;
+}
+
+.first-intake-chat-mode .intake-chat-card {
+  width: 100%;
+}
+
+.restore-intake-card {
+  max-width: 760px;
+  height: auto;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+.compact-safety-note {
+  margin: -4px 18px 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
 .intake-split-shell {
   display: grid;
   grid-template-columns: minmax(300px, 0.86fr) minmax(460px, 1.14fr);
@@ -3417,6 +3441,12 @@ h3 {
   font-weight: 800;
 }
 
+.compact-note label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .compact-note textarea {
   min-height: 38px;
   max-height: 64px;
@@ -3434,6 +3464,17 @@ h3 {
 
 .inline-answer-field {
   margin: 0;
+}
+
+.answer-panel .compact-note {
+  margin: 0;
+}
+
+.inline-answer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .inline-answer-field .primary-btn {
@@ -4389,6 +4430,10 @@ h3 {
     overflow: visible;
   }
 
+  .first-intake-chat-mode .intake-context-panel {
+    display: none;
+  }
+
   .intake-question-panel {
     height: auto;
     min-height: 0;
@@ -4472,6 +4517,15 @@ h3 {
     min-height: 54px;
   }
 
+  .inline-answer-row {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-answer-row .primary-btn {
+    width: 100%;
+    justify-self: stretch;
+  }
+
   .tag-chip.optional-collapsed {
     display: none;
   }
@@ -4506,6 +4560,11 @@ h3 {
     justify-content: stretch;
     padding-right: 14px;
     padding-left: 14px;
+  }
+
+  .compact-safety-note {
+    margin-right: 14px;
+    margin-left: 14px;
   }
 
   .chat-actions > .secondary-btn {
