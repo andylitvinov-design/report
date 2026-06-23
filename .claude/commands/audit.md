@@ -7,7 +7,22 @@ This repository uses the shared RY audit protocol as source of truth:
 ```txt
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/ry-agent-audit-modes.md
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-loop.md
+https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-ui-polish-skill.md
 ```
+
+Optional external UI polish skill:
+
+```bash
+npx skills add jakubkrehel/make-interfaces-feel-better
+```
+
+Source:
+
+```txt
+https://jakub.kr/skills/make-interfaces-feel-better
+```
+
+If the skill is installed, load and apply it during `/audit`. If it is not installed or cannot be verified, do not block the audit; run the local UI polish checklist from the shared addendum.
 
 Repository mapping:
 
@@ -26,7 +41,7 @@ Do not edit app code by default. Create or update a GitHub issue with the full t
 Required chain:
 
 ```txt
-understand target -> inspect project rules -> inspect relevant code deeply -> evaluate UX/UI/product/technical layers -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
+understand target -> inspect project rules -> inspect relevant code deeply -> evaluate UX/UI/product/technical layers -> run UI polish pass -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
 ```
 
 Handoff prompt rule:
