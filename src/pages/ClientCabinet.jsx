@@ -59,6 +59,38 @@ function OrdersSection() {
   );
 }
 
+function MasterDeliveredFeed() {
+  const { orders } = clientCabinet;
+  const deliveredItems = orders.items.filter((item) => item.status === "Передано мастером");
+
+  if (deliveredItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="master-delivered-feed" aria-labelledby="master-delivered-title">
+      <div className="master-delivered-heading">
+        <p className="eyebrow">Лента кабинета</p>
+        <h2 id="master-delivered-title">Передано мастером</h2>
+      </div>
+      <div className="master-delivered-list">
+        {deliveredItems.map((item) => (
+          <article className="master-delivered-card" key={item.id}>
+            <div className="master-delivered-copy">
+              <span className="master-delivered-status">{item.status}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </div>
+            <a className="master-delivered-action" href={item.href} aria-label={`${item.action}: ${item.title}`}>
+              {item.action}
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function CoursesSection() {
   const { courses } = clientCabinet;
 
@@ -161,7 +193,9 @@ export default function ClientCabinet() {
         </div>
       </section>
 
-      {sectionRenderers[activeSection] || sectionRenderers.orders}
+      <MasterDeliveredFeed />
+
+      {activeSection === "orders" ? null : (sectionRenderers[activeSection] || sectionRenderers.orders)}
     </div>
   );
 }
