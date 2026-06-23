@@ -24,7 +24,7 @@ export const pageTabs = {
   overview: [],
   profile: [],
   expert: ["Меню отчётов", "Самоотчёт", "Расширенный ИИ-анализ", "Диагностика эксперта", "Механизм", "У-Син", "Препараты"],
-  recommendations: ["Текущая формула", "Bach", "Натуротерапия", "Практики", "Что отслеживать"],
+  recommendations: ["Рецепт Мастера", "ИИ-советы"],
   self: [],
   advanced: [],
   history: ["Текущие рекомендации", "Карта личности", "Динамика замеров", "История", "Следующий шаг"],
@@ -212,17 +212,60 @@ function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, 
   );
 }
 
-function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRepeatAiIntake, onStartSelfAnalysis }) {
+export function NextStepsPage({
+  activeTab = pageTabs.recommendations[0],
+  hasCompletedResults,
+  masterPrescription = null,
+  onBookSession,
+  onOpenReport,
+  onRepeatAiIntake,
+  onStartSelfAnalysis,
+}) {
+  const selectedTab = pageTabs.recommendations.includes(activeTab) ? activeTab : pageTabs.recommendations[0];
+
+  if (selectedTab === "Рецепт Мастера") {
+    return (
+      <section className="compact-section-page" aria-labelledby="master-prescription-title">
+        <article className="card compact-route-hero">
+          <p className="eyebrow">Назначение</p>
+          <h2 id="master-prescription-title">
+            {masterPrescription?.title || "Рецепт Мастера пока не добавлен"}
+          </h2>
+          <p>
+            {masterPrescription?.notes ||
+              "Рецепт Мастера добавляется специалистом вручную после личной сессии или проверки."}
+          </p>
+          <div className="compact-route-actions">
+            <button className="primary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
+          </div>
+        </article>
+        {masterPrescription?.items?.length > 0 && (
+          <div className="compact-archive-grid next-plan-grid">
+            {masterPrescription.items.map((item) => (
+              <article className="card compact-route-card" key={item.title}>
+                <span>{masterPrescription.authorLabel || "Добавлено специалистом"}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   if (!hasCompletedResults) {
     return (
-      <section className="compact-section-page" aria-labelledby="next-empty-title">
+      <section className="compact-section-page" aria-labelledby="ai-advice-empty-title">
         <article className="card compact-route-hero">
-          <p className="eyebrow">Что дальше</p>
-          <h2 id="next-empty-title">Сначала короткий срез</h2>
-          <p>После него появится первый план действий.</p>
+          <p className="eyebrow">ИИ-советы</p>
+          <h2 id="ai-advice-empty-title">ИИ-советы появятся после тестов</h2>
+          <p>
+            Сначала нужен короткий ИИ-приём, чтобы советы опирались на ответы, а не на пустой шаблон.
+            Рецепт Мастера добавляется специалистом вручную отдельно.
+          </p>
           <div className="compact-route-actions">
             <button className="primary-btn" type="button" onClick={onStartSelfAnalysis}>Пройти ИИ-приём</button>
-            <button className="secondary-btn" type="button" onClick={onBookSession}>Заказать сессию</button>
           </div>
         </article>
       </section>
@@ -230,29 +273,28 @@ function NextStepsPage({ hasCompletedResults, onBookSession, onOpenReport, onRep
   }
 
   return (
-    <section className="compact-section-page" aria-labelledby="next-title">
+    <section className="compact-section-page" aria-labelledby="ai-advice-title">
       <article className="card compact-route-hero">
-        <p className="eyebrow">Что дальше</p>
-        <h2 id="next-title">Текущее направление поддержки</h2>
-        <p>Один фокус, мягкая поддержка и повторная проверка.</p>
+        <p className="eyebrow">ИИ-советы</p>
+        <h2 id="ai-advice-title">ИИ-советы по текущему срезу</h2>
+        <p>
+          Это не медицинское назначение и не замена работе со специалистом. Советы опираются на
+          результаты краткого ИИ-приёма и помогают выбрать мягкий следующий шаг.
+        </p>
         <div className="compact-route-actions">
           <button className="primary-btn" type="button" onClick={onOpenReport}>Открыть отчёт</button>
-          <button className="secondary-btn" type="button" onClick={onBookSession}>Записаться на сессию</button>
           <button className="secondary-btn" type="button" onClick={onRepeatAiIntake}>Пройти повторную проверку</button>
         </div>
       </article>
 
       <div className="compact-archive-grid next-plan-grid">
         {[
-          ["Главный фокус", "Снизить расход ресурса и оставить один понятный шаг на ближайшие дни."],
-          ["Что поддерживать", "Сон, паузы и мягкие практики."],
-          ["Что не перегружать", "Не расширять список задач."],
-          ["Что делать мягко", "Отмечать изменения коротко, без жёсткой оценки и давления на результат."],
-          ["Что принимать / использовать", "Только назначенное специалистом."],
-          ["Что отслеживать", "Ресурс, напряжение и телесные маркеры."],
+          ["Главный фокус", "Выберите один понятный шаг на ближайшие дни и не расширяйте список задач."],
+          ["Что поддерживать", "Сон, паузы, бережный режим и короткие практики восстановления."],
+          ["Как отслеживать", "Мягко отмечайте ресурс, напряжение и телесные маркеры без жёсткой оценки."],
         ].map(([title, text]) => (
           <article className="card compact-route-card" key={title}>
-            <span>Текущее назначение</span>
+            <span>По результатам ИИ-приёма</span>
             <h3>{title}</h3>
             <p>{text}</p>
           </article>
@@ -686,6 +728,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, onSignOut 
     if (activePage === "recommendations") {
       return (
         <NextStepsPage
+          activeTab={activeTabs.recommendations}
           hasCompletedResults={hasCompletedResults}
           onBookSession={() => handleNavigation("consultations")}
           onOpenReport={() => openResultReport(pageTabs.expert[0])}

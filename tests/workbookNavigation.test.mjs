@@ -14,7 +14,7 @@ describe("workbookNavigation", () => {
       [
         "Приём",
         "Профиль / Отчёты",
-        "Что дальше",
+        "Назначение",
       ],
     );
 
@@ -30,7 +30,7 @@ describe("workbookNavigation", () => {
   it("keeps compact mobile labels for the top mobile navigation", () => {
     assert.deepEqual(
       workbookNavigation.map((item) => item.shortLabel),
-      ["Приём", "Отчёты", "Дальше"],
+      ["Приём", "Отчёты", "Назначение"],
     );
   });
 
@@ -43,7 +43,12 @@ describe("workbookNavigation", () => {
     assert.equal(findWorkbookCategoryByPage("expert").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("history").id, "profile-reports");
     assert.equal(findWorkbookCategoryByPage("settings").id, "profile-reports");
-    assert.equal(findWorkbookCategoryByPage("recommendations").id, "next-step");
+    assert.equal(findWorkbookCategoryByPage("recommendations").id, "prescription");
+
+    assert.deepEqual(
+      findWorkbookCategoryByPage("recommendations").subnav.map((item) => item.label),
+      ["Рецепт Мастера", "ИИ-советы"],
+    );
 
     assert.deepEqual(
       findWorkbookCategoryByPage("self").subnav.map((item) => item.label),

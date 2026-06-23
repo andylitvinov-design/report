@@ -21,17 +21,14 @@ export const workbookNavigation = [
     ],
   },
   {
-    id: "next-step",
-    label: "Что дальше",
-    shortLabel: "Дальше",
+    id: "prescription",
+    label: "Назначение",
+    shortLabel: "Назначение",
     page: "recommendations",
     pages: ["recommendations"],
     subnav: [
-      { id: "current-assignment", label: "Текущее назначение", page: "recommendations", tab: "current-assignment" },
-      { id: "support-plan", label: "План сопровождения", page: "recommendations", tab: "support-plan" },
-      { id: "personal-session", label: "Личная сессия", page: "consultations", tab: "order" },
-      { id: "next-action", label: "Следующий шаг", page: "recommendations", tab: "next-action" },
-      { id: "next-check", label: "Следующая проверка", page: "recommendations", tab: "next-check" },
+      { id: "master-prescription", label: "Рецепт Мастера", page: "recommendations", tab: "Рецепт Мастера" },
+      { id: "ai-advice", label: "ИИ-советы", page: "recommendations", tab: "ИИ-советы" },
     ],
   },
 ];
