@@ -1,0 +1,38 @@
+# /audit
+
+`/audit` is sufficient by itself.
+
+This repository uses the shared RY audit protocol as source of truth:
+
+```txt
+https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/ry-agent-audit-modes.md
+https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-loop.md
+```
+
+Repository mapping:
+
+```txt
+Live URL: https://2mentalica.vercel.app
+GitHub repo: andylitvinov-design/report
+Local folder may be: /Users/andriilitvinov/projects/MYPROJECTS/reports
+```
+
+If `andylitvinov-design/reports` returns Not Found, use `andylitvinov-design/report`.
+
+`/audit` is diagnostic mode, not implementation mode.
+
+Do not edit app code by default. Create or update a GitHub issue with the full technical audit when GitHub Issues are available, then return only a short `/delivery` prompt pointing to that issue.
+
+Required chain:
+
+```txt
+understand target -> inspect project rules -> inspect relevant code deeply -> evaluate UX/UI/product/technical layers -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
+```
+
+If GitHub Issues are unavailable, output the full issue body in chat and use:
+
+```txt
+STATUS: AUDIT_COMPLETE_ISSUE_NOT_CREATED
+```
+
+If the issue is behind Google/Supabase/private auth, use auth-safe evidence and do not request credentials, cookies, tokens, or secrets.
