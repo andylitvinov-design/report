@@ -7,7 +7,7 @@ This repository uses the shared RY audit protocol as source of truth:
 ```txt
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/ry-agent-audit-modes.md
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-loop.md
-https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-ui-polish-skill.md
+docs/audit-ui-polish-skill.md
 ```
 
 Optional external UI polish skill:
