@@ -655,11 +655,12 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
   const partLabel = `Часть ${state.currentPartIndex + 1} из ${parts.length} · ${part.shortTitle}`;
   const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
   const currentTheme = step.theme || step.label || part.shortTitle;
-  const scaleChoices = [
-    { id: "scale-low", icon: "leaf", label: "Слабо", description: "примерно 2 из 10", value: 2 },
-    { id: "scale-mid", icon: "body", label: "Заметно", description: "примерно 5 из 10", value: 5 },
-    { id: "scale-high", icon: "heart", label: "Сильно", description: "примерно 8 из 10", value: 8 },
-  ];
+  const scaleChoices = Array.from({ length: 11 }, (_, value) => ({
+    id: `scale-${value}`,
+    icon: "leaf",
+    label: String(value),
+    value,
+  }));
   const bachChoices = [
     { id: "bach-no", icon: "leaf", label: "Нет / не про меня", description: "0", value: 0 },
     { id: "bach-some", icon: "body", label: "Заметно", description: "2", value: 2 },
@@ -845,7 +846,7 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
                   </div>
                 ) : null}
                 {step.type === "scale10" ? (
-                  <p className="scale-helper">Число сохранится совместимо со старой шкалой: 2, 5 или 8 из 10.</p>
+                  <p className="scale-helper">Выберите точное число от 0 до 10: 0 — совсем не ощущается, 10 — максимально выражено.</p>
                 ) : null}
                 {part.kind === "bach" ? (
                   <p className="scale-helper">Ответ сохраняется числом для прежнего Bach scoring.</p>

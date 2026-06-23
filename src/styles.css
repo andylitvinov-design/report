@@ -3378,7 +3378,8 @@ h3 {
 
 .scale-grid {
   display: grid;
-  grid-template-columns: repeat(11, minmax(38px, 1fr));
+  grid-template-columns: repeat(11, minmax(34px, 1fr));
+  gap: 6px;
 }
 
 .bach-scale-grid {
@@ -3434,6 +3435,12 @@ h3 {
   background: #fbfff7;
   box-shadow: none;
   font-size: 13px;
+}
+
+.scale-chip {
+  min-width: 0;
+  padding: 7px 6px;
+  text-align: center;
 }
 
 .tag-chip.active {
@@ -4577,6 +4584,7 @@ h3 {
 
   .scale-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .scale-chip,
