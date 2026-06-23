@@ -29,6 +29,12 @@ Required chain:
 understand target -> inspect project rules -> inspect relevant code deeply -> evaluate UX/UI/product/technical layers -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
 ```
 
+Handoff prompt rule:
+
+The copy-pasteable prompt for the implementation agent must start with `/delivery` as the first non-empty line.
+
+Do not start the prompt block with `/audit -> /delivery handoff`, `/audit → /delivery handoff`, `/audit handoff`, or any other slash-prefixed audit label. If a label is useful, put it outside the prompt block as plain text only.
+
 If GitHub Issues are unavailable, output the full issue body in chat and use:
 
 ```txt
