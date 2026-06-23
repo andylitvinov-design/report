@@ -13,12 +13,14 @@ describe("workbookNavigation", () => {
       workbookNavigation.map((item) => item.label),
       [
         "Приём",
-        "Профиль / Отчёты",
-        "Назначение",
+        "Профиль",
+        "Что делать",
       ],
     );
 
     assert.equal(workbookNavigation.some((item) => item.label === "Обзор"), false);
+    assert.equal(workbookNavigation.some((item) => item.label === "Профиль / Отчёты"), false);
+    assert.equal(workbookNavigation.some((item) => item.label === "Назначение"), false);
     assert.equal(workbookNavigation.some((item) => item.id === "overview"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Ещё"), false);
     assert.equal(workbookNavigation.some((item) => item.label === "Личная сессия"), false);
@@ -30,7 +32,7 @@ describe("workbookNavigation", () => {
   it("keeps compact mobile labels for the top mobile navigation", () => {
     assert.deepEqual(
       workbookNavigation.map((item) => item.shortLabel),
-      ["Приём", "Отчёты", "Назначение"],
+      ["Приём", "Профиль", "Что делать"],
     );
   });
 
@@ -39,20 +41,25 @@ describe("workbookNavigation", () => {
     assert.equal(findWorkbookCategoryByPage("self").id, "intake");
     assert.equal(findWorkbookCategoryByPage("advanced").id, "intake");
     assert.equal(findWorkbookCategoryByPage("consultations").id, "intake");
-    assert.equal(findWorkbookCategoryByPage("profile").id, "profile-reports");
-    assert.equal(findWorkbookCategoryByPage("expert").id, "profile-reports");
-    assert.equal(findWorkbookCategoryByPage("history").id, "profile-reports");
-    assert.equal(findWorkbookCategoryByPage("settings").id, "profile-reports");
-    assert.equal(findWorkbookCategoryByPage("recommendations").id, "prescription");
+    assert.equal(findWorkbookCategoryByPage("profile").id, "profile");
+    assert.equal(findWorkbookCategoryByPage("history").id, "profile");
+    assert.equal(findWorkbookCategoryByPage("settings").id, "profile");
+    assert.equal(findWorkbookCategoryByPage("recommendations").id, "next-actions");
+    assert.equal(findWorkbookCategoryByPage("expert").id, "next-actions");
 
     assert.deepEqual(
       findWorkbookCategoryByPage("recommendations").subnav.map((item) => item.label),
-      ["Рецепт Мастера", "ИИ-советы"],
+      ["Отчёты Мастера", "ИИ-отчёты"],
     );
 
     assert.deepEqual(
       findWorkbookCategoryByPage("self").subnav.map((item) => item.label),
-      [],
+      ["ИИ-приём", "Приём у Мастера"],
+    );
+
+    assert.deepEqual(
+      findWorkbookCategoryByPage("profile").subnav.map((item) => item.label),
+      ["Сейчас", "Динамика", "Настройки"],
     );
   });
 });
