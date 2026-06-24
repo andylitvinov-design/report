@@ -40,6 +40,41 @@ If a file is missing, report `not found`.
 
 ## Agent Command Registry
 
+### /audit
+
+`/audit` is diagnostic mode, not implementation mode.
+
+When the user invokes `/audit`, follow:
+
+1. `.claude/commands/audit.md`
+2. `docs/audit-deep-technical-issue-writing.md`
+3. `docs/audit-ui-polish-skill.md`
+4. this `AGENTS.md`
+
+The issue/prompt must be technical enough that another agent can implement without rediscovering the codebase.
+
+Before creating an issue, run the code-trace chain:
+
+```txt
+route/page -> layout shell -> visible component -> child component -> state/store -> data/API/persistence -> formatting/rendering -> styles/responsive rules -> tests/checks
+```
+
+Every issue must include:
+
+- technical code trace;
+- inspected files table;
+- confirmed vs suspected findings;
+- implementation map;
+- do-not-touch rules;
+- verification plan;
+- ready-to-run `/delivery` prompt.
+
+Use evidence labels: `CODE VERIFIED`, `RUNTIME VERIFIED`, `LIKELY`, `NOT VERIFIED`.
+
+Do not create vague issues. Map symptom -> file/component/function -> likely cause -> change direction -> verification.
+
+The copy-pasteable handoff prompt must start with `/delivery` as the first non-empty line.
+
 ### /delivery
 
 When the user invokes `/delivery`, follow the local source-of-truth files in this order:
