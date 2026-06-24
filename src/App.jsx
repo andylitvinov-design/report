@@ -178,10 +178,6 @@ function TestCatalogSection({
   const themes = ["all", ...Array.from(new Set(testCatalog.map((item) => item.theme)))];
 
   const getStatus = (item) => {
-    if (item.id === "general-state") {
-      if (firstIntakeStatus === "completed") return "repeat_available";
-      return firstIntakeStatus;
-    }
     if (item.id === "dao-resource" && advancedAiResult) return "completed";
     return "not_started";
   };
@@ -192,10 +188,6 @@ function TestCatalogSection({
   });
 
   const handleStart = (item, status) => {
-    if (item.id === "general-state") {
-      onStartBrief?.();
-      return;
-    }
     if (item.page === "advanced") {
       onStartAdvanced?.();
       return;
@@ -209,9 +201,29 @@ function TestCatalogSection({
 
   return (
     <section className="test-catalog-section" aria-labelledby="test-catalog-title">
+      <div className="basic-intake-block">
+        <div className="test-catalog-head">
+          <div>
+            <span className="ai-intake-secondary-title">Базовый первичный приём</span>
+            <h2>Первичный ИИ-приём</h2>
+          </div>
+        </div>
+        <article className="card test-catalog-card primary-intake-card">
+          <span>Базовый первичный приём</span>
+          <h3>Первичный ИИ-приём</h3>
+          <p>4 части: точка состояния и 3 анкеты Bach.</p>
+          <div className="test-catalog-meta">
+            <small>{getTestStatusLabel(firstIntakeStatus)}</small>
+          </div>
+          <button className="secondary-btn" type="button" onClick={onStartBrief}>
+            {getPrimaryIntakeCtaLabel(firstIntakeStatus)}
+          </button>
+        </article>
+      </div>
+
       <div className="test-catalog-head">
         <div>
-          <span className="ai-intake-secondary-title">Самопроверка</span>
+          <span className="ai-intake-secondary-title">Расширенный приём</span>
           <h2 id="test-catalog-title">Тесты для самопроверки</h2>
         </div>
         <div className="test-catalog-filters" aria-label="Фильтры тестов">

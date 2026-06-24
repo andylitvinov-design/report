@@ -1942,6 +1942,11 @@ h3 {
   padding-top: clamp(18px, 4vw, 34px);
 }
 
+.basic-intake-block {
+  display: grid;
+  gap: 12px;
+}
+
 .test-catalog-head {
   display: flex;
   align-items: end;
@@ -2003,6 +2008,12 @@ h3 {
   display: grid;
   gap: 10px;
   min-height: 210px;
+}
+
+.primary-intake-card {
+  min-height: 176px;
+  border-color: rgba(63, 122, 61, 0.2);
+  background: linear-gradient(135deg, rgba(255, 253, 248, 0.96), rgba(234, 243, 226, 0.76));
 }
 
 .test-catalog-card span,
@@ -3507,6 +3518,85 @@ h3 {
   background: rgba(234, 243, 226, 0.74);
 }
 
+.first-intake-stage-ruler {
+  display: grid;
+  gap: 10px;
+  margin: 0 16px 12px;
+  padding: 12px;
+  border: 1px solid rgba(18, 63, 49, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 253, 248, 0.78);
+}
+
+.first-intake-stage-ruler > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.first-intake-stage-ruler span {
+  color: var(--workbook-green);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.first-intake-stage-ruler p {
+  color: #625d53;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.stage-ruler-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stage-ruler-chips span {
+  min-width: 0;
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid rgba(228, 220, 207, 0.78);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.15;
+  text-transform: none;
+}
+
+.stage-ruler-chips b {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #efe8da;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.stage-ruler-chips .done,
+.stage-ruler-chips .active {
+  border-color: rgba(63, 122, 61, 0.24);
+  color: var(--psi-green-dark);
+}
+
+.stage-ruler-chips .done b,
+.stage-ruler-chips .active b {
+  background: var(--green);
+  color: #fff;
+}
+
+.stage-ruler-chips .active {
+  background: rgba(234, 243, 226, 0.82);
+}
+
 .intake-hint-card,
 .intake-baseline-mini {
   display: grid;
@@ -4621,6 +4711,7 @@ h3 {
   .ai-intake-secondary-grid,
   .ai-intake-option-card,
   .test-catalog-section,
+  .basic-intake-block,
   .test-catalog-grid,
   .test-catalog-card,
   .profile-metrics-grid,
@@ -5043,6 +5134,20 @@ h3 {
     padding: 12px 14px 9px;
   }
 
+  .first-intake-stage-ruler {
+    margin: 0 14px 10px;
+    padding: 10px;
+  }
+
+  .stage-ruler-chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stage-ruler-chips span {
+    min-height: 40px;
+    border-radius: 14px;
+  }
+
   .chat-card-header h2 {
     font-size: 22px;
   }
@@ -5236,6 +5341,19 @@ h3 {
 }
 
 @media (max-width: 380px) {
+  .first-intake-stage-ruler p {
+    font-size: 12px;
+  }
+
+  .stage-ruler-chips {
+    gap: 6px;
+  }
+
+  .stage-ruler-chips span {
+    padding: 7px;
+    font-size: 10.5px;
+  }
+
   .workbook-shell {
     padding: 0 8px;
   }

@@ -107,7 +107,13 @@ const baselineSteps = [
       "Понимание причины",
     ],
   },
-  { id: "freeComment", label: "Комментарий", question: "Хотите добавить своими словами?", type: "comment", placeholder: "Коротко добавьте важный нюанс." },
+  {
+    id: "freeComment",
+    label: "Комментарий",
+    question: "Напишите, если хотите что-то добавить ещё про своё состояние.",
+    type: "comment",
+    placeholder: "Коротко добавьте важный нюанс, если он есть.",
+  },
 ];
 
 const therapySteps = [
@@ -118,12 +124,80 @@ const therapySteps = [
   { id: "formulatedRequest", label: "Формулировка запроса", question: "Сформулируем запрос: что вы хотите получить от работы?", placeholder: "Я хочу прояснить / изменить / укрепить..." },
 ];
 
+const PRODUCT_STAGE_RULER_TEXT = "1 Точка · 2 Bach: ситуация · 3 Bach: фон · 4 Bach: поддержка";
+
+const firstIntakeStages = [
+  {
+    id: "baseline",
+    partIds: ["baseline", "therapyRequest"],
+    label: "Точка",
+    title: "Базовая точка состояния",
+    visiblePartLabel: "Часть 1 из 4 · Базовая точка состояния",
+  },
+  {
+    id: "bach-situation",
+    partIds: ["bachSituation"],
+    label: "Bach: ситуация",
+    title: "Bach: ситуация",
+    visiblePartLabel: "Часть 2 из 4 · Bach: ситуация",
+  },
+  {
+    id: "bach-background",
+    partIds: ["bachCharacter"],
+    label: "Bach: фон",
+    title: "Bach: личный фон",
+    visiblePartLabel: "Часть 3 из 4 · Bach: личный фон",
+  },
+  {
+    id: "bach-support",
+    partIds: ["bachControl"],
+    label: "Bach: поддержка",
+    title: "Bach: поддержка",
+    visiblePartLabel: "Часть 4 из 4 · Bach: поддержка",
+  },
+];
+
 const parts = [
-  { id: "baseline", title: "Базовая точка состояния", shortTitle: "Базовая точка состояния", kind: "baseline", steps: baselineSteps },
-  { id: "bachSituation", title: "Bach: что похоже на состояние сейчас", shortTitle: "Bach: состояние сейчас", kind: "bach", source: "situation" },
-  { id: "bachCharacter", title: "Bach: что часто повторяется", shortTitle: "Bach: повторяющиеся темы", kind: "bach", source: "character" },
-  { id: "bachControl", title: "Bach: что держит напряжение", shortTitle: "Bach: острое напряжение", kind: "bach", source: "control" },
-  { id: "therapyRequest", title: "Запрос на терапию", shortTitle: "Запрос на терапию", kind: "therapy", steps: therapySteps },
+  {
+    id: "baseline",
+    title: "Базовая точка состояния",
+    shortTitle: "Базовая точка состояния",
+    kind: "baseline",
+    steps: baselineSteps,
+    productStageId: "baseline",
+  },
+  {
+    id: "bachSituation",
+    title: "Bach: ситуация",
+    shortTitle: "Bach: ситуация",
+    kind: "bach",
+    source: "situation",
+    productStageId: "bach-situation",
+  },
+  {
+    id: "bachCharacter",
+    title: "Bach: личный фон",
+    shortTitle: "Bach: личный фон",
+    kind: "bach",
+    source: "character",
+    productStageId: "bach-background",
+  },
+  {
+    id: "bachControl",
+    title: "Bach: поддержка",
+    shortTitle: "Bach: поддержка",
+    kind: "bach",
+    source: "control",
+    productStageId: "bach-support",
+  },
+  {
+    id: "therapyRequest",
+    title: "Запрос на терапию",
+    shortTitle: "Запрос на терапию",
+    kind: "therapy",
+    steps: therapySteps,
+    productStageId: "baseline",
+  },
 ];
 
 const makeInitialState = () => ({
@@ -142,12 +216,19 @@ const makeInitialState = () => ({
 });
 
 const partIntroText = {
-  baseline: "Часть 1 — измеримая базовая точка: что беспокоит и насколько сильно.",
+  baseline: "Часть 1 из 4 — измеримая базовая точка: что беспокоит и насколько сильно.",
   bachSituation: "Смотрим текущие эмоциональные состояния, связанные с ситуацией.",
   bachCharacter: "Смотрим устойчивые эмоциональные паттерны, которые могут повторяться в разных ситуациях.",
   bachControl: "Смотрим точки острого напряжения и контроля, которые сейчас могут усиливать нагрузку.",
   therapyRequest: "Формулируем запрос: что хочется изменить и какую поддержку важно получить.",
 };
+
+const getProductStageIndex = (partId) => {
+  const index = firstIntakeStages.findIndex((stage) => stage.partIds.includes(partId));
+  return index === -1 ? 0 : index;
+};
+
+const getProductStage = (partId) => firstIntakeStages[getProductStageIndex(partId)] || firstIntakeStages[0];
 
 const formatDateTime = (value) => {
   if (!value) return "нет даты";
@@ -309,18 +390,44 @@ function RestartChoiceSheet({ onCancel, onResetCurrentPart, onResetFullIntake })
 }
 
 function IntakeProgressMap({ currentPartIndex }) {
+  const currentStageIndex = getProductStageIndex(parts[currentPartIndex]?.id);
+
   return (
     <div className="intake-progress-map" aria-label="Прогресс первого приёма">
-      {parts.map((item, index) => {
-        const status = index < currentPartIndex ? "done" : index === currentPartIndex ? "active" : "";
+      {firstIntakeStages.map((item, index) => {
+        const status = index < currentStageIndex ? "done" : index === currentStageIndex ? "active" : "";
         return (
           <span className={status} key={item.id}>
             <b>{index + 1}</b>
-            {item.shortTitle}
+            {item.title}
           </span>
         );
       })}
     </div>
+  );
+}
+
+function FirstIntakeStageRuler({ currentPartId }) {
+  const currentStageIndex = getProductStageIndex(currentPartId);
+
+  return (
+    <section className="first-intake-stage-ruler" aria-label="Структура первичного ИИ-приёма">
+      <div>
+        <span>Первичный ИИ-приём</span>
+        <p>{PRODUCT_STAGE_RULER_TEXT}</p>
+      </div>
+      <div className="stage-ruler-chips" aria-label={PRODUCT_STAGE_RULER_TEXT}>
+        {firstIntakeStages.map((stage, index) => {
+          const status = index < currentStageIndex ? "done" : index === currentStageIndex ? "active" : "";
+          return (
+            <span className={status} key={stage.id}>
+              <b>{index + 1}</b>
+              {stage.label}
+            </span>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -652,7 +759,8 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
     />
   ) : null;
 
-  const partLabel = `Часть ${state.currentPartIndex + 1} из ${parts.length} · ${part.shortTitle}`;
+  const productStage = getProductStage(part.id);
+  const partLabel = productStage.visiblePartLabel;
   const stepLabel = `Шаг ${Math.min(state.currentStepIndex + 1, steps.length)} из ${steps.length}`;
   const currentTheme = step.theme || step.label || part.shortTitle;
   const scaleChoices = Array.from({ length: 11 }, (_, value) => ({
@@ -740,6 +848,8 @@ function SelfAnalysisForm({ clientName, onComplete, onModeChange, onNavigate, on
             </div>
             <span className="chat-progress">{stepLabel}</span>
           </header>
+
+          <FirstIntakeStageRuler currentPartId={part.id} />
 
           {state.currentPartIndex >= 1 && state.currentPartIndex <= 3 ? (
             <div className="baseline-strip-wrap">
