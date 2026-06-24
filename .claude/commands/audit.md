@@ -7,6 +7,7 @@ This repository uses the shared RY audit protocol as source of truth:
 ```txt
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/ry-agent-audit-modes.md
 https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-loop.md
+docs/audit-deep-technical-issue-writing.md
 docs/audit-ui-polish-skill.md
 ```
 
@@ -41,8 +42,18 @@ Do not edit app code by default. Create or update a GitHub issue with the full t
 Required chain:
 
 ```txt
-understand target -> inspect project rules -> inspect relevant code deeply -> evaluate UX/UI/product/technical layers -> run UI polish pass -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
+understand target -> inspect project rules -> inspect relevant code deeply -> trace route/component/state/data/style/test chain -> evaluate UX/UI/product/technical layers -> run UI polish pass -> map symptoms to code-level findings -> create/update GitHub issue -> return short /delivery prompt with issue link
 ```
+
+Before creating the issue, run the code-trace chain from `docs/audit-deep-technical-issue-writing.md`:
+
+```txt
+route/page -> layout shell -> visible component -> child component -> state/store -> data/API/persistence -> formatting/rendering -> styles/responsive rules -> tests/checks
+```
+
+The issue must include: technical code trace, inspected files, confirmed vs suspected findings, implementation map, do-not-touch rules, verification plan, and a ready-to-run `/delivery` prompt.
+
+Use evidence labels: `CODE VERIFIED`, `RUNTIME VERIFIED`, `LIKELY`, `NOT VERIFIED`.
 
 Handoff prompt rule:
 
