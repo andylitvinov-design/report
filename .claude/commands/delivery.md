@@ -37,6 +37,12 @@ Read in order:
 
 Follow the shared `/delivery` chain and this repo's deployment fallback rules. For UI tasks, include `DESIGN QUALITY GATE` and `UI POLISH / FEEL-BETTER PASS` in the final report.
 
+Final Result Verification Gate: compare the completed diff, checks, deploy state, and live proof against the original request before reporting success.
+
+Extract the Original Request Contract and verify every item as `PASS`, `PARTIAL`, `FAIL`, or `NOT VERIFIED`.
+
+Run the Spiral Validator-Critic Loop before merge readiness is claimed.
+
 Do not touch secrets, env values, auth/OAuth/security settings, billing, or production data unless explicitly requested.
 
 Final status must be exactly one of:

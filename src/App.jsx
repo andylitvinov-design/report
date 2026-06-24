@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
 import { analysisCatalog, client, clientProgress, selfAnalysis } from "./data/mockData.js";
+import { testCatalog } from "./data/testCatalog.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
-import ClientCabinet from "./pages/ClientCabinet.jsx";
-import DynamicsHistory from "./pages/DynamicsHistory.jsx";
 import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
@@ -18,7 +17,7 @@ import {
   signOut,
 } from "./lib/authClient.js";
 import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js";
-import { readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
+import { readFirstIntakeProgress, readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
 
 export const pageTabs = {
   overview: [],
@@ -125,29 +124,167 @@ function LockedReportState({
   );
 }
 
+export function getFirstIntakeStatus({ firstIntakeResult, firstIntakeProgress }) {
+  if (firstIntakeResult) return "completed";
+  if (firstIntakeProgress && firstIntakeProgress.status !== "completed") return "in_progress";
+  return "not_started";
+}
+
+export function getPrimaryIntakeCtaLabel(status) {
+  if (status === "in_progress") return "Продолжить первый ИИ-приём";
+  if (status === "completed") return "Повторный ИИ-приём";
+  return "Пройти первый ИИ-приём";
+}
+
+const durationFilters = [
+  { id: "any", label: "Любое время" },
+  { id: "under5", label: "до 5 минут" },
+  { id: "5to10", label: "5–10 минут" },
+  { id: "10to20", label: "10–20 минут" },
+  { id: "20plus", label: "20+ минут" },
+];
+
+function matchesDurationFilter(minutes, filter) {
+  if (filter === "under5") return minutes <= 5;
+  if (filter === "5to10") return minutes >= 5 && minutes <= 10;
+  if (filter === "10to20") return minutes >= 10 && minutes <= 20;
+  if (filter === "20plus") return minutes >= 20;
+  return true;
+}
+
+function getTestStatusLabel(status) {
+  if (status === "in_progress") return "начат";
+  if (status === "completed") return "результат готов";
+  if (status === "repeat_available") return "можно повторить";
+  return "не начат";
+}
+
+function getTestCtaLabel(status) {
+  if (status === "in_progress") return "Продолжить";
+  if (status === "completed") return "Открыть результат";
+  if (status === "repeat_available") return "Пройти повторно";
+  return "Пройти тест";
+}
+
+function TestCatalogSection({
+  advancedAiResult,
+  firstIntakeStatus,
+  onStartAdvanced,
+  onStartAnalysis,
+  onStartBrief,
+}) {
+  const [themeFilter, setThemeFilter] = useState("all");
+  const [durationFilter, setDurationFilter] = useState("any");
+  const themes = ["all", ...Array.from(new Set(testCatalog.map((item) => item.theme)))];
+
+  const getStatus = (item) => {
+    if (item.id === "general-state") {
+      if (firstIntakeStatus === "completed") return "repeat_available";
+      return firstIntakeStatus;
+    }
+    if (item.id === "dao-resource" && advancedAiResult) return "completed";
+    return "not_started";
+  };
+
+  const visibleTests = testCatalog.filter((item) => {
+    const themeMatches = themeFilter === "all" || item.theme === themeFilter;
+    return themeMatches && matchesDurationFilter(item.durationMinutes, durationFilter);
+  });
+
+  const handleStart = (item, status) => {
+    if (item.id === "general-state") {
+      onStartBrief?.();
+      return;
+    }
+    if (item.page === "advanced") {
+      onStartAdvanced?.();
+      return;
+    }
+    if (status === "completed") {
+      onStartAnalysis?.(item.analysisId);
+      return;
+    }
+    onStartAnalysis?.(item.analysisId);
+  };
+
+  return (
+    <section className="test-catalog-section" aria-labelledby="test-catalog-title">
+      <div className="test-catalog-head">
+        <div>
+          <span className="ai-intake-secondary-title">Самопроверка</span>
+          <h2 id="test-catalog-title">Тесты для самопроверки</h2>
+        </div>
+        <div className="test-catalog-filters" aria-label="Фильтры тестов">
+          <label>
+            <span>Все темы</span>
+            <select value={themeFilter} onChange={(event) => setThemeFilter(event.target.value)}>
+              {themes.map((theme) => (
+                <option key={theme} value={theme}>
+                  {theme === "all" ? "Все темы" : theme}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Время</span>
+            <select value={durationFilter} onChange={(event) => setDurationFilter(event.target.value)}>
+              {durationFilters.map((filter) => (
+                <option key={filter.id} value={filter.id}>
+                  {filter.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {visibleTests.length === 0 ? (
+        <p className="test-catalog-empty" role="status">
+          По этим фильтрам пока нет тестов. Попробуйте выбрать другую тему или время.
+        </p>
+      ) : (
+        <div className="test-catalog-grid">
+          {visibleTests.map((item) => {
+            const status = getStatus(item);
+            return (
+              <article className="card test-catalog-card" key={item.id}>
+                <span>{item.theme}</span>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <div className="test-catalog-meta">
+                  <small>≈ {item.durationMinutes} минут</small>
+                  <small>{getTestStatusLabel(status)}</small>
+                </div>
+                <button className="secondary-btn" type="button" onClick={() => handleStart(item, status)}>
+                  {getTestCtaLabel(status)}
+                </button>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function AiIntakeDashboard({
   advancedAiResult,
+  firstIntakeProgress,
   firstIntakeResult,
   onOpenPersonalIntake,
   onStartAdvanced,
+  onStartAnalysis,
   onStartBrief,
 }) {
-  const hasBriefIntake = Boolean(firstIntakeResult);
+  const firstIntakeStatus = getFirstIntakeStatus({ firstIntakeResult, firstIntakeProgress });
+  const hasBriefIntake = firstIntakeStatus === "completed";
 
   return (
     <section className="compact-section-page ai-intake-onboarding" aria-labelledby="ai-intake-title">
-      <div className="intake-option-row" aria-label="Варианты приёма">
-        <button className="intake-option-pill active" type="button">
-          ИИ-приём
-        </button>
-        <button className="intake-option-pill" type="button" onClick={onOpenPersonalIntake}>
-          Приём у Мастера
-        </button>
-      </div>
       <article className="card compact-route-hero ai-intake-hero">
         <span className="ai-intake-kicker">Мягкий AI-сеанс</span>
         <h2 id="ai-intake-title">
-          {hasBriefIntake ? "Можно сделать новый мягкий срез" : "Начните с мягкого AI-приёма"}
+          {hasBriefIntake ? "Повторный ИИ-приём" : "Начните путь к ясности"}
         </h2>
         <p>
           {hasBriefIntake
@@ -156,12 +293,12 @@ function AiIntakeDashboard({
         </p>
         <div className="compact-route-actions">
           <button className="primary-btn" type="button" onClick={onStartBrief}>
-            {hasBriefIntake ? "Пройти новый приём" : "Пройти первый приём"}
+            {getPrimaryIntakeCtaLabel(firstIntakeStatus)}
           </button>
         </div>
-        <p className="compact-route-note">
-          {hasBriefIntake ? "Новый срез сохранится в историю" : "Guided AI session для первого среза"}
-        </p>
+        <button className="text-link ai-intake-personal-link" type="button" onClick={onOpenPersonalIntake}>
+          Записаться на личный приём
+        </button>
         {hasBriefIntake && (
           <button className="text-link ai-intake-advanced-link" type="button" onClick={onStartAdvanced}>
             {advancedAiResult ? "Вернуться к расширенному AI-срезу" : "Открыть расширенный AI-срез"}
@@ -169,30 +306,13 @@ function AiIntakeDashboard({
         )}
       </article>
 
-      <div className="ai-intake-secondary" aria-label="Другие варианты">
-        <span className="ai-intake-secondary-title">Другие варианты</span>
-        <div className="compact-route-grid ai-intake-secondary-grid">
-          <article className="card compact-route-card ai-intake-option-card">
-            <h3>Заказать встречу</h3>
-            <p>Оставить запрос на живое сопровождение</p>
-            <button className="secondary-btn" type="button" onClick={onOpenPersonalIntake}>
-              Заказать встречу
-            </button>
-          </article>
-          <article className="card compact-route-card ai-intake-option-card">
-            <h3>Продолжить приём</h3>
-            <p>Вернуться к сохранённым ответам</p>
-            <button className="secondary-btn" type="button" onClick={onStartBrief}>
-              Продолжить приём
-            </button>
-          </article>
-        </div>
-        {!hasBriefIntake && (
-          <button className="text-link ai-intake-advanced-link" type="button" disabled onClick={onStartAdvanced}>
-            Расширенный AI-срез станет доступен после первого приёма
-          </button>
-        )}
-      </div>
+      <TestCatalogSection
+        advancedAiResult={advancedAiResult}
+        firstIntakeStatus={firstIntakeStatus}
+        onStartAdvanced={onStartAdvanced}
+        onStartAnalysis={onStartAnalysis}
+        onStartBrief={onStartBrief}
+      />
     </section>
   );
 }
@@ -206,14 +326,6 @@ function ConsultationPlaceholder({
 }) {
   return (
     <section className="compact-section-page" aria-labelledby="consultations-title">
-      <div className="intake-option-row" aria-label="Варианты приёма">
-        <button className="intake-option-pill" type="button" onClick={onOpenAiIntake}>
-          ИИ-приём
-        </button>
-        <button className="intake-option-pill active" type="button">
-          Приём у Мастера
-        </button>
-      </div>
       <article className="card compact-route-hero">
         <h2 id="consultations-title">Приём у Мастера</h2>
         <p>Можно оставить заявку на живое сопровождение, если хочется разобрать состояние вместе со специалистом.</p>
@@ -277,6 +389,170 @@ function ProfileReportsPage({ hasCompletedResults, onBookSession, onOpenReport, 
           <p>Данные, вход и приватность.</p>
         </article>
       </div>
+    </section>
+  );
+}
+
+function clampScore(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return null;
+  return Math.max(0, Math.min(100, Math.round(number)));
+}
+
+function scale10ToPercent(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return null;
+  return clampScore(number * 10);
+}
+
+function formatProfileDate(value) {
+  if (!value) return "первая точка";
+  try {
+    return new Date(value).toLocaleDateString("ru-RU");
+  } catch {
+    return "первая точка";
+  }
+}
+
+function getProfileMetrics(firstIntakeResult) {
+  if (!firstIntakeResult) return [];
+
+  const baseline = firstIntakeResult.symptomBaseline || {};
+  const answers = firstIntakeResult.answers?.baseline || {};
+  const metrics = [
+    {
+      id: "resource",
+      title: "Ресурс",
+      value: scale10ToPercent(baseline.resourceLevel ?? answers.resourceLevel),
+      firstValue: clampScore(firstIntakeResult.dynamics?.resource?.firstValue),
+      currentValue: clampScore(firstIntakeResult.dynamics?.resource?.currentValue),
+      interpretation: "Показывает, сколько опоры ощущается прямо сейчас.",
+    },
+    {
+      id: "tension",
+      title: "Напряжение",
+      value: scale10ToPercent(baseline.problemStrength ?? answers.problemStrength),
+      firstValue: clampScore(firstIntakeResult.dynamics?.tension?.firstValue),
+      currentValue: clampScore(firstIntakeResult.dynamics?.tension?.currentValue),
+      interpretation: "Помогает увидеть силу текущей нагрузки.",
+    },
+    {
+      id: "support",
+      title: "Опора",
+      value: scale10ToPercent(baseline.supportLevel ?? answers.supportLevel),
+      firstValue: clampScore(firstIntakeResult.dynamics?.support?.firstValue),
+      currentValue: clampScore(firstIntakeResult.dynamics?.support?.currentValue),
+      interpretation: "Отражает доступность внутренних и внешних поддержек.",
+    },
+  ].filter((item) => item.value !== null);
+
+  return metrics;
+}
+
+function GaugeCard({ metric }) {
+  const gaugeStyle = {
+    "--gauge-value": `${metric.value}%`,
+  };
+
+  return (
+    <article className="card profile-metric-card">
+      <div className="profile-gauge" style={gaugeStyle} aria-label={`${metric.title}: ${metric.value} из 100`}>
+        <strong>{metric.value}</strong>
+        <span>/100</span>
+      </div>
+      <div>
+        <span>{metric.title}</span>
+        <p>{metric.interpretation}</p>
+        <button className="text-link" type="button">Открыть детали</button>
+      </div>
+    </article>
+  );
+}
+
+function ClientStateProfile({ firstIntakeResult, onStartSelfAnalysis }) {
+  const metrics = getProfileMetrics(firstIntakeResult);
+
+  return (
+    <section className="compact-section-page profile-metrics-page" aria-labelledby="profile-state-title">
+      <article className="card compact-route-hero profile-state-hero">
+        <p className="eyebrow">Профиль</p>
+        <h2 id="profile-state-title">Профиль состояния</h2>
+        <p>Краткая карта по вашим тестам</p>
+      </article>
+
+      {metrics.length === 0 ? (
+        <article className="card profile-empty-state">
+          <h3>Пока нет данных по тестам</h3>
+          <p>Первый ИИ-приём создаст мягкую исходную точку для показателей и будущей динамики.</p>
+          <button className="primary-btn" type="button" onClick={onStartSelfAnalysis}>
+            Пройти первый ИИ-приём
+          </button>
+        </article>
+      ) : (
+        <div className="profile-metrics-grid">
+          {metrics.map((metric) => (
+            <GaugeCard key={metric.id} metric={metric} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function deltaLabel(firstValue, currentValue) {
+  if (currentValue > firstValue) return "выросло";
+  if (currentValue < firstValue) return "снизилось";
+  return "без изменений";
+}
+
+function ProfileDynamicsPage({ firstIntakeResult, onRepeatIntake }) {
+  const metrics = getProfileMetrics(firstIntakeResult);
+  const completedDate = formatProfileDate(firstIntakeResult?.completedAt);
+  const hasTwoPoints = metrics.some((metric) => metric.firstValue !== null && metric.currentValue !== null);
+
+  return (
+    <section className="compact-section-page profile-dynamics-page" aria-labelledby="profile-dynamics-title">
+      <article className="card compact-route-hero profile-state-hero">
+        <p className="eyebrow">Профиль</p>
+        <h2 id="profile-dynamics-title">Динамика состояния</h2>
+        <p>Сравнение первой точки и текущего среза по сохранённым тестам.</p>
+      </article>
+
+      {!firstIntakeResult || !hasTwoPoints ? (
+        <article className="card profile-empty-state">
+          <h3>Нужна повторная точка, чтобы увидеть динамику</h3>
+          <p>
+            Сейчас есть только первая точка{firstIntakeResult ? ` от ${completedDate}` : ""}. Повторная проверка
+            покажет направление изменения без выдуманных значений.
+          </p>
+          <button className="primary-btn" type="button" onClick={onRepeatIntake}>
+            Пройти повторную проверку
+          </button>
+        </article>
+      ) : (
+        <div className="profile-dynamics-grid">
+          {metrics.filter((metric) => metric.firstValue !== null && metric.currentValue !== null).map((metric) => {
+            const firstValue = metric.firstValue;
+            const currentValue = metric.currentValue;
+            return (
+              <article className="card profile-dynamics-card" key={metric.id}>
+                <span>{metric.title}</span>
+                <div className="profile-dynamics-points">
+                  <div>
+                    <small>первая точка · {completedDate}</small>
+                    <strong>{firstValue}</strong>
+                  </div>
+                  <div>
+                    <small>сейчас</small>
+                    <strong>{currentValue}</strong>
+                  </div>
+                </div>
+                <p>{deltaLabel(firstValue, currentValue)}</p>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
@@ -500,7 +776,8 @@ export function CabinetAuthGate({ initialPage = "self" } = {}) {
 
 function RoutedApp() {
   const path = window.location.pathname;
-  const requestedDemoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+  const query = new URLSearchParams(window.location.search);
+  const requestedDemoMode = query.get("demo") === "1";
   const demoMode = isDemoCabinetEnabled && requestedDemoMode;
 
   if (path === "/") {
@@ -512,7 +789,12 @@ function RoutedApp() {
   }
 
   if (path === "/profile") {
-    return demoMode ? <ReportApp forceDemo initialPage="profile" /> : <CabinetAuthGate initialPage="profile" />;
+    const explicitProfile =
+      query.get("section") === "profile" ||
+      query.get("tab") === "profile-now" ||
+      query.get("tab") === "profile";
+    const initialPage = explicitProfile ? "profile" : "self";
+    return demoMode ? <ReportApp forceDemo initialPage={initialPage} /> : <CabinetAuthGate initialPage={initialPage} />;
   }
 
   if (path === "/demo") {
@@ -527,6 +809,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
   const [selfAnalysisMode, setSelfAnalysisMode] = useState("overview");
   const [bookingNoticeVisible, setBookingNoticeVisible] = useState(false);
   const [firstIntakeResult, setFirstIntakeResult] = useState(() => readFirstIntakeResult());
+  const [firstIntakeProgress, setFirstIntakeProgress] = useState(() => readFirstIntakeProgress());
   const [advancedAiResult, setAdvancedAiResult] = useState(() => readAdvancedAiAnalysisResult());
   const [advancedAnalysisMode, setAdvancedAnalysisMode] = useState("overview");
   const [activeAnalysisId, setActiveAnalysisId] = useState("general-state");
@@ -625,6 +908,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
   };
 
   const openFirstIntake = () => {
+    setFirstIntakeProgress(readFirstIntakeProgress());
     setActivePage("self");
     setSelfAnalysisMode("form");
     setBookingNoticeVisible(false);
@@ -674,12 +958,14 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
 
   const handleFirstIntakeComplete = (result) => {
     setFirstIntakeResult(result);
+    setFirstIntakeProgress(readFirstIntakeProgress());
     setActivePage("self");
     setSelfAnalysisMode("overview");
     setActiveAnalysisId("general-state");
   };
 
   const handleFirstIntakeSaveAndExit = () => {
+    setFirstIntakeProgress(readFirstIntakeProgress());
     setActivePage("self");
     setSelfAnalysisMode("overview");
   };
@@ -771,16 +1057,18 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
       );
     }
     if (activePage === "profile") {
-      return <ClientCabinet />;
+      return <ClientStateProfile firstIntakeResult={firstIntakeResult} onStartSelfAnalysis={openFirstIntake} />;
     }
     if (activePage === "self") {
       if (selfAnalysisMode !== "form") {
         return (
           <AiIntakeDashboard
             advancedAiResult={advancedAiResult}
+            firstIntakeProgress={firstIntakeProgress}
             firstIntakeResult={firstIntakeResult}
             onOpenPersonalIntake={() => handleNavigation("consultations")}
             onStartAdvanced={() => handleNavigation("advanced")}
+            onStartAnalysis={handleStartAnalysis}
             onStartBrief={openFirstIntake}
           />
         );
@@ -844,14 +1132,16 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
       );
     }
     if (activePage === "history") {
-      return <DynamicsHistory />;
+      return <ProfileDynamicsPage firstIntakeResult={firstIntakeResult} onRepeatIntake={openFirstIntake} />;
     }
     return (
       <AiIntakeDashboard
         advancedAiResult={advancedAiResult}
+        firstIntakeProgress={firstIntakeProgress}
         firstIntakeResult={firstIntakeResult}
         onOpenPersonalIntake={() => handleNavigation("consultations")}
         onStartAdvanced={() => handleNavigation("advanced")}
+        onStartAnalysis={handleStartAnalysis}
         onStartBrief={openFirstIntake}
       />
     );
