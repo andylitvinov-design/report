@@ -33,3 +33,7 @@ export function removeStorageItem(key) {
 export function readFirstIntakeResult() {
   return readJsonStorage(FIRST_INTAKE_RESULT_KEY);
 }
+
+export function readFirstIntakeProgress() {
+  return readJsonStorage(FIRST_INTAKE_PROGRESS_KEY);
+}

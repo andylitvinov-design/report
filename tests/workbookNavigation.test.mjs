@@ -71,18 +71,48 @@ describe("first intake baseline hints", () => {
 
     assert.ok(component);
     assert.match(component[0], /Мягкий AI-сеанс/);
-    assert.match(component[0], /Начните с мягкого AI-приёма/);
+    assert.match(component[0], /Начните путь к ясности/);
     assert.match(component[0], /AI задаст несколько бережных вопросов и создаст первую карту состояния\./);
-    assert.match(component[0], /Пройти первый приём/);
-    assert.match(component[0], /Guided AI session для первого среза/);
-    assert.match(component[0], /Другие варианты/);
-    assert.match(component[0], /Заказать встречу/);
-    assert.match(component[0], /Оставить запрос на живое сопровождение/);
-    assert.match(component[0], /Продолжить приём/);
-    assert.match(component[0], /Вернуться к сохранённым ответам/);
+    assert.match(source, /Пройти первый ИИ-приём/);
+    assert.match(source, /Продолжить первый ИИ-приём/);
+    assert.match(source, /Повторный ИИ-приём/);
+    assert.match(component[0], /Записаться на личный приём/);
+    assert.match(component[0], /TestCatalogSection/);
+    assert.match(source, /Тесты для самопроверки/);
+    assert.match(source, /Любое время/);
+    assert.match(source, /до 5 минут/);
+    assert.match(source, /5–10 минут/);
+    assert.match(source, /10–20 минут/);
+    assert.match(source, /20\+ минут/);
+    assert.doesNotMatch(component[0], /Guided AI session для первого среза/);
+    assert.doesNotMatch(component[0], /className="intake-option-row"/);
+    assert.doesNotMatch(component[0], /Другие варианты/);
+    assert.doesNotMatch(component[0], /Заказать встречу/);
     assert.doesNotMatch(component[0], /Пройти краткий ИИ-приём/);
     assert.doesNotMatch(component[0], /Расширенный ИИ-приём/);
     assert.doesNotMatch(component[0], /Откроется после краткого приёма/);
+  });
+
+  it("keeps consultation content from duplicating the intake subnav", () => {
+    const source = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+    const component = source.match(/function ConsultationPlaceholder\([\s\S]*?\n}\n\nfunction ProfileReportsPage/);
+
+    assert.ok(component);
+    assert.doesNotMatch(component[0], /className="intake-option-row"/);
+  });
+
+  it("keeps profile as metrics and dynamics, not orders", () => {
+    const source = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+    const profileComponent = source.match(/function ClientStateProfile\([\s\S]*?\n}\n\nfunction deltaLabel/);
+    const dynamicsComponent = source.match(/function ProfileDynamicsPage\([\s\S]*?\n}\n\nexport function NextStepsPage/);
+
+    assert.ok(profileComponent);
+    assert.ok(dynamicsComponent);
+    assert.match(profileComponent[0], /Профиль состояния/);
+    assert.match(profileComponent[0], /Краткая карта по вашим тестам/);
+    assert.match(profileComponent[0], /Пока нет данных по тестам/);
+    assert.match(dynamicsComponent[0], /Нужна повторная точка, чтобы увидеть динамику/);
+    assert.doesNotMatch(profileComponent[0], /Мои заказы/);
   });
 
   it("keeps the initial baseline answer hints to six visible choices", () => {
