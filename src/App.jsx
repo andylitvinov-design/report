@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout.jsx";
+import MasterPlanSwitcher from "./components/MasterPlanSwitcher.jsx";
 import { analysisCatalog, client, clientProgress, selfAnalysis } from "./data/mockData.js";
 import { testCatalog } from "./data/testCatalog.js";
 import AdvancedAiAnalysis from "./pages/AdvancedAiAnalysis.jsx";
@@ -18,6 +19,7 @@ import {
 } from "./lib/authClient.js";
 import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js";
 import { readFirstIntakeProgress, readFirstIntakeResult } from "./lib/firstIntakeStorage.js";
+import { resolveStoredMasterPlan, saveStoredMasterPlan } from "./lib/masterPlanStorage.js";
 
 export const pageTabs = {
   overview: [],
@@ -801,11 +803,12 @@ function RoutedApp() {
   }
 
   if (path === "/profile") {
+    const explicitSettings = query.get("section") === "settings";
     const explicitProfile =
       query.get("section") === "profile" ||
       query.get("tab") === "profile-now" ||
       query.get("tab") === "profile";
-    const initialPage = explicitProfile ? "profile" : "self";
+    const initialPage = explicitSettings ? "settings" : explicitProfile ? "profile" : "self";
     return demoMode ? <ReportApp forceDemo initialPage={initialPage} /> : <CabinetAuthGate initialPage={initialPage} />;
   }
 
@@ -825,6 +828,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
   const [advancedAiResult, setAdvancedAiResult] = useState(() => readAdvancedAiAnalysisResult());
   const [advancedAnalysisMode, setAdvancedAnalysisMode] = useState("overview");
   const [activeAnalysisId, setActiveAnalysisId] = useState("general-state");
+  const [masterPlanId, setMasterPlanId] = useState(() => resolveStoredMasterPlan({ email: clientOverride?.email }));
   const [activeTabs, setActiveTabs] = useState({
     overview: pageTabs.overview[0],
     expert: pageTabs.expert[0],
@@ -846,6 +850,10 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
     clientOverride?.hasCompletedFirstConsultation === true ||
     clientOverride?.hasCompletedResults === true;
   const currentAccessLevel = clientOverride?.accessLevel || (forceDemo ? "expanded" : "basic");
+
+  useEffect(() => {
+    setMasterPlanId(resolveStoredMasterPlan({ email: clientOverride?.email }));
+  }, [clientOverride?.email]);
 
   const analysisGroups = useMemo(() => {
     const completedAt = firstIntakeResult?.completedAt
@@ -934,6 +942,10 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
     setActivePage("settings");
     setBookingNoticeVisible(false);
     setSelfAnalysisMode("overview");
+  };
+
+  const handleMasterPlanChange = (planId) => {
+    setMasterPlanId(saveStoredMasterPlan({ email: clientOverride?.email, planId }));
   };
 
   const handleSelectAnalysis = (analysisId) => {
@@ -1026,6 +1038,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
             </div>
             {userAction ? <div className="settings-actions">{userAction}</div> : null}
           </article>
+          <MasterPlanSwitcher masterPlanId={masterPlanId} onPlanChange={handleMasterPlanChange} />
           <article className="card settings-card format-settings-card">
             <p className="eyebrow">Форматы</p>
             <h2>Пакеты доступа</h2>

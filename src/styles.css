@@ -851,6 +851,176 @@ h3 {
   width: 100%;
 }
 
+.master-plan-section {
+  align-content: start;
+}
+
+.master-plan-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.master-plan-current {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(18, 63, 49, 0.2);
+  border-radius: var(--psi-radius-md);
+  background: rgba(234, 243, 226, 0.74);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.master-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.master-plan-card {
+  min-height: 340px;
+  padding: 16px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-lg);
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.master-plan-card.active {
+  border-color: rgba(18, 63, 49, 0.3);
+  background: linear-gradient(180deg, rgba(234, 243, 226, 0.92), rgba(255, 253, 248, 0.92));
+}
+
+.master-plan-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.master-plan-card-head span {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.master-plan-card-head strong {
+  color: #26312d;
+  font-size: 22px;
+}
+
+.master-plan-card p,
+.master-plan-prepared-note,
+.master-plan-payment-note {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.master-plan-limits {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  color: #2f3935;
+  font-size: 14px;
+}
+
+.master-plan-limits li {
+  padding: 8px 10px;
+  border-radius: var(--psi-radius-md);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.master-plan-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.master-plan-actions .primary-btn,
+.master-plan-actions .secondary-btn {
+  width: 100%;
+}
+
+.master-plan-pay-link {
+  text-decoration: none;
+  text-align: center;
+}
+
+.master-plan-payment-note {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: 1px dashed var(--border);
+  border-radius: var(--psi-radius-md);
+  font-size: 13px;
+  text-align: center;
+}
+
+.master-plan-guard-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.master-plan-guard-panel h3 {
+  margin: 0;
+  color: #26312d;
+  font-size: 18px;
+}
+
+.master-plan-guard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.master-plan-guard {
+  min-height: 132px;
+  padding: 12px;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--psi-radius-md);
+  background: rgba(255, 253, 248, 0.7);
+}
+
+.master-plan-guard.allowed {
+  border-color: rgba(63, 122, 61, 0.26);
+}
+
+.master-plan-guard.blocked {
+  border-color: rgba(194, 119, 46, 0.28);
+}
+
+.master-plan-guard span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.master-plan-guard strong {
+  color: var(--green);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.master-plan-guard.blocked strong {
+  color: #9a5d24;
+}
+
+.master-plan-guard p {
+  margin: 0;
+  color: #4d5752;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 .mobile-nav {
   display: none;
 }
@@ -4672,12 +4842,24 @@ h3 {
   .compact-route-grid,
   .compact-archive-grid,
   .next-plan-grid,
-  .format-card-grid {
+  .format-card-grid,
+  .master-plan-grid,
+  .master-plan-guard-grid {
     grid-template-columns: 1fr;
   }
 
-  .format-card {
+  .format-card,
+  .master-plan-card,
+  .master-plan-guard {
     min-height: 0;
+  }
+
+  .master-plan-heading {
+    display: grid;
+  }
+
+  .master-plan-current {
+    justify-self: start;
   }
 
   .compact-route-card {
