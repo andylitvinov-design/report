@@ -1,58 +1,43 @@
 # /audit-fin
 
-`/audit-fin` is sufficient by itself.
+`/audit-fin` is diagnostic numeric/calculation mode for Report/PsiTherapy. It creates or updates an implementation-ready GitHub issue and returns a short `/delivery` prompt.
 
-Mode: diagnostic, not implementation.
+## Source of truth
 
-Source of truth:
+Read in order:
 
-```txt
-https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/ry-agent-audit-modes.md
-https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-fin-loop.md
-https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/audit-fin-failed-repair.md
-docs/audit-fin-deep-technical-implementation.md
-```
+1. `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-agent-settings.md`
+2. `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-command-protocols.md`
+3. `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-project-adapters.md`
+4. `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-agent-skills.md`
+5. `AGENTS.md` - Report/PsiTherapy local adapter
+6. `docs/audit-fin-deep-technical-implementation.md`
+7. `.claude/commands/delivery.md`
 
-Project mapping:
+## Project adapter
 
-```txt
-https://2mentalica.vercel.app -> andylitvinov-design/report
-```
+- Repository: `andylitvinov-design/report`
+- Known local folder: `/Users/andriilitvinov/projects/MYPROJECTS/reports`
+- Primary production URL: `https://psitherapy.vercel.app/`
+- Build-info URL: `https://psitherapy.vercel.app/build-info.json`
+- Issue tracker: `https://github.com/andylitvinov-design/report/issues`
 
-Required chain:
+## Required behavior
 
-```txt
-numeric target -> numeric contract -> visible value -> code/data inspection -> implementation trace -> source-layer matrix -> first divergence layer -> focused hypotheses -> issue -> /delivery prompt
-```
-
-Mandatory implementation trace:
-
-```txt
-visible value -> component -> state/selection -> data source -> parsing -> formula/helper -> aggregation -> hydration/cache -> formatting -> rendering -> tests
-```
-
-Before writing the issue, identify the first layer where expected value becomes wrong actual value.
-
-The issue must include:
-
-- numeric implementation trace;
-- inspected files/functions/components;
-- expected vs actual;
-- first divergence layer;
-- confirmed vs likely/unverified findings;
-- implementation map;
-- deterministic verification plan;
-- ready-to-run `/delivery` prompt.
-
-Use labels:
+Follow the shared `/audit-fin` trace:
 
 ```txt
-CODE VERIFIED
-API VERIFIED
-RUNTIME VERIFIED
-DATA VERIFIED
-LIKELY
-NOT VERIFIED
+visible value
+-> component
+-> state/selection
+-> data source
+-> parsing
+-> formula/helper
+-> aggregation
+-> hydration/cache
+-> formatting
+-> rendering
+-> tests
 ```
 
-The handoff prompt must start with `/delivery` as the first non-empty line.
+Find the first divergence layer before proposing a fix. Do not implement during `/audit-fin` unless the user explicitly switches to `/delivery`.

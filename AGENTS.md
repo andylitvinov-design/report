@@ -25,20 +25,27 @@ Current rule: use `report` as the main site implementation repo for `psitherapy.
 Before changing this repo, read:
 
 1. `AGENTS.md`
-2. `README.md`
-3. `package.json`
-4. `vite.config.js`
-5. `vercel.json`
-6. `.github/workflows/deploy-production.yml`
-7. `.github/workflows/pages.yml`
-8. `docs/deploy-fallback.md`
-9. `docs/deploy-version-check.md`
-10. `docs/myalchemy-migration-plan.md` if present
-11. relevant product/design docs under `docs/`
+2. Shared global agent settings:
+   - `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-agent-settings.md`
+   - `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-command-protocols.md`
+   - `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-project-adapters.md`
+   - `https://github.com/andylitvinov-design/reiki-yggdrasil/blob/main/docs/global-agent-skills.md`
+3. `README.md`
+4. `package.json`
+5. `vite.config.js`
+6. `vercel.json`
+7. `.github/workflows/deploy-production.yml`
+8. `.github/workflows/pages.yml`
+9. `docs/deploy-fallback.md`
+10. `docs/deploy-version-check.md`
+11. `docs/myalchemy-migration-plan.md` if present
+12. relevant product/design docs under `docs/`
 
 If a file is missing, report `not found`.
 
 ## Agent Command Registry
+
+This registry is the Report/PsiTherapy local adapter for the shared global agent settings. Keep runtime prompts short and reference the shared global docs instead of copying long command protocols into chat or one-off repo files.
 
 ### /audit
 
