@@ -81,6 +81,14 @@ h2 {
     linear-gradient(135deg, #fffaf3, var(--psi-bg));
 }
 
+.app-shell.page-self:not(.focus-mode) {
+  background:
+    linear-gradient(180deg, rgba(12, 50, 45, 0.66) 0, rgba(23, 63, 53, 0.58) 210px, rgba(247, 243, 234, 0) 430px),
+    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.13), transparent 20rem),
+    url("./assets/therapy-login-bg.jpg") top center / 100% 430px no-repeat,
+    linear-gradient(135deg, #fffaf3, var(--psi-bg));
+}
+
 .app-shell.workbook-mode {
   display: block;
   min-height: 100vh;
@@ -101,6 +109,36 @@ h2 {
   border-bottom: 1px solid rgba(228, 220, 207, 0.74);
   background: rgba(255, 253, 248, 0.86);
   backdrop-filter: blur(16px);
+}
+
+.page-self:not(.focus-mode) .global-topbar {
+  border-bottom-color: rgba(255, 253, 248, 0.18);
+  background: rgba(14, 50, 42, 0.58);
+  box-shadow: 0 14px 38px rgba(14, 50, 42, 0.18);
+}
+
+.page-self:not(.focus-mode) .brand strong,
+.page-self:not(.focus-mode) .brand span {
+  color: #fffdf8;
+}
+
+.page-self:not(.focus-mode) .brand span {
+  color: rgba(255, 253, 248, 0.74);
+}
+
+.page-self:not(.focus-mode) .top-nav-item {
+  color: rgba(255, 253, 248, 0.9);
+}
+
+.page-self:not(.focus-mode) .top-nav-item:hover,
+.page-self:not(.focus-mode) .top-nav-item:focus-visible,
+.page-self:not(.focus-mode) .top-nav-item.active {
+  background: rgba(255, 253, 248, 0.18);
+  color: #fffdf8;
+}
+
+.page-self:not(.focus-mode) .top-nav-item.active {
+  box-shadow: inset 0 0 0 1px rgba(255, 253, 248, 0.22);
 }
 
 .top-nav-list {
@@ -437,6 +475,30 @@ h2 {
     radial-gradient(circle at 92% 18%, rgba(63, 122, 61, 0.14), transparent 18rem),
     linear-gradient(135deg, rgba(255, 253, 248, 0.96), rgba(251, 247, 239, 0.9));
   box-shadow: var(--shadow);
+}
+
+.page-self-main .topbar {
+  min-height: 178px;
+  align-items: flex-end;
+  border-color: rgba(255, 253, 248, 0.2);
+  background:
+    linear-gradient(180deg, rgba(12, 50, 45, 0.08), rgba(12, 50, 45, 0.78)),
+    linear-gradient(135deg, rgba(20, 72, 60, 0.42), rgba(25, 92, 84, 0.28)),
+    url("./assets/therapy-login-bg.jpg") center 42% / cover;
+  box-shadow: 0 24px 70px rgba(14, 50, 42, 0.2);
+  overflow: hidden;
+}
+
+.page-self-main .topbar .eyebrow,
+.page-self-main .topbar h1,
+.page-self-main .topbar .subtitle {
+  color: #fffdf8;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.28);
+}
+
+.page-self-main .topbar .eyebrow,
+.page-self-main .topbar .subtitle {
+  color: rgba(255, 253, 248, 0.82);
 }
 
 .eyebrow {
@@ -1914,6 +1976,10 @@ h3 {
   padding: clamp(18px, 2.4vw, 28px);
 }
 
+.ai-intake-onboarding {
+  gap: clamp(20px, 3vw, 30px);
+}
+
 .compact-route-hero h2 {
   max-width: 820px;
   font-family: Georgia, "Times New Roman", serif;
@@ -2077,6 +2143,70 @@ h3 {
   padding: 0;
   color: var(--workbook-green-2);
   font-size: 15px;
+}
+
+.page-self-main .ai-intake-hero {
+  min-height: clamp(340px, 42vh, 480px);
+  align-content: end;
+  border-color: rgba(255, 253, 248, 0.24);
+  background:
+    linear-gradient(180deg, rgba(12, 50, 45, 0.16), rgba(12, 50, 45, 0.82)),
+    linear-gradient(135deg, rgba(20, 72, 60, 0.38), rgba(25, 92, 84, 0.22)),
+    url("./assets/therapy-login-bg.jpg") center 54% / cover;
+  box-shadow: 0 24px 70px rgba(14, 50, 42, 0.2);
+}
+
+.page-self-main .ai-intake-hero::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 52%;
+  background: linear-gradient(180deg, transparent, rgba(8, 38, 32, 0.62));
+  pointer-events: none;
+}
+
+.page-self-main .ai-intake-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.page-self-main .ai-intake-hero .ai-intake-kicker {
+  width: fit-content;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 253, 248, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.14);
+  color: rgba(255, 253, 248, 0.86);
+  letter-spacing: 0;
+}
+
+.page-self-main .ai-intake-hero h2 {
+  max-width: 760px;
+  color: #fffdf8;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.28);
+}
+
+.page-self-main .ai-intake-hero p {
+  max-width: 560px;
+  color: rgba(255, 253, 248, 0.86);
+}
+
+.page-self-main .ai-intake-hero .primary-btn {
+  background: linear-gradient(135deg, #fffdf8, #eaf3e2);
+  color: var(--psi-green-dark);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.page-self-main .ai-intake-personal-link,
+.page-self-main .ai-intake-advanced-link {
+  color: rgba(255, 253, 248, 0.88);
+}
+
+.page-self-main .ai-intake-personal-link:hover,
+.page-self-main .ai-intake-personal-link:focus-visible,
+.page-self-main .ai-intake-advanced-link:hover,
+.page-self-main .ai-intake-advanced-link:focus-visible {
+  color: #fffdf8;
 }
 
 .ai-intake-secondary {
@@ -4562,6 +4692,13 @@ h3 {
     display: block;
   }
 
+  .app-shell.page-self:not(.focus-mode) {
+    background:
+      linear-gradient(180deg, rgba(12, 50, 45, 0.68) 0, rgba(23, 63, 53, 0.48) 172px, rgba(247, 243, 234, 0) 340px),
+      url("./assets/therapy-login-bg.jpg") top center / 100% 340px no-repeat,
+      linear-gradient(135deg, #fffaf3, var(--psi-bg));
+  }
+
   .global-topbar {
     position: sticky;
     grid-template-columns: 1fr;
@@ -4588,6 +4725,10 @@ h3 {
     display: block;
   }
 
+  .page-self-main {
+    padding-top: 12px;
+  }
+
   .app-shell.focus-mode .main-shell {
     padding: 0;
   }
@@ -4596,6 +4737,21 @@ h3 {
   .profile-hero {
     display: block;
     padding: 18px;
+  }
+
+  .page-self-main .topbar {
+    min-height: 132px;
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .page-self-main .topbar h1 {
+    font-size: 30px;
+  }
+
+  .page-self-main .topbar .subtitle {
+    font-size: 14px;
+    line-height: 1.42;
   }
 
   .profile-hero .secondary-btn {
@@ -4873,7 +5029,7 @@ h3 {
   }
 
   .ai-intake-onboarding {
-    gap: 18px;
+    gap: 28px;
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -4883,9 +5039,9 @@ h3 {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    min-height: calc(100svh - 238px);
-    align-content: center;
-    padding: 30px 18px;
+    min-height: auto;
+    align-content: end;
+    padding: 24px 18px;
     border-radius: 22px;
   }
 
@@ -4906,7 +5062,7 @@ h3 {
   }
 
   .ai-intake-hero h2 {
-    font-size: clamp(31px, 9.2vw, 40px);
+    font-size: clamp(29px, 8.2vw, 38px);
   }
 
   .ai-intake-hero .primary-btn,
