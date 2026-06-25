@@ -72,6 +72,7 @@ export default function Layout({
       : navLabel;
   const shellClassName = [
     "app-shell",
+    activePage ? `page-${activePage}` : "",
     focusMode ? "focus-mode" : "",
     workbookMode ? "workbook-mode" : "",
     isNewUser ? "new-user-shell" : "",
@@ -80,6 +81,7 @@ export default function Layout({
     .join(" ");
   const mainShellClassName = [
     "main-shell",
+    activePage ? `page-${activePage}-main` : "",
     hideSpecialistPanel ? "no-specialist-panel" : "",
     workbookMode ? "workbook-main-shell" : "",
   ]
