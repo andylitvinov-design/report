@@ -2238,13 +2238,52 @@ h3 {
 
 .test-catalog-section {
   display: grid;
-  gap: 16px;
-  padding-top: clamp(18px, 4vw, 34px);
+  gap: 14px;
+  padding-top: clamp(6px, 1.6vw, 14px);
 }
 
-.basic-intake-block {
-  display: grid;
-  gap: 12px;
+.intake-continuation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 0;
+  padding: clamp(14px, 2.2vw, 20px);
+  border-color: rgba(63, 122, 61, 0.18);
+  background: linear-gradient(135deg, rgba(255, 253, 248, 0.96), rgba(234, 243, 226, 0.72));
+}
+
+.intake-continuation-card h3 {
+  margin-top: 4px;
+  color: #26312d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.08;
+}
+
+.intake-continuation-card p {
+  margin-top: 4px;
+  color: #625d53;
+  line-height: 1.35;
+}
+
+.intake-continuation-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.intake-continuation-actions small {
+  color: #8a6d32;
+  font-weight: 850;
+}
+
+.intake-continuation-actions .secondary-btn {
+  min-height: 42px;
+  border-radius: 999px;
 }
 
 .test-catalog-head {
@@ -2308,12 +2347,6 @@ h3 {
   display: grid;
   gap: 10px;
   min-height: 210px;
-}
-
-.primary-intake-card {
-  min-height: 176px;
-  border-color: rgba(63, 122, 61, 0.2);
-  background: linear-gradient(135deg, rgba(255, 253, 248, 0.96), rgba(234, 243, 226, 0.76));
 }
 
 .test-catalog-card span,
@@ -5049,7 +5082,7 @@ h3 {
   .ai-intake-secondary-grid,
   .ai-intake-option-card,
   .test-catalog-section,
-  .basic-intake-block,
+  .intake-continuation-card,
   .test-catalog-grid,
   .test-catalog-card,
   .profile-metrics-grid,
@@ -5063,6 +5096,45 @@ h3 {
 
   .ai-intake-hero h2 {
     font-size: clamp(29px, 8.2vw, 38px);
+  }
+
+  .page-self-main .ai-intake-hero {
+    min-height: clamp(292px, 39vh, 340px);
+  }
+
+  .test-catalog-section {
+    gap: 12px;
+    padding-top: 0;
+  }
+
+  .intake-continuation-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .intake-continuation-card h3 {
+    font-size: 21px;
+  }
+
+  .intake-continuation-card p {
+    font-size: 14px;
+  }
+
+  .intake-continuation-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .intake-continuation-actions .secondary-btn {
+    width: auto;
+    min-height: 42px;
+    padding-inline: 15px;
+    font-size: 14px;
+    white-space: normal;
   }
 
   .ai-intake-hero .primary-btn,

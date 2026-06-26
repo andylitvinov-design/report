@@ -203,25 +203,19 @@ function TestCatalogSection({
 
   return (
     <section className="test-catalog-section" aria-labelledby="test-catalog-title">
-      <div className="basic-intake-block">
-        <div className="test-catalog-head">
-          <div>
-            <span className="ai-intake-secondary-title">Базовый первичный приём</span>
-            <h2>Первичный ИИ-приём</h2>
-          </div>
-        </div>
-        <article className="card test-catalog-card primary-intake-card">
-          <span>Базовый первичный приём</span>
+      <article className="card intake-continuation-card">
+        <div>
+          <span className="ai-intake-secondary-title">Базовый первичный приём</span>
           <h3>Первичный ИИ-приём</h3>
           <p>4 части: точка состояния и 3 анкеты Bach.</p>
-          <div className="test-catalog-meta">
-            <small>{getTestStatusLabel(firstIntakeStatus)}</small>
-          </div>
+        </div>
+        <div className="intake-continuation-actions">
+          <small>{getTestStatusLabel(firstIntakeStatus)}</small>
           <button className="secondary-btn" type="button" onClick={onStartBrief}>
             {getPrimaryIntakeCtaLabel(firstIntakeStatus)}
           </button>
-        </article>
-      </div>
+        </div>
+      </article>
 
       <div className="test-catalog-head">
         <div>
