@@ -865,7 +865,7 @@ h3 {
 
 .format-card-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 12px;
 }
 
@@ -900,11 +900,24 @@ h3 {
 .format-card strong {
   color: #26312d;
   font-size: 22px;
+  white-space: nowrap;
 }
 
 .format-card p {
   color: var(--muted);
   line-height: 1.35;
+}
+
+.format-card-details {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.format-card-details li + li {
+  margin-top: 6px;
 }
 
 .format-card .primary-btn,
