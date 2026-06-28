@@ -356,3 +356,23 @@ Gate from `.claude/commands/delivery.md`. Every required item must be `PASS`.
 - Stop after 3 failed fix attempts on the same issue — return STATUS: BLOCKED.
 - Never touch env vars, secrets, billing, production database, or auth-sensitive settings without explicit user approval.
 - Final report must include a COST CONTROL section.
+
+## Agent memory router
+
+Before `/delivery`, `/audit`, `/save`, `/memory`, `/memory-review`, `/learn-pass`, or `/upgrade`:
+
+1. Read `agent-memory/active.md`.
+2. Read `agent-memory/index.md`.
+3. Identify task scope.
+4. Read only relevant topic/component files.
+5. Do not load archive unless resolving conflicts or running `/memory-review`.
+6. Do not load candidates/metrics unless running `/learn-pass`, `/memory-review`, or `/upgrade`.
+7. Do not load harness proposals/tests unless running `/upgrade`.
+
+For `/save`, use `.codex/skills/save/SKILL.md` if present.
+For `/memory`, use `.codex/skills/memory/SKILL.md` if present.
+For `/memory-review`, use `.codex/skills/memory-review/SKILL.md` if present.
+For `/learn-pass`, use `.codex/skills/learn-pass/SKILL.md` if present.
+For `/upgrade`, use `.codex/skills/upgrade/SKILL.md` if present.
+
+Do not load the whole instruction tree by default.
