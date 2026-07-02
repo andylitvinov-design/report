@@ -37,8 +37,8 @@ export default function LoginPage() {
 
           {!authEnv.isConfigured && (
             <div className="auth-notice">
-              <strong>Supabase ещё не настроен.</strong>
-              <span>Добавьте в Vercel переменные VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY.</span>
+              <strong>Firebase ещё не настроен.</strong>
+              <span>Добавьте в Vercel публичные переменные Firebase Auth.</span>
             </div>
           )}
 

@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+    }
+
+    match /forms/{formId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+
+      match /questions/{questionId} {
+        allow read: if get(/databases/$(database)/documents/forms/$(formId)).data.status == 'published' || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    match /submissions/{submissionId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.keys().hasOnly([
+          'formId',
+          'formSlug',
+          'userId',
+          'answers',
+          'status',
+          'createdAt',
+          'updatedAt',
+          'source',
+          'schemaVersion'
+        ]);
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow update, delete: if isAdmin();
+    }
+
+    match /testResults/{resultId} {
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /leads/{leadId} {
+      allow create: if request.resource.data.status == 'new'
+        && request.resource.data.keys().hasOnly([
+          'name',
+          'email',
+          'telegram',
+          'message',
+          'source',
+          'status',
+          'createdAt',
+          'updatedAt',
+          'schemaVersion'
+        ]);
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
