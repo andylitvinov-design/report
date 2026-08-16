@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PsiTherapy — конструктор PDF-отчётов</title>
+  <style>
+    :root{--ink:#24312d;--muted:#68746b;--green:#263a34;--sage:#60796b;--gold:#b88a55;--paper:#fffdf8;--line:#ded2c0;--bg:#efe7d7}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 85% 8%,rgba(184,138,85,.22),transparent 22rem),radial-gradient(circle at 12% 24%,rgba(96,121,107,.14),transparent 24rem),var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+    .top{height:64px;display:flex;align-items:center;gap:13px;padding:0 clamp(20px,5vw,76px);background:rgba(255,253,248,.86);border-bottom:1px solid rgba(36,49,45,.14);color:var(--muted);font-size:13px}.brand{font:700 22px Georgia,serif;color:var(--green)}
+    main{width:min(1160px,calc(100% - 36px));margin:auto;padding:55px 0 80px}.intro{max-width:760px;margin-bottom:30px}.eyebrow,.kicker,.map span{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}h1{margin:10px 0 14px;font:700 clamp(38px,6vw,68px)/.98 Georgia,serif;letter-spacing:-.04em}.intro p{margin:0;max-width:680px;color:#617067;font-size:17px;line-height:1.55}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}.card{border:1px solid rgba(84,70,48,.2);border-radius:22px;background:rgba(255,253,248,.92);box-shadow:0 18px 44px rgba(67,49,25,.09)}.input-card{padding:19px}.input-head,.actions,.hero,.map,.footer{display:flex;align-items:center;justify-content:space-between;gap:16px}.input-head{margin-bottom:13px}.input-head div,.format{display:grid;gap:4px}.input-head span,.format span{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}.input-head strong{font-size:13px}
+    textarea{width:100%;min-height:480px;resize:vertical;padding:16px;border:1px solid var(--line);border-radius:15px;outline:none;background:var(--paper);color:var(--ink);font:15px/1.55 Georgia,serif}textarea:focus{border-color:var(--sage);box-shadow:0 0 0 4px rgba(96,121,107,.15)}
+    button{font:inherit;cursor:pointer}.link{padding:0;border:0;background:none;color:#2d6c4f;font-weight:800;text-decoration:underline;text-underline-offset:3px}.side{display:grid;gap:12px;position:sticky;top:82px}.format{padding:20px}.format strong{font:700 25px/1.08 Georgia,serif}.format p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.5}.primary,.secondary{min-height:48px;padding:11px 16px;border-radius:14px;font-weight:850}.primary{border:1px solid var(--green);background:var(--green);color:#fff}.primary:disabled{opacity:.42;cursor:not-allowed}.secondary{border:1px solid #b8c4b7;background:#fffdf8;color:var(--green)}
+    .preview{display:none;margin-top:46px}.preview.show{display:block}.actions{margin-bottom:16px}.report{overflow:hidden;border:1px solid rgba(84,70,48,.2);border-radius:28px;background:var(--paper);box-shadow:0 26px 70px rgba(67,49,25,.14)}.hero{align-items:flex-end;padding:clamp(28px,6vw,68px);background:radial-gradient(circle at 83% 18%,rgba(184,138,85,.3),transparent 17rem),linear-gradient(135deg,#fcf8ef,#f0e6d5)}.hero>div:first-child{max-width:700px;display:grid;gap:14px}.hero h1{font-size:clamp(35px,5vw,60px);margin:0}.hero p{margin:0;color:#617067;font-size:16px;line-height:1.5}.mark{flex:0 0 116px;min-height:116px;padding:18px;display:grid;align-content:center;border-radius:50%;background:var(--green);color:#fff;text-align:center}.mark span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.78}.mark strong{font:700 23px Georgia,serif}.map{padding:14px clamp(24px,5vw,56px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f8f3e8}.map strong{font:700 18px Georgia,serif;color:var(--green)}
+    .sections{padding:clamp(24px,5vw,58px);display:grid;gap:16px}.section{display:grid;grid-template-columns:46px minmax(0,1fr);gap:16px;padding:21px;border:1px solid var(--line);border-radius:18px;background:var(--paper);break-inside:avoid}.index{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#e8f0df;color:#2d6c4f;font-weight:900}.section h2{margin:0 0 8px;font:700 26px/1.08 Georgia,serif}.section p{margin:0;color:#33433c;font-size:15px;line-height:1.66;white-space:pre-wrap}.footer{padding:18px clamp(24px,5vw,56px);border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.4}
+    @media(max-width:760px){main{width:min(100% - 24px,1160px);padding-top:34px}.workspace{grid-template-columns:1fr}.side{position:static}textarea{min-height:360px}.hero{align-items:flex-start;flex-direction:column}.mark{flex-basis:auto;min-height:84px;width:84px}.map,.footer{align-items:flex-start;flex-direction:column;gap:5px}.section{grid-template-columns:36px minmax(0,1fr);padding:15px;gap:10px}.section h2{font-size:23px}}
+    @media print{@page{size:A4;margin:12mm}body{background:var(--paper)}.no-print,.top{display:none!important}main{width:auto;margin:0;padding:0}.report{border:0;border-radius:0;box-shadow:none}.hero{padding:18mm 16mm}.hero h1{font-size:37pt}.sections{padding:12mm 16mm}.section{page-break-inside:avoid}.footer{padding:8mm 16mm}}
+  </style>
+</head>
+<body>
+  <header class="top no-print"><strong class="brand">PsiTherapy</strong><span>Инструмент для отчётов</span></header>
+  <main>
+    <section class="intro no-print"><span class="eyebrow">Конструктор PDF-отчётов</span><h1>Вставьте текст - получите готовый отчёт</h1><p>Инструмент сам выбирает рабочий формат: первичный, глубокий ДАО / У-Син, повторный или краткую заметку по поддержке. Текст остаётся только в вашем браузере.</p></section>
+    <div class="workspace no-print">
+      <section class="card input-card"><div class="input-head"><div><span>Исходный текст</span><strong id="count">вставьте отчёт</strong></div><button class="link" id="structure" type="button">Вставить структуру</button></div><textarea id="source" aria-label="Текст отчёта" placeholder="1. Диагностика
+
+Опишите текущую картину: ресурс, слабое место, главный механизм и направление движения.
+
+2. Назначение
+
+Укажите основную поддержку, дополнительные средства и формат применения.
+
+3. Примечание
+
+Добавьте меры предосторожности, что отслеживать и когда повторно сверить динамику.
+
+4. Приложение
+
+Добавьте послания средств, общую метафору этапа и полезные ссылки."></textarea></section>
+      <aside class="side"><article class="card format"><span>Выбранный формат</span><strong id="format-label">Первичный отчёт</strong><p id="format-description">Новый отчёт без достаточных данных о динамике или У-Син.</p></article><button class="primary" id="open" type="button" disabled>Открыть макет отчёта</button></aside>
+    </div>
+    <section class="preview" id="preview"><div class="actions no-print"><button class="secondary" id="back" type="button">Вернуться к тексту</button><button class="primary" id="print" type="button">Сохранить как PDF</button></div><article class="report"><header class="hero"><div><span class="kicker" id="report-kicker"></span><h1 id="report-title"></h1><p id="report-description"></p></div><div class="mark"><span>Персональный</span><strong>отчёт</strong></div></header><div class="map"><span>Текущая карта</span><strong id="map-format"></strong><span id="section-count"></span></div><div class="sections" id="sections"></div><footer class="footer"><span>PsiTherapy • рабочий отчёт</span><span>Текст подготовлен для последующей проверки специалистом.</span></footer></article></section>
+  </main>
+  <script>
+    const source=document.querySelector('#source'),open=document.querySelector('#open'),preview=document.querySelector('#preview');
+    const meta={deep:{label:'Глубокий отчёт ДАО / У-Син',title:'Карта ресурса и поддержки',description:'Новый отчёт с ресурсом ДАО, смысловым слоем и картой поддержки.'},repeat:{label:'Повторный отчёт',title:'Динамика и корректировка поддержки',description:'Отчёт выбран как повторный: в тексте есть движение, сравнение или уточнение схемы.'},remedy:{label:'Краткая заметка по поддержке',title:'Направление поддержки',description:'Короткий формат для средств и практических шагов.'},primary:{label:'Первичный отчёт',title:'Текущая карта состояния',description:'Новый отчёт без достаточных данных о динамике или У-Син.'}};
+    const structure='1. Диагностика\n\nОпишите текущую картину: ресурс, слабое место, главный механизм и направление движения.\n\n2. Назначение\n\nУкажите основную поддержку, дополнительные средства и формат применения.\n\n3. Примечание\n\nДобавьте меры предосторожности, что отслеживать и когда повторно сверить динамику.\n\n4. Приложение\n\nДобавьте послания средств, общую метафору этапа и полезные ссылки.';
+    function type(text){text=text.toLowerCase();if(/было|стало|динамика|повторн|изменил|прошл/.test(text))return'repeat';if(/у[-\s]?син|усин|вода|дерево|огонь|земля|металл|дао|крепость|корол[ья]/.test(text))return'deep';if(/препарат|средств|бах|натуропат|дозиров|назначени/.test(text))return'remedy';return'primary'}
+    function parse(text){const r=/^\s*(\d+)\.\s+(.+?)\s*$/gm,m=[...text.matchAll(r)];if(!m.length)return text.trim()?[{number:'',title:'Текст отчёта',body:text.trim()}]:[];return m.map((x,i)=>({number:x[1],title:x[2].trim(),body:text.slice(x.index+x[0].length,i+1<m.length?m[i+1].index:text.length).trim()}))}
+    function escape(s){return s.replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]))}
+    function update(){const text=source.value.trim(),kind=type(text),m=meta[kind];document.querySelector('#count').textContent=text?text.length+' символов':'вставьте отчёт';document.querySelector('#format-label').textContent=m.label;document.querySelector('#format-description').textContent=m.description;open.disabled=!text}
+    source.addEventListener('input',update);document.querySelector('#structure').onclick=()=>{source.value=structure;update()};open.onclick=()=>{const text=source.value.trim(),kind=type(text),m=meta[kind],sections=parse(text),first=text.split('\n').map(x=>x.trim()).find(Boolean)||'';document.querySelector('#report-kicker').textContent=m.label;document.querySelector('#report-title').textContent=/^\d+\.\s/.test(first)?m.title:first.replace(/^#+\s*/,'').slice(0,90);document.querySelector('#report-description').textContent=m.description;document.querySelector('#map-format').textContent=m.label;document.querySelector('#section-count').textContent=(sections.length||1)+' раздела';document.querySelector('#sections').innerHTML=sections.map(s=>'<section class="section"><div class="index">'+escape(s.number||'•')+'</div><div><h2>'+escape(s.title)+'</h2><p>'+escape(s.body)+'</p></div></section>').join('');preview.classList.add('show');preview.scrollIntoView({behavior:'smooth'})};document.querySelector('#back').onclick=()=>{preview.classList.remove('show');source.focus()};document.querySelector('#print').onclick=()=>window.print();update();
+  </script>
+</body>
+</html>
