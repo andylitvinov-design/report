@@ -1,14 +1,33 @@
-const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL?.replace(/\/$/, "") || "";
-const SUPABASE_ANON_KEY = import.meta.env?.VITE_SUPABASE_ANON_KEY || "";
+import { initializeApp } from "firebase/app";
+import {
+  GoogleAuthProvider,
+  getAuth,
+  getRedirectResult,
+  onAuthStateChanged,
+  signInWithRedirect,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
 
-const SESSION_KEY = "psitherapy-session";
-const PKCE_VERIFIER_KEY = "psitherapy-pkce-verifier";
+const firebaseConfig = {
+  apiKey: import.meta.env?.VITE_FIREBASE_API_KEY || "",
+  authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: import.meta.env?.VITE_FIREBASE_APP_ID || "",
+};
+
 const REQUEST_TIMEOUT_MS = 12000;
 
 export const authEnv = {
-  url: SUPABASE_URL,
-  isConfigured: Boolean(SUPABASE_URL && SUPABASE_ANON_KEY),
+  provider: "firebase",
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+  isConfigured: Object.values(firebaseConfig).every(Boolean),
 };
+
+let firebaseApp = null;
+let firebaseAuth = null;
 
 function authError(message, details = null) {
   const error = new Error(message);
@@ -18,145 +37,93 @@ function authError(message, details = null) {
 
 function requireConfig() {
   if (!authEnv.isConfigured) {
-    throw authError("Для Google-входа нужно настроить VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в Vercel.");
+    throw authError("Для Google-входа нужно настроить Firebase переменные в Vercel.");
   }
 }
 
-async function request(path, options = {}) {
+function getFirebaseAuth() {
   requireConfig();
 
-  const {
-    method = "GET",
-    body,
-    accessToken,
-    headers = {},
-    timeoutMs = REQUEST_TIMEOUT_MS,
-  } = options;
+  if (!firebaseApp) {
+    firebaseApp = initializeApp(firebaseConfig);
+  }
 
-  const controller = new AbortController();
-  const timeoutId = globalThis.setTimeout(() => controller.abort(), timeoutMs);
+  if (!firebaseAuth) {
+    firebaseAuth = getAuth(firebaseApp);
+  }
 
-  let response;
-  try {
-    response = await fetch(`${SUPABASE_URL}${path}`, {
-      method,
-      signal: controller.signal,
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${accessToken || SUPABASE_ANON_KEY}`,
-        "Content-Type": "application/json",
-        ...headers,
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-  } catch (error) {
-    if (error?.name === "AbortError") {
-      throw authError("Вход загружается слишком долго. Проверьте подключение и попробуйте снова.", {
+  return firebaseAuth;
+}
+
+function normalizeFirebaseUser(user) {
+  if (!user) return null;
+
+  return {
+    id: user.uid,
+    email: user.email || "",
+    user_metadata: {
+      full_name: user.displayName || "",
+      name: user.displayName || "",
+      avatar_url: user.photoURL || "",
+    },
+    app_metadata: {
+      provider: "firebase",
+    },
+  };
+}
+
+function waitForFirebaseUser(timeoutMs = REQUEST_TIMEOUT_MS) {
+  const auth = getFirebaseAuth();
+
+  if (auth.currentUser) {
+    return Promise.resolve(normalizeFirebaseUser(auth.currentUser));
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeoutId = globalThis.setTimeout(() => {
+      unsubscribe();
+      reject(authError("Вход загружается слишком долго. Проверьте подключение и попробуйте снова.", {
         status: 408,
         timeout: true,
-      });
-    }
-    throw error;
-  } finally {
-    globalThis.clearTimeout(timeoutId);
-  }
+      }));
+    }, timeoutMs);
 
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
-
-  if (!response.ok) {
-    throw authError(data?.msg || data?.message || "Ошибка Supabase Auth запроса.", {
-      ...(data && typeof data === "object" ? data : {}),
-      status: response.status,
-    });
-  }
-
-  return data;
-}
-
-function base64UrlEncode(value) {
-  const bytes = value instanceof ArrayBuffer ? new Uint8Array(value) : value;
-  let binary = "";
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        globalThis.clearTimeout(timeoutId);
+        unsubscribe();
+        resolve(normalizeFirebaseUser(user));
+      },
+      (error) => {
+        globalThis.clearTimeout(timeoutId);
+        unsubscribe();
+        reject(authError("Не удалось загрузить Firebase-сессию.", error));
+      },
+    );
   });
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function createPkceVerifier() {
-  const bytes = new Uint8Array(64);
-  crypto.getRandomValues(bytes);
-  return base64UrlEncode(bytes);
-}
-
-async function createPkceChallenge(verifier) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-  return base64UrlEncode(digest);
-}
-
-function storeSession(session) {
-  if (!session?.access_token) return null;
-
-  const expiresAt = Number(session.expires_at) || (session.expires_in ? Math.floor(Date.now() / 1000) + Number(session.expires_in) : null);
-  const storedSession = {
-    access_token: session.access_token,
-    refresh_token: session.refresh_token || "",
-    expires_at: expiresAt,
-    token_type: session.token_type || "bearer",
-  };
-
-  localStorage.setItem(SESSION_KEY, JSON.stringify(storedSession));
-  return storedSession;
 }
 
 export function getStoredSession() {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    clearStoredSession();
-    return null;
-  }
+  if (!authEnv.isConfigured || !firebaseAuth?.currentUser) return null;
+  return { provider: "firebase", access_token: "firebase-session" };
 }
 
 export function clearStoredSession() {
-  localStorage.removeItem(SESSION_KEY);
+  if (!authEnv.isConfigured || !firebaseAuth) return;
+  void firebaseSignOut(firebaseAuth);
 }
 
-export function isStoredSessionExpired(session) {
-  if (!session?.expires_at) return false;
-  const expiresAt = Number(session.expires_at);
-  if (!Number.isFinite(expiresAt)) return false;
-  return expiresAt * 1000 <= Date.now();
+export function isStoredSessionExpired() {
+  return false;
 }
 
 export async function exchangeOAuthCodeFromUrl() {
   if (typeof window === "undefined" || !authEnv.isConfigured) return null;
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const authCode = searchParams.get("code");
-  if (!authCode) return getStoredSession();
-
-  const codeVerifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
-  if (!codeVerifier) return getStoredSession();
-
-  try {
-    const data = await request("/auth/v1/token?grant_type=pkce", {
-      method: "POST",
-      body: {
-        auth_code: authCode,
-        code_verifier: codeVerifier,
-      },
-    });
-    const storedSession = storeSession(data);
-    sessionStorage.removeItem(PKCE_VERIFIER_KEY);
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return storedSession;
-  } catch (error) {
-    sessionStorage.removeItem(PKCE_VERIFIER_KEY);
-    window.history.replaceState({}, document.title, window.location.pathname);
-    throw error;
-  }
+  const auth = getFirebaseAuth();
+  const result = await getRedirectResult(auth);
+  return normalizeFirebaseUser(result?.user || auth.currentUser);
 }
 
 export async function signInWithGoogle(redirectPath = "/profile") {
@@ -164,27 +131,20 @@ export async function signInWithGoogle(redirectPath = "/profile") {
 
   const safePath = redirectPath.startsWith("/") && !redirectPath.startsWith("//") ? redirectPath : "/profile";
   const redirectTo = new URL(safePath, window.location.origin).toString();
-  const authorizeUrl = new URL("/auth/v1/authorize", `${SUPABASE_URL}/`);
-  const codeVerifier = createPkceVerifier();
-  const codeChallenge = await createPkceChallenge(codeVerifier);
+  const auth = getFirebaseAuth();
+  const provider = new GoogleAuthProvider();
 
-  sessionStorage.setItem(PKCE_VERIFIER_KEY, codeVerifier);
-  authorizeUrl.searchParams.set("provider", "google");
-  authorizeUrl.searchParams.set("redirect_to", redirectTo);
-  authorizeUrl.searchParams.set("code_challenge", codeChallenge);
-  authorizeUrl.searchParams.set("code_challenge_method", "s256");
-
-  window.location.assign(authorizeUrl.toString());
+  provider.setCustomParameters({ prompt: "select_account" });
+  sessionStorage.setItem("psitherapy-auth-redirect", redirectTo);
+  window.history.replaceState({}, document.title, safePath);
+  await signInWithRedirect(auth, provider);
 }
 
-export async function getCurrentUser(session = getStoredSession()) {
-  if (!session?.access_token) return null;
-
-  return request("/auth/v1/user", {
-    accessToken: session.access_token,
-  });
+export async function getCurrentUser() {
+  return waitForFirebaseUser();
 }
 
 export function signOut() {
-  clearStoredSession();
+  if (!authEnv.isConfigured || !firebaseAuth) return;
+  void firebaseSignOut(firebaseAuth);
 }

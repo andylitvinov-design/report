@@ -34,33 +34,36 @@ The Vercel project should be connected to this repo and configured to deploy `ma
 
 ## Google Auth setup
 
-The first PsiTherapy cabinet layer uses Supabase Auth with Google OAuth.
+The first PsiTherapy cabinet layer uses Firebase Auth with Google OAuth.
 
 Required frontend env names:
 
 ```bash
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 VITE_ADMIN_EMAIL=
 ```
 
 Use `.env.example` as the local template. Do not commit real env values.
 
-Required Supabase Auth redirect URLs for production:
+Required Firebase authorized domains:
 
 ```text
-https://psitherapy.vercel.app/login
-https://psitherapy.vercel.app/profile
+psitherapy.vercel.app
+localhost
 ```
 
-For local development, also add:
+Firebase project setup and the Supabase-to-Firebase cutover checklist are in:
 
 ```text
-http://localhost:5173/login
-http://localhost:5173/profile
+docs/psitherapy-firebase-migration.md
 ```
 
-Google provider must be enabled in Supabase Auth, and the Supabase callback URL must be added to Google Cloud OAuth redirect URIs.
+Keep the old Supabase project active until Firebase production login is verified and the backup noted in the migration doc exists.
 
 ## Legacy GitHub Pages site
 

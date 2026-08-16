@@ -12,8 +12,6 @@ import {
   clearStoredSession,
   exchangeOAuthCodeFromUrl,
   getCurrentUser,
-  getStoredSession,
-  isStoredSessionExpired,
   signOut,
 } from "./lib/authClient.js";
 import { readAdvancedAiAnalysisResult } from "./lib/advancedAiAnalysisStorage.js";
@@ -730,16 +728,8 @@ export function CabinetAuthGate({ initialPage = "self" } = {}) {
       }
 
       try {
-        const session = await exchangeOAuthCodeFromUrl();
-        const storedSession = session || getStoredSession();
-
-        if (!storedSession?.access_token || isStoredSessionExpired(storedSession)) {
-          clearStoredSession();
-          if (isMounted) setAuthStatus("signed-out");
-          return;
-        }
-
-        const currentUser = await getCurrentUser(storedSession);
+        const redirectUser = await exchangeOAuthCodeFromUrl();
+        const currentUser = redirectUser || await getCurrentUser();
         if (!isMounted) return;
 
         if (!currentUser) {
