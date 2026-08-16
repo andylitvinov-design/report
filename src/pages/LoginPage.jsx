@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { authEnv, signInWithGoogle } from "../lib/authClient.js";
 
+const isDemoCabinetEnabled = import.meta.env.VITE_ENABLE_DEMO_CABINET === "true";
+
 export default function LoginPage() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
@@ -48,9 +50,11 @@ export default function LoginPage() {
             <button className="primary-btn auth-google-btn" type="button" onClick={handleGoogleLogin} disabled={status === "loading" || !authEnv.isConfigured}>
               {status === "loading" ? "Открываю Google…" : "Войти через Google"}
             </button>
-            <a className="auth-link" href="/demo">
-              Вернуться к демо отчёта
-            </a>
+            {isDemoCabinetEnabled && (
+              <a className="auth-link" href="/demo">
+                Вернуться к демо отчёта
+              </a>
+            )}
           </div>
         </div>
       </section>
