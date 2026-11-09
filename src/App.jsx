@@ -7,6 +7,7 @@ import ExpertAnalysis from "./pages/ExpertAnalysis.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import Recommendations from "./pages/Recommendations.jsx";
 import SelfAnalysis from "./pages/SelfAnalysis.jsx";
+import LifePlanPage from "./pages/LifePlanPage.jsx";
 import {
   authEnv,
   clearStoredSession,
@@ -811,7 +812,8 @@ function RoutedApp() {
       query.get("section") === "profile" ||
       query.get("tab") === "profile-now" ||
       query.get("tab") === "profile";
-    const initialPage = explicitSettings ? "settings" : explicitProfile ? "profile" : "self";
+    const explicitLifePlan = query.get("section") === "coaching-plan" || query.get("tab") === "life-plan";
+    const initialPage = explicitLifePlan ? "lifePlan" : explicitSettings ? "settings" : explicitProfile ? "profile" : "self";
     return demoMode ? <ReportApp forceDemo initialPage={initialPage} /> : <CabinetAuthGate initialPage={initialPage} />;
   }
 
@@ -1093,6 +1095,19 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
     if (activePage === "profile") {
       return <ClientStateProfile firstIntakeResult={firstIntakeResult} onStartSelfAnalysis={openFirstIntake} />;
     }
+
+    if (activePage === "lifePlan") {
+      return (
+        <LifePlanPage
+          client={clientOverride}
+          firstIntakeResult={firstIntakeResult}
+          advancedAiResult={advancedAiResult}
+          consultationReports={clientOverride?.consultationReports || []}
+          onStartIntake={openFirstIntake}
+          onOpenConsultations={() => handleNavigation("consultations")}
+        />
+      );
+    }
     if (activePage === "self") {
       if (selfAnalysisMode !== "form") {
         return (
@@ -1193,7 +1208,7 @@ export function ReportApp({ clientOverride = null, forceDemo = false, initialPag
       clientOverride={clientOverride}
       focusMode={isSelfAnalysisFocusMode || isAdvancedAnalysisFocusMode}
       hasCompletedResults={hasCompletedResults}
-      hideSpecialistPanel={["expert", "settings", "profile", "self", "consultations"].includes(activePage)}
+      hideSpecialistPanel={["expert", "settings", "profile", "lifePlan", "self", "consultations"].includes(activePage)}
       onPrimaryAction={!hasCompletedResults && ["overview", "expert"].includes(activePage) ? openFirstIntake : undefined}
       onOpenSettings={openSettings}
       onSelectAnalysis={handleSelectAnalysis}
