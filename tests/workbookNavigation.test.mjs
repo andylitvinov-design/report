@@ -42,6 +42,7 @@ describe("workbookNavigation", () => {
     assert.equal(findWorkbookCategoryByPage("advanced").id, "intake");
     assert.equal(findWorkbookCategoryByPage("consultations").id, "intake");
     assert.equal(findWorkbookCategoryByPage("profile").id, "profile");
+    assert.equal(findWorkbookCategoryByPage("lifePlan").id, "profile");
     assert.equal(findWorkbookCategoryByPage("history").id, "profile");
     assert.equal(findWorkbookCategoryByPage("settings").id, "profile");
     assert.equal(findWorkbookCategoryByPage("recommendations").id, "next-actions");
@@ -59,7 +60,7 @@ describe("workbookNavigation", () => {
 
     assert.deepEqual(
       findWorkbookCategoryByPage("profile").subnav.map((item) => item.label),
-      ["Сейчас", "Динамика", "Настройки"],
+      ["Сейчас", "My Coaching Plan", "Динамика", "Настройки"],
     );
   });
 });
