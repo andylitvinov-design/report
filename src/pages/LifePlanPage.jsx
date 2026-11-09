@@ -125,6 +125,7 @@ export default function LifePlanPage({
     return readLifePlan({ ownerId, email })?.sections || createEmptyLifePlanSections();
   });
   const [updatedAt, setUpdatedAt] = useState(() => readLifePlan({ ownerId, email })?.updatedAt || null);
+  const [hasSavedPlan, setHasSavedPlan] = useState(() => Boolean(readLifePlan({ ownerId, email })));
   const [view, setView] = useState("plan");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -135,7 +136,7 @@ export default function LifePlanPage({
   const reports = useMemo(() => makeReports({ firstIntakeResult, advancedAiResult, consultationReports }), [firstIntakeResult, advancedAiResult, consultationReports]);
   const hasContent = hasLifePlanContent(sections);
   const hasHistory = reports.length > 0;
-  const hasWorkspace = hasContent || hasHistory || editing;
+  const hasWorkspace = hasSavedPlan || hasContent || hasHistory || editing;
 
   const updateField = (sectionId, field, value) => {
     setSections((current) => ({
@@ -153,6 +154,7 @@ export default function LifePlanPage({
       const saved = saveLifePlan({ ownerId, email, sections });
       setSections(normalizeLifePlanSections(saved.sections));
       setUpdatedAt(saved.updatedAt);
+      setHasSavedPlan(true);
       setEditing(false);
       setNotice("План сохранён в этом браузере для вашего аккаунта.");
     } catch (error) {
