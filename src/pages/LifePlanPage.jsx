@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createEmptyLifePlanSections, hasLifePlanContent, normalizeLifePlanSections, readLifePlan, saveLifePlan } from "../lib/lifePlanStorage.js";
 
 const LIFE_AREAS = [
@@ -133,6 +133,22 @@ export default function LifePlanPage({
   const [noticeError, setNoticeError] = useState(false);
   const [reportFilter, setReportFilter] = useState("all");
   const [selectedReport, setSelectedReport] = useState(null);
+
+  // The cabinet may keep this page mounted while the authenticated client changes.
+  // Always re-hydrate account-partitioned data and clear transient UI state on owner changes.
+  useEffect(() => {
+    const saved = readLifePlan({ ownerId, email });
+    setSections(saved?.sections || createEmptyLifePlanSections());
+    setUpdatedAt(saved?.updatedAt || null);
+    setHasSavedPlan(Boolean(saved));
+    setView("plan");
+    setEditing(false);
+    setSelectedReport(null);
+    setReportFilter("all");
+    setNotice("");
+    setNoticeError(false);
+  }, [ownerId, email]);
+
   const reports = useMemo(() => makeReports({ firstIntakeResult, advancedAiResult, consultationReports }), [firstIntakeResult, advancedAiResult, consultationReports]);
   const hasContent = hasLifePlanContent(sections);
   const hasHistory = reports.length > 0;
