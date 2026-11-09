@@ -5804,3 +5804,65 @@ h3 {
     transition-duration: 1ms !important;
   }
 }
+
+
+/* My Coaching Plan */
+.life-plan-page { display:grid; gap:18px; max-width:1120px; margin:0 auto; }
+.life-plan-hero { padding:clamp(20px,3vw,32px); display:grid; gap:10px; }
+.life-plan-hero h2 { margin:0; font-size:clamp(24px,3vw,34px); }
+.life-plan-hero > p { max-width:780px; line-height:1.65; margin:0; }
+.life-plan-privacy { border-left:3px solid #9aa99d; padding:9px 12px; background:rgba(55,85,67,.05); color:#59665d; font-size:13px; line-height:1.5; }
+.life-plan-empty { padding:clamp(22px,4vw,38px); display:grid; gap:12px; }
+.life-plan-empty h2 { margin:0; font-size:clamp(23px,3vw,30px); }
+.life-plan-empty p { margin:0; line-height:1.65; max-width:760px; }
+.life-plan-empty-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.life-plan-toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.life-plan-tabs,.life-plan-filters { display:flex; gap:8px; flex-wrap:wrap; }
+.life-plan-area-list,.life-plan-report-list { display:grid; gap:12px; }
+.life-plan-area { padding:0; overflow:hidden; }
+.life-plan-area summary { list-style:none; display:flex; justify-content:space-between; align-items:center; gap:14px; cursor:pointer; padding:18px 20px; }
+.life-plan-area summary::-webkit-details-marker { display:none; }
+.life-plan-area summary > span:first-child { display:grid; gap:5px; }
+.life-plan-area summary small { color:var(--muted,#777); line-height:1.45; }
+.life-plan-area-status { color:var(--muted,#777); font-size:12px; flex-shrink:0; }
+.life-plan-area-status.filled { color:#2c704c; }
+.life-plan-area-body { display:grid; gap:12px; padding:0 20px 18px; }
+.life-plan-area-body label { display:grid; gap:6px; font-weight:600; }
+.life-plan-area-body textarea { width:100%; min-height:78px; padding:11px 12px; border:1px solid var(--border,#dedbd2); border-radius:12px; resize:vertical; font:inherit; font-weight:400; }
+.life-plan-area-preview { display:grid; gap:8px; }
+.life-plan-area-preview p { white-space:pre-wrap; margin:0; line-height:1.6; }
+.life-plan-journey { display:grid; gap:10px; margin:0 20px 18px; padding:16px; border:1px solid var(--border,#dedbd2); border-radius:14px; background:rgba(55,85,67,.035); }
+.life-plan-journey-step { display:grid; grid-template-columns:26px minmax(0,1fr); gap:10px; align-items:start; }
+.life-plan-journey-step > span { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:#344f42; color:white; font-size:12px; }
+.life-plan-journey-step > div { display:grid; gap:4px; }
+.life-plan-journey-step b { font-size:13px; font-weight:600; }
+.life-plan-journey-step p { margin:0; font-size:13px; color:var(--muted,#777); line-height:1.5; }
+.life-plan-journey > small { color:var(--muted,#777); line-height:1.5; }
+.life-plan-inline-button { padding:0; border:0; background:none; cursor:pointer; text-align:left; }
+.life-plan-save-row { display:flex; justify-content:flex-end; }
+.life-plan-updated { color:var(--muted,#777); font-size:12px; margin:0; text-align:right; }
+.life-plan-reports { display:grid; gap:14px; }
+.life-plan-report { display:grid; gap:9px; }
+.life-plan-report h3,.life-plan-report p { margin:0; }
+.life-plan-report p { line-height:1.55; }
+.life-plan-report-meta { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--muted,#777); }
+.life-plan-type { padding:5px 9px; border-radius:999px; background:rgba(55,85,67,.08); color:#344f42; }
+.life-plan-report-source { font-size:13px; color:var(--muted,#777); }
+.life-plan-empty-report { padding:22px; }
+.life-plan-empty-report h3 { margin-top:0; }
+.life-plan-modal-backdrop { position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:20px; background:rgba(20,28,24,.48); }
+.life-plan-report-modal { width:min(560px,100%); display:grid; gap:12px; padding:24px; }
+.life-plan-report-modal h3,.life-plan-report-modal p { margin:0; line-height:1.6; }
+.life-plan-modal-close { justify-self:end; border:0; background:transparent; color:inherit; text-decoration:underline; cursor:pointer; }
+@media(max-width:700px) {
+ .life-plan-toolbar { align-items:stretch; }
+ .life-plan-tabs,.life-plan-filters { display:grid; grid-template-columns:1fr; }
+ .life-plan-toolbar > button { width:100%; }
+ .life-plan-empty-actions { display:grid; grid-template-columns:1fr; }
+ .life-plan-empty-actions > * { width:100%; text-align:center; }
+ .life-plan-area summary { align-items:flex-start; flex-direction:column; padding:16px; }
+ .life-plan-area-body { padding:0 16px 16px; }
+ .life-plan-journey { margin:0 12px 12px; padding:13px; }
+ .life-plan-journey > button { width:100%; text-align:center; }
+ .life-plan-save-row .primary-btn { width:100%; }
+}

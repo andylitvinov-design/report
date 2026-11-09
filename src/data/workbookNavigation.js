@@ -15,9 +15,10 @@ export const workbookNavigation = [
     label: "Профиль",
     shortLabel: "Профиль",
     page: "profile",
-    pages: ["profile", "history", "settings"],
+    pages: ["profile", "lifePlan", "history", "settings"],
     subnav: [
       { id: "profile-now", label: "Сейчас", page: "profile", tab: "profile-now" },
+      { id: "life-plan", label: "My Coaching Plan", page: "lifePlan", tab: "life-plan" },
       { id: "profile-dynamics", label: "Динамика", page: "history", tab: "Динамика замеров" },
       { id: "profile-settings", label: "Настройки", page: "settings", tab: "settings" },
     ],
