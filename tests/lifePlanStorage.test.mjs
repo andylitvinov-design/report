@@ -77,3 +77,12 @@ test("My Coaching Plan is linked from the Profile navigation and authenticated r
   assert.match(page, /clientVisible === false/);
   assert.match(page, /не передаются специалистам автоматически/);
 });
+
+test("life plan rehydrates and clears transient report state when the signed-in owner changes", () => {
+  const page = readFileSync(new URL("../src/pages/LifePlanPage.jsx", import.meta.url), "utf8");
+  assert.match(page, /useEffect\(\(\) => \{/);
+  assert.match(page, /readLifePlan\(\{ ownerId, email \}\)/);
+  assert.match(page, /setSections\(saved\?\.sections \|\| createEmptyLifePlanSections\(\)\)/);
+  assert.match(page, /setSelectedReport\(null\)/);
+  assert.match(page, /\}, \[ownerId, email\]\)/);
+});
