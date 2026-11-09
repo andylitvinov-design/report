@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
 import {
   createEmptyLifePlanSections,
   getLifePlanStorageKey,
@@ -61,4 +62,18 @@ test("corrupted plan storage safely returns an empty result", () => {
   const storage = memoryStorage();
   storage.setItem(getLifePlanStorageKey("user-a"), "{bad json");
   assert.equal(readLifePlan({ ownerId: "user-a", storage }), null);
+});
+
+test("My Coaching Plan is linked from the Profile navigation and authenticated route", () => {
+  const navigation = readFileSync(new URL("../src/data/workbookNavigation.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const page = readFileSync(new URL("../src/pages/LifePlanPage.jsx", import.meta.url), "utf8");
+  assert.match(navigation, /label: "My Coaching Plan", page: "lifePlan"/);
+  assert.match(navigation, /pages: \["profile", "lifePlan", "history", "settings"\]/);
+  assert.match(app, /query\.get\("section"\) === "coaching-plan"/);
+  assert.match(app, /activePage === "lifePlan"/);
+  assert.match(page, /Отчёты и консультации/);
+  assert.match(page, /Возможная последовательность встреч/);
+  assert.match(page, /clientVisible === false/);
+  assert.match(page, /не передаются специалистам автоматически/);
 });
